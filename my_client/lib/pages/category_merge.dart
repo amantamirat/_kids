@@ -56,7 +56,7 @@ class CategoryMerge extends StatelessWidget {
                       decoration: const InputDecoration(
                           hintText: "Category Description")),
                 ),
-                const ImagePickerHandler(),
+                ImagePickerHandler(currentImage: selectedImage()),
                 const SizedBox(
                   height: 20,
                 ),
@@ -86,7 +86,7 @@ class CategoryMerge extends StatelessWidget {
     return controller;
   }
 
-  Widget selectedImage() {
+  Image selectedImage() {
     Image img = Config.NoImagePlaceHolder;
     if (category != null) {
       img = Image.network(
@@ -96,112 +96,30 @@ class CategoryMerge extends StatelessWidget {
         fit: BoxFit.fill,
       );
     }
-    return SizedBox(child: img);
-  }
-
-  Widget imagePicker() {
-    Future<XFile?> imageFile;
-    ImagePicker picker = ImagePicker();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        SizedBox(
-          height: 35.0,
-          width: 35.0,
-          child: IconButton(
-            padding: const EdgeInsets.all(0),
-            icon: const Icon(Icons.image, size: 35.0),
-            onPressed: () {
-              imageFile = picker.pickImage(source: ImageSource.gallery);
-            },
-          ),
-        ),
-        SizedBox(
-          height: 35.0,
-          width: 35.0,
-          child: IconButton(
-            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-            icon: const Icon(Icons.camera, size: 35.0),
-            onPressed: () {
-              imageFile = picker.pickImage(source: ImageSource.camera);
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  static Widget picPicker(bool isImageSelected, String fileName) {
-    Future<XFile?> imageFile;
-    ImagePicker picker = ImagePicker();
-    return Column(
-      children: [
-        fileName.isNotEmpty
-            ? isImageSelected
-                ? Image.file(
-                    File(fileName),
-                    width: 300,
-                    height: 300,
-                  )
-                : SizedBox(
-                    child: Image.network(
-                      fileName,
-                      width: 200,
-                      height: 200,
-                      fit: BoxFit.scaleDown,
-                    ),
-                  )
-            : SizedBox(
-                child: Image.asset("assets/images/No-Image-Placeholder.svg.png",
-                    width: 200, height: 200, fit: BoxFit.scaleDown),
-              ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              height: 35.0,
-              width: 35.0,
-              child: IconButton(
-                padding: const EdgeInsets.all(0),
-                icon: const Icon(Icons.image, size: 35.0),
-                onPressed: () {
-                  imageFile = picker.pickImage(source: ImageSource.gallery);
-                },
-              ),
-            ),
-            SizedBox(
-              height: 35.0,
-              width: 35.0,
-              child: IconButton(
-                padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                icon: const Icon(Icons.camera, size: 35.0),
-                onPressed: () {
-                  imageFile = picker.pickImage(source: ImageSource.camera);
-                },
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+    return img;
   }
 }
 
 class ImagePickerHandler extends StatefulWidget {
-  const ImagePickerHandler({super.key});
+  final Image currentImage;
+  const ImagePickerHandler({Key? key, required this.currentImage})
+      : super(key: key);
   @override
   State<ImagePickerHandler> createState() => _ImagePickerHandler();
 }
 
 class _ImagePickerHandler extends State<ImagePickerHandler> {
+  File? _image;
   ImagePicker picker = ImagePicker();
 
   @override
   Widget build(BuildContext context) {
-    Future<XFile?> imageFile;
     return Column(
       children: [
-        SizedBox(child: Config.NoImagePlaceHolder),
+        SizedBox(
+            child: _image != null
+                ? Image.file(_image!, fit: BoxFit.cover)
+                : widget.currentImage),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -211,8 +129,14 @@ class _ImagePickerHandler extends State<ImagePickerHandler> {
               child: IconButton(
                 padding: const EdgeInsets.all(0),
                 icon: const Icon(Icons.image, size: 35.0),
-                onPressed: () {
-                  imageFile = picker.pickImage(source: ImageSource.gallery);
+                onPressed: () async {
+                  final XFile? pickedImage =
+                      await picker.pickImage(source: ImageSource.gallery);
+                  if (pickedImage != null) {
+                    setState(() {
+                      _image = File(pickedImage.path);
+                    });
+                  }
                 },
               ),
             ),
@@ -222,8 +146,14 @@ class _ImagePickerHandler extends State<ImagePickerHandler> {
               child: IconButton(
                 padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
                 icon: const Icon(Icons.camera, size: 35.0),
-                onPressed: () {
-                  imageFile = picker.pickImage(source: ImageSource.camera);
+                onPressed: () async {
+                  final XFile? pickedImage =
+                      await picker.pickImage(source: ImageSource.camera);
+                  if (pickedImage != null) {
+                    setState(() {
+                      _image = File(pickedImage.path);
+                    });
+                  }
                 },
               ),
             ),
