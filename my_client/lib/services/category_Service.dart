@@ -28,7 +28,5 @@ class CategoryService {
     }
   }
 
-  static String getFullImageURL(String cat_title) {
-    return 'http://${Config.apiURL}/files${cat_title}';
-  }
+  
 }

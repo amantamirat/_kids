@@ -1,26 +1,34 @@
 import 'dart:io';
 import 'package:abdu_kids/model/category.dart';
-import 'package:abdu_kids/services/category_Service.dart';
-import 'package:abdu_kids/util/config.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class CategoryMerge extends StatelessWidget {
-  final Category? category;
+class CategoryMerge extends StatefulWidget {
+  final bool editMode;
+  final Category selectedCategory;
+  const CategoryMerge(
+      {Key? key, required this.editMode, required this.selectedCategory})
+      : super(key: key);
+  @override
+  State<CategoryMerge> createState() => _CategoryMerge();
+}
+
+class _CategoryMerge extends State<CategoryMerge> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
-  CategoryMerge({super.key, this.category});
-
   @override
   Widget build(BuildContext context) {
+    String appBarTitle = "Add Category";
+    if (widget.editMode) {
+      _titleController.text = widget.selectedCategory.title ?? '';
+      _descriptionController.text = widget.selectedCategory.description ?? '';
+      appBarTitle = "Edit Category";
+    }
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(
-          title: category != null
-              ? const Text('Edit Category')
-              : const Text('Add Category')),
+      appBar: AppBar(title: Text(appBarTitle)),
       body: Form(key: globalFormKey, child: categoryForm()),
     ));
   }
@@ -40,7 +48,7 @@ class CategoryMerge extends StatelessWidget {
                     top: 10,
                   ),
                   child: TextField(
-                      controller: refreshController(_titleController),
+                      controller: _titleController,
                       decoration:
                           const InputDecoration(hintText: "Category Title")),
                 ),
@@ -51,12 +59,12 @@ class CategoryMerge extends StatelessWidget {
                   ),
                   child: TextField(
                       maxLines: null,
-                      controller: refreshController(_descriptionController),
+                      controller: _descriptionController,
                       keyboardType: TextInputType.multiline,
                       decoration: const InputDecoration(
                           hintText: "Category Description")),
                 ),
-                ImagePickerHandler(currentImage: selectedImage()),
+                imagePicker(),
                 const SizedBox(
                   height: 20,
                 ),
@@ -75,51 +83,27 @@ class CategoryMerge extends StatelessWidget {
     );
   }
 
-  TextEditingController refreshController(TextEditingController controller) {
-    if (category != null) {
-      if (controller == _titleController) {
-        controller.text = category?.title ?? '';
-      } else if (controller == _descriptionController) {
-        controller.text = category?.description ?? '';
-      }
-    }
-    return controller;
-  }
-
-  Image selectedImage() {
-    Image img = Config.NoImagePlaceHolder;
-    if (category != null) {
-      img = Image.network(
-        CategoryService.getFullImageURL('${category!.imageURL}'),
-        width: 200,
-        height: 200,
-        fit: BoxFit.fill,
-      );
-    }
-    return img;
-  }
-}
-
-class ImagePickerHandler extends StatefulWidget {
-  final Image currentImage;
-  const ImagePickerHandler({Key? key, required this.currentImage})
-      : super(key: key);
-  @override
-  State<ImagePickerHandler> createState() => _ImagePickerHandler();
-}
-
-class _ImagePickerHandler extends State<ImagePickerHandler> {
   File? _image;
   ImagePicker picker = ImagePicker();
 
-  @override
-  Widget build(BuildContext context) {
+  Widget imagePicker() {
     return Column(
       children: [
         SizedBox(
             child: _image != null
-                ? Image.file(_image!, fit: BoxFit.cover)
-                : widget.currentImage),
+                ? Image.file(_image!, width: 200, height: 200)
+                : widget.editMode
+                    ? Image.network(
+                        widget.selectedCategory.getFullImageURL(),
+                        width: 200,
+                        height: 200,
+                        fit: BoxFit.fill,
+                      )
+                    : Image.asset(
+                        "assets/images/No-Image-Placeholder.svg.png",
+                        width: 200,
+                        height: 200,
+                      )),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

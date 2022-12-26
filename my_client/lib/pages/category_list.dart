@@ -65,9 +65,7 @@ class _CategoryListState extends State<CategoryList> {
                 child: ListTile(
                   title: Center(child: Text('${categories[index].title}')),
                   leading: CircleAvatar(
-                      backgroundImage: NetworkImage(
-                          CategoryService.getFullImageURL(
-                              '${categories[index].imageURL}'))),
+                      backgroundImage: NetworkImage(categories[index].getFullImageURL())),
                   trailing: SizedBox(
                     width: MediaQuery.of(context).size.width - 180,
                     child: Row(

@@ -26,14 +26,16 @@ final GoRouter _router = GoRouter(
             GoRoute(
               path: 'categories/add_category',
               name: 'add_category',
-              builder: (context, state) => CategoryMerge(),
+              builder: (context, state) =>
+                  CategoryMerge(editMode: false, selectedCategory: Category()),
             ),
             GoRoute(
                 path: 'categories/edit_category',
                 name: 'edit_category',
                 builder: (context, state) {
                   Category category = state.extra as Category;
-                  return CategoryMerge(category: category);
+                  return CategoryMerge(
+                      editMode: true, selectedCategory: category);
                 }),
           ],
         ),
