@@ -2,6 +2,8 @@ const express = require("express");
 
 const Category = require("../models/Category");
 
+const upload = require("../middlewares/upload.js");
+
 const router = express.Router();
 
 router.get("/", async (req, res) => {
@@ -25,21 +27,63 @@ router.get("/:id", getCategory, (req, res) => {
 });
 
 router.post("/new", async (req, res) => {
-  const category = new Category(req.body);
-  try {
-    await category.save();
-    res.status(201).json({
-      status: "Success",
-      data: {
-        category,
-      },
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "Failed to create category",
-      message: err,
-    });
-  }
+  console.log(req);
+  upload(req, res, async function (err) {
+    if (err) {
+      next(err);
+    } else {
+      const path =
+        req.file != undefined ? req.file.path.replace(/\\/g, "/") : "";
+
+      const category = new Category({
+        title: req.body.title,
+        description: req.body.description,
+        image_url: path
+      });
+      try {
+        await category.save();
+        res.status(201).json({
+          status: "Success",
+          data: {
+            category,
+          },
+        });
+      } catch (err) {
+        res.status(500).json({
+          status: "Failed to create category",
+          message: err,
+        });
+      }
+
+
+      /*
+            const url = req.protocol + "://" + req.get("host");
+      
+            const path =
+              req.file != undefined ? req.file.path.replace(/\\/g, "/") : "";
+      
+            var model = {
+              title: req.body.title,
+              description: req.body.description,
+            };
+      
+            productsServices.createProduct(model, (error, results) => {
+              if (error) {
+                return next(error);
+              }
+              return res.status(200).send({
+                message: "Success",
+                data: results,
+              });
+            });
+      */
+
+    }
+  });
+
+  /*
+  */
+
 });
 
 router.patch("/update/:id", async (req, res) => {
@@ -98,9 +142,9 @@ async function init() {
   let categories = await Category.find({});
   if (categories.length === 0) {
     categories = [
-      { title: "Boys", description: "a collection of clothes of boys ....", cat_image_url: "/catImages/boys.jpg" },
-      { title: "Girls", description: "a collection of clothes of girls including tights, skirts ....", cat_image_url: "/catImages/girls.jpg" },
-      { title: "Babies", description: "a collection of clothes of babies ....", cat_image_url: "/catImages/babies.jpg" }
+      { title: "Boys", description: "a collection of clothes of boys ....", image_url: "/catImages/boys.jpg" },
+      { title: "Girls", description: "a collection of clothes of girls including tights, skirts ....", image_url: "/catImages/girls.jpg" },
+      { title: "Babies", description: "a collection of clothes of babies ....", image_url: "/catImages/babies.jpg" }
     ];
     await Category.insertMany(categories);
   }

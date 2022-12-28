@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:abdu_kids/model/category.dart';
+import 'package:abdu_kids/services/category_Service.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 
 class CategoryMerge extends StatefulWidget {
@@ -70,10 +72,23 @@ class _CategoryMerge extends State<CategoryMerge> {
                 ),
                 ElevatedButton(
                     child: const Text("Save"),
-                    onPressed: () {
-                      final category = Category(
-                          title: _titleController.text,
-                          description: _descriptionController.text);
+                    onPressed: () async {
+                      if (validateAndSave()) {
+                        final category = Category(
+                            title: _titleController.text,
+                            description: _descriptionController.text,
+                            imageURL: _image!.path);
+                        if (await CategoryService.saveCategory(
+                            category, widget.editMode, _isImageSelected)) {
+                          Fluttertoast.showToast(
+                              msg: 'Thisistoastnotification',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.yellow);
+                        }
+                      }
                     }),
               ],
             ),
@@ -83,21 +98,36 @@ class _CategoryMerge extends State<CategoryMerge> {
     );
   }
 
+  bool validateAndSave() {
+    final form = globalFormKey.currentState;
+    if (form!.validate()) {
+      form.save();
+      return true;
+    }
+    return false;
+  }
+
   File? _image;
-  ImagePicker picker = ImagePicker();
+  final ImagePicker _picker = ImagePicker();
+  bool _isImageSelected = false;
 
   Widget imagePicker() {
     return Column(
       children: [
         SizedBox(
             child: _image != null
-                ? Image.file(_image!, width: 200, height: 200)
+                ? Image.file(
+                    _image!,
+                    width: 200,
+                    height: 200,
+                    fit: BoxFit.scaleDown,
+                  )
                 : widget.editMode
                     ? Image.network(
                         widget.selectedCategory.getFullImageURL(),
                         width: 200,
                         height: 200,
-                        fit: BoxFit.fill,
+                        fit: BoxFit.scaleDown,
                       )
                     : Image.asset(
                         "assets/images/No-Image-Placeholder.svg.png",
@@ -115,10 +145,15 @@ class _CategoryMerge extends State<CategoryMerge> {
                 icon: const Icon(Icons.image, size: 35.0),
                 onPressed: () async {
                   final XFile? pickedImage =
-                      await picker.pickImage(source: ImageSource.gallery);
+                      await _picker.pickImage(source: ImageSource.gallery);
                   if (pickedImage != null) {
                     setState(() {
                       _image = File(pickedImage.path);
+                      if (_image != null) {
+                        _isImageSelected = true;
+                      } else {
+                        _isImageSelected = false;
+                      }
                     });
                   }
                 },
@@ -132,10 +167,15 @@ class _CategoryMerge extends State<CategoryMerge> {
                 icon: const Icon(Icons.camera, size: 35.0),
                 onPressed: () async {
                   final XFile? pickedImage =
-                      await picker.pickImage(source: ImageSource.camera);
+                      await _picker.pickImage(source: ImageSource.camera);
                   if (pickedImage != null) {
                     setState(() {
                       _image = File(pickedImage.path);
+                      if (_image != null) {
+                        _isImageSelected = true;
+                      } else {
+                        _isImageSelected = false;
+                      }
                     });
                   }
                 },

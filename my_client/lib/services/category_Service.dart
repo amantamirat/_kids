@@ -28,5 +28,37 @@ class CategoryService {
     }
   }
 
-  
+  static Future<bool> saveCategory(
+      Category category, bool isEditMode, bool isFileSelected) async {
+    var categoryURL = Config.catagoryURL;
+    var requestMethod = "POST";
+    if (isEditMode) {
+      categoryURL = categoryURL + "/update/" + category.id.toString();
+      requestMethod = "PUT";
+    } else {
+      categoryURL = categoryURL + "/new";
+    }
+    var url = Uri.http(Config.apiURL, categoryURL);
+    var request = http.MultipartRequest(requestMethod, url);
+    request.fields[Category.attributeTitle] = category.title!;
+    request.fields[Category.attributeDescription] = category.description!;
+
+    if (category.imageURL != null && isFileSelected) {
+      http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
+        'images',
+        category.imageURL!,
+      );
+      request.files.add(multipartFile);
+    }
+
+    var response = await request.send();
+
+    print(response.statusCode);
+
+    if (response.statusCode == 201) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
