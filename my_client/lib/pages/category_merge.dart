@@ -74,12 +74,12 @@ class _CategoryMerge extends State<CategoryMerge> {
                     child: const Text("Save"),
                     onPressed: () async {
                       if (validateAndSave()) {
-                        final category = Category(
-                            title: _titleController.text,
-                            description: _descriptionController.text,
-                            imageURL: _image!.path);
+                        final category = widget.selectedCategory;
+                        category.title = _titleController.text;
+                        category.description = _descriptionController.text;                       
+
                         if (await CategoryService.saveCategory(
-                            category, widget.editMode, _isImageSelected)) {
+                            category, widget.editMode, _isImageSelected ? _image!.path : null)) {
                           Fluttertoast.showToast(
                               msg: 'Thisistoastnotification',
                               toastLength: Toast.LENGTH_SHORT,
@@ -124,7 +124,7 @@ class _CategoryMerge extends State<CategoryMerge> {
                   )
                 : widget.editMode
                     ? Image.network(
-                        widget.selectedCategory.getFullImageURL(),
+                        widget.selectedCategory.getImageURL(),
                         width: 200,
                         height: 200,
                         fit: BoxFit.scaleDown,

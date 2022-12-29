@@ -4,22 +4,18 @@ import 'dart:convert';
 import '../util/config.dart';
 
 class CategoryService {
+  
   static var client = http.Client();
 
   static Future<List<Category>?> getCategories() async {
-    Map<String, String> requestHeaders = {
-      'Content-Type': 'application/json',
-    };
     var url = Uri.http(
       Config.apiURL,
-      Config.catagoryURL,
+      Category.pathURL,
     );
-
     var response = await client.get(
       url,
-      headers: requestHeaders,
+      headers: Config.requestHeaders,
     );
-
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
       return categoriesFromJson(data["categories"]);
@@ -28,37 +24,43 @@ class CategoryService {
     }
   }
 
+  static Future<http.StreamedResponse> uploadImage(
+      String id, String imagePath) async {
+    var request = http.MultipartRequest(
+        "PUT", Uri.http("http://${Config.apiURL}/upload/$id"));
+    http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
+      "image",
+      imagePath,
+    );
+    request.files.add(multipartFile);
+    return request.send();
+  }
+
   static Future<bool> saveCategory(
-      Category category, bool isEditMode, bool isFileSelected) async {
-    var categoryURL = Config.catagoryURL;
-    var requestMethod = "POST";
+      Category category, bool isEditMode, String? selectedImagePath) async {
+    String url = "http://${Config.apiURL}${Category.pathURL}";
+    var response = http.Response("{}", 400);
     if (isEditMode) {
-      categoryURL = categoryURL + "/update/" + category.id.toString();
-      requestMethod = "PUT";
-    } else {
-      categoryURL = categoryURL + "/new";
-    }
-    var url = Uri.http(Config.apiURL, categoryURL);
-    var request = http.MultipartRequest(requestMethod, url);
-    request.fields[Category.attributeTitle] = category.title!;
-    request.fields[Category.attributeDescription] = category.description!;
-
-    if (category.imageURL != null && isFileSelected) {
-      http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
-        'images',
-        category.imageURL!,
+      url = "$url/update/${category.id}";
+      response = await http.patch(
+        Uri.parse(url),
+        headers: Config.requestHeaders,
+        body: jsonEncode(category.toJson()),
       );
-      request.files.add(multipartFile);
-    }
-
-    var response = await request.send();
-
-    print(response.statusCode);
-
-    if (response.statusCode == 201) {
-      return true;
     } else {
+      url = "$url/new";
+      response = await http.post(
+        Uri.parse(url),
+        headers: Config.requestHeaders,
+        body: jsonEncode(category.toJson()),
+      );
+    }
+    if (response.statusCode != 201) {
       return false;
     }
+    if (selectedImagePath != null) {
+      uploadImage(category.id!, selectedImagePath);
+    }
+    return true;
   }
 }
