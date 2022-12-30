@@ -1,13 +1,25 @@
 import 'package:abdu_kids/util/preference_util.dart';
 
 class Configuration {
+  
   static const String appName = "abdu_kids";
-  static const String apiURL = "http://10.194.49.20:8080";
+
   static const Map<String, String> requestHeaders = {
     'Content-Type': 'application/json',
   };
+
+  static String apiURL = "${protocol()}://${hostName()}:${portNumber()}";
   static String imageFileURL = "$apiURL/files";
 
-  static final someString =
-      SharedPrefs.instance.getString('hostname') ?? 'localhost';
+  static String protocol() {
+    return SharedPrefs.instance.getString(SharedPrefs.keyProtocol) ?? 'http';
+  }
+
+  static String hostName() {
+    return SharedPrefs.instance.getString(SharedPrefs.keyHostAddress) ?? 'localhost';
+  }
+
+  static int portNumber() {
+    return SharedPrefs.instance.getInt(SharedPrefs.keyPortNumber) ?? 8080;
+  }
 }

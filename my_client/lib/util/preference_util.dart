@@ -9,4 +9,5 @@ class SharedPrefs {
 
   static Future<SharedPreferences> init() async =>
       instance = await SharedPreferences.getInstance();
+
 }

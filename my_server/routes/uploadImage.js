@@ -4,27 +4,40 @@ const fs = require('fs');
 const router = express.Router();
 
 router.put("/:id", async (req, res) => {
-    let exists = fs.existsSync('../files/' + req.params.id);
-    if (exists) {
-        fs.rename('files/' + req.params.id, 'files/' + req.params.id + '_2');
-    }
     upload(req, res, async function (err) {
         if (err) {
-            if (exists) {
-                fs.rename('files/' + req.params.id + "_2", 'files/' + req.params.id);
-            }
             console.log(err);
         } else {
-            if (exists) {
-                fs.unlink('files/' + req.params.id + "_2", (err) => {
-                    if (err) {
-                        throw err;
-                    }
-                });
-            }
+            res.status(201).json({
+                status: "Success",
+                data: "Image uploaded",
+            });
         }
     });
 
+});
+
+router.delete("/remove/:id", async (req, res) => {
+    let path = 'files/' + req.params.id;
+    let exists = fs.existsSync(path);
+    if (exists) {
+        fs.unlink(path, (err) => {
+            if (err) {
+                throw err;
+            }
+            else {
+                res.status(201).json({
+                    status: "Success",
+                    msg: "Removed",
+                });
+            }
+        });
+    } else {
+        res.status(404).json({
+            status: "Success",
+            data: "Not Found!",
+        });
+    }
 });
 
 module.exports = router;

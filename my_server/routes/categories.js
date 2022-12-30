@@ -5,6 +5,7 @@ const fs = require('fs');
 const router = express.Router();
 
 router.get("/", async (req, res) => {
+  //console.log("Request recieved");
   const categories = await Category.find({});
   await init(categories.length);
   try {
@@ -45,6 +46,7 @@ router.post('/new', async (req, res) => {
 
 
 router.patch("/update/:id", async (req, res) => {
+  //console.log("Request recieved => category update "+req.params.id)
   try {
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
@@ -67,6 +69,7 @@ router.patch("/update/:id", async (req, res) => {
 });
 
 router.delete("/delete/:id", async (req, res) => {
+  //console.log("delete requested");
   await Category.findByIdAndDelete(req.params.id);
   try {
     res.status(204).json({

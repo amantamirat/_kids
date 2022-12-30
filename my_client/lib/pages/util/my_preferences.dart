@@ -80,9 +80,6 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
                   _protocolController.text = snapshot.data![0];
                   _hostAddressController.text = snapshot.data![1];
                   _portNumberController.text = "${snapshot.data![2]}";
-                  print(snapshot.data![0]);
-                  print(snapshot.data![1]);
-                  print(snapshot.data![2]);
                   return myForm();
                 }
             }

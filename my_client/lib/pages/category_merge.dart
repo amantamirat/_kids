@@ -4,6 +4,7 @@ import 'package:abdu_kids/services/category_Service.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:go_router/go_router.dart';
 
 class CategoryMerge extends StatefulWidget {
   final bool editMode;
@@ -88,11 +89,10 @@ class _CategoryMerge extends State<CategoryMerge> {
                         category.title = _titleController.text;
                         category.description = _descriptionController.text;
 
-                        ScaffoldMessenger.of(context).showSnackBar(
+                        /*ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text('Processing Request...')),
-                        );
-
+                        );*/
                         if (await CategoryService.saveCategory(
                             category,
                             widget.editMode,
@@ -104,6 +104,7 @@ class _CategoryMerge extends State<CategoryMerge> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.yellow);
+                              context.pop();
                         }
                       }
                     }),

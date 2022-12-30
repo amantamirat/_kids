@@ -1,11 +1,10 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/services/category_Service.dart';
-import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class CategoryList extends StatefulWidget {
-  
   const CategoryList({super.key});
 
   @override
@@ -13,9 +12,12 @@ class CategoryList extends StatefulWidget {
 }
 
 class _CategoryListState extends State<CategoryList> {
+  Future<List<Category>?>? categoriesList;
+
   @override
   void initState() {
     super.initState();
+    categoriesList = CategoryService.getCategories();
   }
 
   @override
@@ -27,30 +29,38 @@ class _CategoryListState extends State<CategoryList> {
       ),
       backgroundColor: Colors.grey[200],
       body: loadCategories(),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.goNamed('add_category');
         },
         backgroundColor: Colors.green,
-        label: const Text("Add Category"),
-        icon: const Icon(Icons.add),
+        tooltip: 'Apply Changes',
+        child: const Icon(Icons.add),
       ),
     );
   }
 
   Widget loadCategories() {
     return FutureBuilder(
-      future: CategoryService.getCategories(),
+      future: categoriesList,
       builder: (
         BuildContext context,
-        AsyncSnapshot<List<Category>?> model,
+        AsyncSnapshot<List<Category>?> snapshot,
       ) {
-        if (model.hasData) {
-          return displayCategories(model.data);
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          default:
+            if (snapshot.hasError) {
+              return Center(
+                child: Text('Error: ${snapshot.error}'),
+              );
+            } else {
+              return displayCategories(snapshot.data);
+            }
         }
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
       },
     );
   }
@@ -58,25 +68,37 @@ class _CategoryListState extends State<CategoryList> {
   Widget displayCategories(categories) {
     return categories.isNotEmpty
         ? ListView.separated(
+            shrinkWrap: true,
+            physics: const ClampingScrollPhysics(),
+            scrollDirection: Axis.vertical,
             padding: const EdgeInsets.all(8),
             itemCount: categories.length,
             itemBuilder: (BuildContext context, int index) {
               return Container(
-                height: 50,
                 color: Colors.amber[index * 10],
                 child: ListTile(
-                  title: Center(child: Text('${categories[index].title}')),
+                  title: Center(
+                      child: Text(
+                    "${categories[index].title}",
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  )),
+                  subtitle: Text("${categories[index].description}"),
                   leading: CircleAvatar(
-                      backgroundImage: NetworkImage(categories[index].getImageURL())),
+                      backgroundImage:
+                          NetworkImage(categories[index].getImageURL())),
                   trailing: SizedBox(
-                    width: MediaQuery.of(context).size.width - 180,
+                    width: MediaQuery.of(context).size.width / 4,
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         GestureDetector(
                           child: const Icon(Icons.edit),
-                          onTap: () {                                                       
-                            context.goNamed('edit_category', extra: categories[index]);
+                          onTap: () {
+                            context.goNamed('edit_category',
+                                extra: categories[index]);
                           },
                         ),
                         GestureDetector(
@@ -85,7 +107,39 @@ class _CategoryListState extends State<CategoryList> {
                             color: Colors.red,
                           ),
                           onTap: () {
-                            Navigator.pop(context);
+                            showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title: const Text('Delete Category'),
+                                content: const Text('Are you sure, proceed?'),
+                                actions: <Widget>[
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.pop(context, 'Cancel'),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  TextButton(
+                                    onPressed: () async {
+                                      if (await CategoryService.deleteCategory(
+                                          categories[index].id)) {
+                                        Fluttertoast.showToast(
+                                            msg: 'Removed!',
+                                            toastLength: Toast.LENGTH_SHORT,
+                                            gravity: ToastGravity.BOTTOM,
+                                            timeInSecForIosWeb: 1,
+                                            backgroundColor: Colors.red,
+                                            textColor: Colors.yellow);
+                                        setState(() {
+                                          
+                                        });
+                                        context.pop();
+                                      }
+                                    },
+                                    child: const Text('Yes'),
+                                  ),
+                                ],
+                              ),
+                            );
                           },
                         ),
                       ],
