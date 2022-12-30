@@ -1,11 +1,15 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/pages/category_list.dart';
 import 'package:abdu_kids/pages/category_merge.dart';
+import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:abdu_kids/pages/util/my_preferences.dart';
 import 'package:go_router/go_router.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Initialize SharedPrefs instance.
+  await SharedPrefs.init();
   runApp(const MyApp());
 }
 

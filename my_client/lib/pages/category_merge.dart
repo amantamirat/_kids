@@ -19,6 +19,9 @@ class _CategoryMerge extends State<CategoryMerge> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+  File? _image;
+  final ImagePicker _picker = ImagePicker();
+  bool _isImageSelected = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,17 +52,24 @@ class _CategoryMerge extends State<CategoryMerge> {
                     bottom: 10,
                     top: 10,
                   ),
-                  child: TextField(
-                      controller: _titleController,
-                      decoration:
-                          const InputDecoration(hintText: "Category Title")),
+                  child: TextFormField(
+                    controller: _titleController,
+                    decoration:
+                        const InputDecoration(hintText: "Category Title"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter category title';
+                      }
+                      return null;
+                    },
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
                     top: 10,
                   ),
-                  child: TextField(
+                  child: TextFormField(
                       maxLines: null,
                       controller: _descriptionController,
                       keyboardType: TextInputType.multiline,
@@ -73,15 +83,22 @@ class _CategoryMerge extends State<CategoryMerge> {
                 ElevatedButton(
                     child: const Text("Save"),
                     onPressed: () async {
-                      if (validateAndSave()) {
+                      if (globalFormKey.currentState!.validate()) {
                         final category = widget.selectedCategory;
                         category.title = _titleController.text;
-                        category.description = _descriptionController.text;                       
+                        category.description = _descriptionController.text;
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text('Processing Request...')),
+                        );
 
                         if (await CategoryService.saveCategory(
-                            category, widget.editMode, _isImageSelected ? _image!.path : null)) {
+                            category,
+                            widget.editMode,
+                            _isImageSelected ? _image!.path : null)) {
                           Fluttertoast.showToast(
-                              msg: 'Thisistoastnotification',
+                              msg: 'Saved',
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 1,
@@ -98,6 +115,7 @@ class _CategoryMerge extends State<CategoryMerge> {
     );
   }
 
+  /*
   bool validateAndSave() {
     final form = globalFormKey.currentState;
     if (form!.validate()) {
@@ -106,10 +124,7 @@ class _CategoryMerge extends State<CategoryMerge> {
     }
     return false;
   }
-
-  File? _image;
-  final ImagePicker _picker = ImagePicker();
-  bool _isImageSelected = false;
+  */
 
   Widget imagePicker() {
     return Column(
@@ -151,9 +166,11 @@ class _CategoryMerge extends State<CategoryMerge> {
                       _image = File(pickedImage.path);
                       if (_image != null) {
                         _isImageSelected = true;
-                      } else {
-                        _isImageSelected = false;
                       }
+                      /*
+                      else {
+                        _isImageSelected = false;
+                      }*/
                     });
                   }
                 },
@@ -173,9 +190,12 @@ class _CategoryMerge extends State<CategoryMerge> {
                       _image = File(pickedImage.path);
                       if (_image != null) {
                         _isImageSelected = true;
-                      } else {
+                      }
+                      /*
+                      else {
                         _isImageSelected = false;
                       }
+                      */
                     });
                   }
                 },
