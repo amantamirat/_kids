@@ -1,7 +1,9 @@
 import 'package:abdu_kids/model/category.dart';
-import 'package:abdu_kids/pages/category_list.dart';
-import 'package:abdu_kids/pages/category_merge.dart';
+import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/pages/categories/category_list.dart';
+import 'package:abdu_kids/pages/categories/category_merge.dart';
 import 'package:abdu_kids/pages/types/type_list.dart';
+import 'package:abdu_kids/pages/types/type_merge.dart';
 import 'package:abdu_kids/pages/util/image_uloader.dart';
 import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +37,22 @@ final GoRouter _router = GoRouter(
                 builder: (context, state) {
                   Category category = state.extra as Category;
                   return TypeList(selectedCategory: category);
-                }),
+                },
+                routes: <RouteBase>[
+                  GoRoute(
+                    path: 'categories/types/add_typ',
+                    name: 'add_type',
+                    builder: (context, state) => TypeMerge(
+                        editMode: false, selectedType: ClothingType()),
+                  ),
+                  GoRoute(
+                    path: 'categories/types/edit_type',
+                    name: 'edit_type',
+                    builder: (context, state) => TypeMerge(
+                        editMode: true,
+                        selectedType: state.extra as ClothingType),
+                  )
+                ]),
             GoRoute(
               path: 'categories/add_category',
               name: 'add_category',

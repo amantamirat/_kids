@@ -1,12 +1,10 @@
+import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/type.dart';
 
-class Category {
-  static const String path = "/categories";
+class Category extends MyModel<Category> {
   static const String attributeTitle = 'title';
   static const String attributeDescription = 'description';
   static const String attributeClothingTypes = 'clothing_types';
-
-  late String? id;
   late String? title;
   late String? description;
 
@@ -14,13 +12,17 @@ class Category {
 
   Category({this.title, this.description});
 
-  Category.fromJson(Map<String, dynamic> json) {
-    id = json["_id"];
+  @override
+  Category fromJson(Map<String, dynamic> json) {
+    id = json[MyModel.attributeId];
     title = json[attributeTitle];
     description = json[attributeDescription];
-    clothingTypes =  ClothingType.clothingTypesFromJson(json[attributeClothingTypes]);
+    clothingTypes =
+        ClothingType.clothingTypesFromJson(json[attributeClothingTypes]);
+    return this;
   }
 
+  @override
   Map<String, dynamic> toJson({bool includeId = true}) {
     final data = <String, dynamic>{};
     if (includeId) {
@@ -32,6 +34,11 @@ class Category {
     return data;
   }
 
+  @override
+  String path() {
+    return "/categories";
+  }
+
   static List<Category> categoriesFromJson(dynamic str) =>
-    List<Category>.from((str).map((x) => Category.fromJson(x)));
+      List<Category>.from((str).map((x) => Category().fromJson(x)));
 }

@@ -1,7 +1,7 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/type.dart';
-import 'package:abdu_kids/services/category_Service.dart';
-import 'package:abdu_kids/util/configuration.dart';
+import 'package:abdu_kids/services/my_service.dart';
+import 'package:abdu_kids/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -34,7 +34,7 @@ class _TypeListState extends State<TypeList> {
       body: displayTypes(typeList),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.goNamed('add_category');
+          context.pushNamed('add_type');
         },
         backgroundColor: Colors.green,
         tooltip: 'Add Types',
@@ -65,17 +65,17 @@ class _TypeListState extends State<TypeList> {
                   )),
                   leading: GestureDetector(
                     onTap: () {
-                      context.goNamed('upload_image', extra: types[index].id);
+                      context.pushNamed('upload_image', extra: types[index].id);
                     },
                     child: CircleAvatar(
                       backgroundColor: Colors.transparent,
                       radius: 30,
                       child: Image.network(
-                        Configuration.getImageURL(types[index].id),
+                        Constants.getImageURL(types[index].id),
                         fit: BoxFit.fill,
                         errorBuilder: (context, error, stackTrace) {
                           return Image.asset(
-                              "assets/images/No-Image-Placeholder.svg.png");
+                              Constants.noImageAssetPath);
                         },
                       ),
                     ),
@@ -88,8 +88,7 @@ class _TypeListState extends State<TypeList> {
                         GestureDetector(
                           child: const Icon(Icons.edit),
                           onTap: () {
-                            /*context.goNamed('edit_category',
-                                extra: products[index]);*/
+                            context.pushNamed('edit_type', extra: types[index]);
                           },
                         ),
                         GestureDetector(
@@ -111,8 +110,8 @@ class _TypeListState extends State<TypeList> {
                                   ),
                                   TextButton(
                                     onPressed: () async {
-                                      if (await CategoryService.deleteCategory(
-                                          types[index].id)) {
+                                      if (await MyService.deleteModel(
+                                          types[index])) {
                                         Fluttertoast.showToast(
                                             msg: 'Removed!',
                                             toastLength: Toast.LENGTH_SHORT,

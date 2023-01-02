@@ -1,6 +1,6 @@
 import 'dart:io';
-import 'package:abdu_kids/services/category_Service.dart';
-import 'package:abdu_kids/util/configuration.dart';
+import 'package:abdu_kids/services/image_service.dart';
+import 'package:abdu_kids/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
@@ -22,12 +22,12 @@ class _ImageUploader extends State<ImageUploader> {
   void initState() {
     super.initState();
     _remoteImage = Image.network(
-      Configuration.getImageURL(widget.id),
+      Constants.getImageURL(widget.id),
       width: 200,
       height: 200,
       fit: BoxFit.scaleDown,
       errorBuilder: (context, error, stackTrace) => Image.asset(
-        "assets/images/No-Image-Placeholder.svg.png",
+        Constants.noImageAssetPath,
         width: 200,
         height: 200,
       ),
@@ -43,7 +43,7 @@ class _ImageUploader extends State<ImageUploader> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           if (_isImageSelected) {
-            CategoryService.uploadImage(widget.id, _image!.path);
+            ImageService.uploadImage(widget.id, _image!.path);
             context.pop();
           }
         },
@@ -69,6 +69,9 @@ class _ImageUploader extends State<ImageUploader> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            const SizedBox(
+              height: 20,
+            ),
             SizedBox(
               height: 35.0,
               width: 35.0,
