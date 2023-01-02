@@ -1,5 +1,6 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/services/category_Service.dart';
+import 'package:abdu_kids/util/configuration.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -86,9 +87,18 @@ class _CategoryListState extends State<CategoryList> {
                     ),
                   )),
                   subtitle: Text("${categories[index].description}"),
-                  leading: CircleAvatar(
-                      backgroundImage:
-                          NetworkImage(categories[index].getImageURL())),
+                  leading: GestureDetector(
+                    onTap: () {
+                      context.goNamed('upload_image',
+                          extra: categories[index].id);
+                    },
+                    child: CircleAvatar(
+                        backgroundImage: NetworkImage(
+                            Configuration.getImageURL(categories[index].id))),
+                  ),
+                  onTap: () {
+                    context.goNamed('types', extra: categories[index]);
+                  },
                   trailing: SizedBox(
                     width: MediaQuery.of(context).size.width / 4,
                     child: Row(
@@ -129,9 +139,7 @@ class _CategoryListState extends State<CategoryList> {
                                             timeInSecForIosWeb: 1,
                                             backgroundColor: Colors.red,
                                             textColor: Colors.yellow);
-                                        setState(() {
-                                          
-                                        });
+                                        setState(() {});
                                         context.pop();
                                       }
                                     },

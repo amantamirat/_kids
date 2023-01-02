@@ -102,13 +102,41 @@ async function getCategory(req, res, next) {
 async function init(length) {
   if (length === 0) {
     categories = [
-      { title: "Boys", description: "a collection of clothes for boys ...."},
-      { title: "Girls", description: "a collection of clothes for girls including tights, skirts ...."},
-      { title: "Babies", description: "a collection of clothes for babies ...."}
+      {
+        title: "Boys", description: "a collection of clothes for boys ...."
+        , clothing_types: [
+          { type: "Jeans" },
+          { type: "Trousers" },
+          { type: "T-shirt" },
+          { type: "Shirts" },
+          { type: "Shoes" }
+        ]
+      },
+      {
+        title: "Girls", description: "a collection of clothes for girls including tights, skirts ....",
+        clothing_types: [
+          { type: "Shorts" },
+          { type: "Tights" },
+          { type: "Dress" },
+          { type: "Heels" },
+          { type: "Swim Dress" }
+        ]
+      },
+      {
+        title: "Babies", description: "a collection of clothes for babies ....",
+        clothing_types: [
+          { type: "Socks" },
+          { type: "Diapers" },
+          { type: "Baby Hat" },
+          { type: "Sweaters" }
+        ]
+      }
     ];
     await Category.insertMany(categories);
   }
 }
+
+
 
 
 

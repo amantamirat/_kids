@@ -14,7 +14,7 @@ class CategoryService {
     );
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      return categoriesFromJson(data["categories"]);
+      return Category.categoriesFromJson(data["categories"]);
     } else {
       return null;
     }

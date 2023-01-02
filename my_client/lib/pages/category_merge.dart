@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/services/category_Service.dart';
+import 'package:abdu_kids/util/configuration.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -104,7 +105,7 @@ class _CategoryMerge extends State<CategoryMerge> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.yellow);
-                              context.pop();
+                          context.pop();
                         }
                       }
                     }),
@@ -116,16 +117,7 @@ class _CategoryMerge extends State<CategoryMerge> {
     );
   }
 
-  /*
-  bool validateAndSave() {
-    final form = globalFormKey.currentState;
-    if (form!.validate()) {
-      form.save();
-      return true;
-    }
-    return false;
-  }
-  */
+  
 
   Widget imagePicker() {
     return Column(
@@ -140,7 +132,7 @@ class _CategoryMerge extends State<CategoryMerge> {
                   )
                 : widget.editMode
                     ? Image.network(
-                        widget.selectedCategory.getImageURL(),
+                        Configuration.getImageURL(widget.selectedCategory.id),
                         width: 200,
                         height: 200,
                         fit: BoxFit.scaleDown,
@@ -168,10 +160,6 @@ class _CategoryMerge extends State<CategoryMerge> {
                       if (_image != null) {
                         _isImageSelected = true;
                       }
-                      /*
-                      else {
-                        _isImageSelected = false;
-                      }*/
                     });
                   }
                 },

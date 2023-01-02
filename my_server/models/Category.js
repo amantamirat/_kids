@@ -11,15 +11,9 @@ const CategorySchema = new mongoose.Schema(
         description: {
             type: String
         },
-        image_url: {
-            type: String
-        },
         clothing_types: [{
             type: {
                 type: String,
-            },
-            sample_image_url: {
-                type: String
             },
             products: [
                 {

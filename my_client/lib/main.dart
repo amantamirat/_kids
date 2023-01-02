@@ -1,6 +1,8 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/pages/category_list.dart';
 import 'package:abdu_kids/pages/category_merge.dart';
+import 'package:abdu_kids/pages/types/type_list.dart';
+import 'package:abdu_kids/pages/util/image_uloader.dart';
 import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:abdu_kids/pages/util/my_preferences.dart';
@@ -28,6 +30,13 @@ final GoRouter _router = GoRouter(
           },
           routes: <RouteBase>[
             GoRoute(
+                path: 'categories/types',
+                name: 'types',
+                builder: (context, state) {
+                  Category category = state.extra as Category;
+                  return TypeList(selectedCategory: category);
+                }),
+            GoRoute(
               path: 'categories/add_category',
               name: 'add_category',
               builder: (context, state) =>
@@ -43,11 +52,15 @@ final GoRouter _router = GoRouter(
                 }),
           ],
         ),
+        GoRoute(
+          path: 'upload',
+          name: 'upload_image',
+          builder: (context, state) => ImageUploader(id: state.extra as String),
+        ),
       ],
     ),
   ],
 );
-
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
