@@ -3,32 +3,20 @@ const Category = require("../models/Category");
 const upload = require("../middlewares/upload.js");
 const fs = require('fs');
 const router = express.Router();
+const categoryController = require("../controllers/categoryController");
 
-router.get("/", async (req, res) => {
-  //console.log("Request recieved");
-  const categories = await Category.find({});
-  await init(categories.length);
-  try {
-    res.status(200).json({
-      status: "Success",
-      categories: categories
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "Failed to retrieve categories",
-      message: err,
-    });
-  }
+router.get("/", categoryController.findAll, (req, res) => {
+  res.json(res.categories);
 });
 
-router.get("/:id", getCategory, (req, res) => {
+router.get("/:id", categoryController.getCategory, (req, res) => {
   res.json(res.category);
 });
 
 
 router.post('/new', async (req, res) => {
-  const category = await Category.create(req.body);
   try {
+    const category = await Category.create(req.body);
     await category.save();
     res.status(201).json({
       status: 'Success',
@@ -46,7 +34,6 @@ router.post('/new', async (req, res) => {
 
 
 router.patch("/update/:id", async (req, res) => {
-  //console.log("Request recieved => category update "+req.params.id)
   try {
     const updatedCategory = await Category.findByIdAndUpdate(
       req.params.id,
@@ -68,76 +55,8 @@ router.patch("/update/:id", async (req, res) => {
   }
 });
 
-router.delete("/delete/:id", async (req, res) => {
-  //console.log("delete requested");
-  await Category.findByIdAndDelete(req.params.id);
-  try {
-    res.status(204).json({
-      status: "Success",
-      data: {},
-    });
-  } catch (err) {
-    res.status(500).json({
-      status: "Failed to Delete Category",
-      message: err,
-    });
-  }
+router.delete("/delete/:id", categoryController.deleteCategory, async (req, res) => {
+  res.json(res.statusCode);
 });
-
-async function getCategory(req, res, next) {
-  let category;
-  try {
-    category = await Category.findById(req.params.id);
-    if (category == null) {
-      return res.status(404).json({ message: "Cannot find category" });
-    }
-  } catch (err) {
-    return res.status(500).json({ message: err.message });
-  }
-
-  res.category = category;
-  next();
-}
-
-async function init(length) {
-  if (length === 0) {
-    categories = [
-      {
-        title: "Boys", description: "a collection of clothes for boys ...."
-        , clothing_types: [
-          { type: "Jeans" },
-          { type: "Trousers" },
-          { type: "T-shirt" },
-          { type: "Shirts" },
-          { type: "Shoes" }
-        ]
-      },
-      {
-        title: "Girls", description: "a collection of clothes for girls including tights, skirts ....",
-        clothing_types: [
-          { type: "Shorts" },
-          { type: "Tights" },
-          { type: "Dress" },
-          { type: "Heels" },
-          { type: "Swim Dress" }
-        ]
-      },
-      {
-        title: "Babies", description: "a collection of clothes for babies ....",
-        clothing_types: [
-          { type: "Socks" },
-          { type: "Diapers" },
-          { type: "Baby Hat" },
-          { type: "Sweaters" }
-        ]
-      }
-    ];
-    await Category.insertMany(categories);
-  }
-}
-
-
-
-
 
 module.exports = router;

@@ -2,6 +2,7 @@ const express = require("express");
 const upload = require("../middlewares/upload.js");
 const fs = require('fs');
 const router = express.Router();
+const imageController = require("../controllers/imageController");
 
 router.put("/:id", async (req, res) => {
     upload(req, res, async function (err) {
@@ -17,27 +18,8 @@ router.put("/:id", async (req, res) => {
 
 });
 
-router.delete("/remove/:id", async (req, res) => {
-    let path = 'files/' + req.params.id;
-    let exists = fs.existsSync(path);
-    if (exists) {
-        fs.unlink(path, (err) => {
-            if (err) {
-                throw err;
-            }
-            else {
-                res.status(201).json({
-                    status: "Success",
-                    msg: "Removed",
-                });
-            }
-        });
-    } else {
-        res.status(404).json({
-            status: "Success",
-            data: "Not Found!",
-        });
-    }
+router.delete("/remove/:id", imageController.deleteImage, (req, res) => {
+    res.json(res.statusCode);
 });
 
 module.exports = router;

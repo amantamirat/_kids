@@ -38,9 +38,6 @@ const CategorySchema = new mongoose.Schema(
                         quantity: {
                             type: Number,
                             min: 0
-                        },
-                        product_image_url: {
-                            type: String
                         }
                     }],
                 }
