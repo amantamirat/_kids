@@ -3,7 +3,7 @@ const router = express.Router();
 const Category = require("../models/Category");
 
 
-router.post('/new/category/:category_id', async (req, res) => {
+router.post('/new/:category_id', async (req, res) => {
     try {
         const category = await Category.findById(req.params.category_id);
         var type = category['clothing_types'].create(req.body);
@@ -21,7 +21,7 @@ router.post('/new/category/:category_id', async (req, res) => {
     }
 });
 
-router.patch('/update/category/:category_id/:type_id', async (req, res) => {
+router.patch('/update/:category_id/:type_id', async (req, res) => {
     try {
         const type = await Category.findOneAndUpdate({ _id: req.params.category_id, 'clothing_types._id': req.params.type_id },
             { $set: { 'clothing_types.$.type': req.body.type } }, { new: true, runValidators: true });
@@ -38,7 +38,7 @@ router.patch('/update/category/:category_id/:type_id', async (req, res) => {
     }
 });
 
-router.delete('/delete/category/:category_id/:type_id', async (req, res) => {
+router.delete('/delete/:category_id/:type_id', async (req, res) => {
     try {
         await Category.findByIdAndUpdate(req.params.category_id,
             { $pull: { clothing_types: { _id: req.params.type_id } } },

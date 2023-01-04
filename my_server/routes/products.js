@@ -2,13 +2,13 @@ const express = require("express");
 const router = express.Router();
 const Category = require("../models/Category");
 
-
-router.post('/new/category/:category_id/type/:type_id', async (req, res) => {
+router.post('/new/:category_id/:type_id', async (req, res) => {
     try {
         const category_id = req.params.category_id;
         const type_id = req.params.type_id;
         const product = req.body;
         const category = await Category.findById(category_id);
+        
         let types = category.clothing_types;
         for (let i = 0; i < types.length; i++) {
             if (types[i]._id.toString() === type_id) {
@@ -33,12 +33,13 @@ router.post('/new/category/:category_id/type/:type_id', async (req, res) => {
     }
 });
 
-router.patch('/update/category/:category_id/type/:type_id/:product_id', async (req, res) => {
+router.patch('/update/:category_id/:type_id/:product_id', async (req, res) => {
     try {
         const category_id = req.params.category_id;
         const type_id = req.params.type_id;
         const product_id = req.params.product_id;
         const product = req.body;
+        
         await Category.updateOne({ _id: category_id },
             { $set: { 'clothing_types.$[t].products.$[p]': product } },
             { arrayFilters: [{ 't._id': type_id }, { 'p._id': product_id }] });
@@ -55,7 +56,7 @@ router.patch('/update/category/:category_id/type/:type_id/:product_id', async (r
     }
 });
 
-router.delete('/delete/category/:category_id/type/:type_id/:product_id', async (req, res) => {
+router.delete('/delete/:category_id/:type_id/:product_id', async (req, res) => {
     try {
         const category_id = req.params.category_id;
         const type_id = req.params.type_id;
@@ -64,11 +65,7 @@ router.delete('/delete/category/:category_id/type/:type_id/:product_id', async (
         await Category.findByIdAndUpdate(category_id,
             { $pull: { 'clothing_types.$[t].products.$[p]': { _id: product_id } } },
             { arrayFilters: [{ 't._id': type_id }] });
-            
-        /*await Category.findByIdAndUpdate(req.params.category_id,
-            { $pull: { clothing_types: { _id: req.params.type_id } } },
-            { new: true, runValidators: true }
-        );*/
+
         res.status(204).json({
             status: 'Success',
         });
