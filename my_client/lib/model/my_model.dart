@@ -3,5 +3,6 @@ abstract class MyModel<T> {
   late String? id;
   T fromJson(Map<String, dynamic> json);
   Map<String, dynamic> toJson({bool includeId = true});
-  String path();
+  String basePath();
+  String paramsPath();
 }

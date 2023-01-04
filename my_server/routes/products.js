@@ -6,7 +6,7 @@ router.post('/new/:category_id/:type_id', async (req, res) => {
     try {
         const category_id = req.params.category_id;
         const type_id = req.params.type_id;
-        const product = req.body;
+        let product = req.body;
         const category = await Category.findById(category_id);
         
         let types = category.clothing_types;
@@ -30,6 +30,7 @@ router.post('/new/:category_id/:type_id', async (req, res) => {
             status: 'Failed to Update Product',
             message: err
         })
+        console.log(err);
     }
 });
 

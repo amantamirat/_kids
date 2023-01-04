@@ -17,9 +17,9 @@ router.put("/:id", async (req, res) => {
     });
 
 });
-
+/*
 router.delete("/remove/:id", imageController.deleteImage, (req, res) => {
     res.json(res.statusCode);
 });
-
+*/
 module.exports = router;

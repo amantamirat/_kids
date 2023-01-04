@@ -1,14 +1,18 @@
+import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 
 class ClothingType extends MyModel<ClothingType> {
+  
+  static const String path = "/types";
   static const String attributeType = 'type';
   static const String attributeProducts = 'products';
+  
   late String? type;
-  //late Category category;
+  late Category? category;
   late List<Product> products;
-
-  ClothingType({this.type});
+  
+  ClothingType({this.category});
 
   @override
   ClothingType fromJson(Map<String, dynamic> json) {
@@ -29,8 +33,13 @@ class ClothingType extends MyModel<ClothingType> {
   }
 
   @override
-  String path() {
-    return "/kinds";
+  String basePath() {
+    return path;
+  }
+
+  @override
+  String paramsPath() {
+    return "/${category!.id}";
   }
 
   static List<ClothingType> clothingTypesFromJson(dynamic str) =>

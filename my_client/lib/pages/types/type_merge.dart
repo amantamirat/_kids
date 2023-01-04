@@ -1,5 +1,8 @@
 import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/services/my_service.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:go_router/go_router.dart';
 
 class TypeMerge extends StatefulWidget {
   final bool editMode;
@@ -66,6 +69,17 @@ class _TypeMerge extends State<TypeMerge> {
                         final clothingType = widget.selectedType;
                         clothingType.type = _typeController.text;
                         
+                        if (await MyService.saveItem(
+                            clothingType, widget.editMode)) {                              
+                          Fluttertoast.showToast(
+                              msg: 'Saved',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.yellow);
+                          context.pop();
+                        }
 
                       }
                     }),

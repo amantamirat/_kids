@@ -1,6 +1,5 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/my_model.dart';
-import 'package:abdu_kids/services/image_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -10,7 +9,7 @@ class MyService {
   static var client = http.Client();
 
   static Future<List<Category>?> getCategories() async {
-    String url = "${Constants.apiURL}/categories";
+    String url = "${Constants.apiURL}${Category.path}";
     var response = await client.get(
       Uri.parse(url),
       headers: Constants.requestHeaders,
@@ -24,23 +23,25 @@ class MyService {
   }
 
   static Future<bool> saveItem(MyModel myModel, bool isEditMode) async {
-    String url = "${Constants.apiURL}${myModel.path()}";
+    String url = "${Constants.apiURL}${myModel.basePath()}";
     var response = http.Response("{}", 404);
     if (isEditMode) {
-      url = "$url/update/${myModel.id}";
+      url = "$url${Constants.updatePath}${myModel.paramsPath()}/${myModel.id}";
       response = await http.patch(
         Uri.parse(url),
         headers: Constants.requestHeaders,
         body: jsonEncode(myModel.toJson()),
       );
     } else {
-      url = "$url/new";
+      url = "$url${Constants.newPath}${myModel.paramsPath()}";
       response = await http.post(
         Uri.parse(url),
         headers: Constants.requestHeaders,
         body: jsonEncode(myModel.toJson(includeId: false)),
       );
     }
+    print(url);
+    print(response.statusCode);
     if (response.statusCode != 201) {
       return false;
     }
@@ -48,13 +49,15 @@ class MyService {
   }
 
   static Future<bool> deleteModel(MyModel myModel) async {
-    String url = "${Constants.apiURL}${myModel.path}/delete/${myModel.id}";
+    String url =
+        "${Constants.apiURL}${myModel.basePath()}${Constants.deletePath}${myModel.paramsPath()}/${myModel.id}";
     var response = await client.delete(
       Uri.parse(url),
       headers: Constants.requestHeaders,
     );
+    print(url);
     if (response.statusCode == 204) {
-      return ImageService.deleteImage(myModel.id!);
+      return true;
     } else {
       return false;
     }

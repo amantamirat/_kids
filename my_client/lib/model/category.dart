@@ -2,6 +2,7 @@ import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/type.dart';
 
 class Category extends MyModel<Category> {
+  static const String path = "/categories";
   static const String attributeTitle = 'title';
   static const String attributeDescription = 'description';
   static const String attributeClothingTypes = 'clothing_types';
@@ -35,8 +36,13 @@ class Category extends MyModel<Category> {
   }
 
   @override
-  String path() {
-    return "/categories";
+  String basePath() {
+    return path;
+  }
+
+  @override
+  String paramsPath() {
+    return "";
   }
 
   static List<Category> categoriesFromJson(dynamic str) =>

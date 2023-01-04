@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Category = require("../models/Category");
+const imageController = require("../controllers/imageController");
 
 
 router.post('/new/:category_id', async (req, res) => {
@@ -44,6 +45,7 @@ router.delete('/delete/:category_id/:type_id', async (req, res) => {
             { $pull: { clothing_types: { _id: req.params.type_id } } },
             { new: true, runValidators: true }
         );
+        await imageController.deleteImage(req, res);
         res.status(204).json({
             status: 'Success',
         });

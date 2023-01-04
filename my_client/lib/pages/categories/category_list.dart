@@ -97,7 +97,7 @@ class _CategoryListState extends State<CategoryList> {
                             Constants.getImageURL(categories[index].id))),
                   ),
                   onTap: () {
-                    context.goNamed('types', extra: categories[index]);
+                    context.pushNamed('types', extra: categories[index]);
                   },
                   trailing: SizedBox(
                     width: MediaQuery.of(context).size.width / 4,

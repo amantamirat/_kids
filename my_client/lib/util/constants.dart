@@ -4,6 +4,12 @@ import 'package:flutter/material.dart';
 class Constants {
   static const String appName = "abdu_kids";
 
+  static const String newPath = "/new";
+
+  static const String updatePath = "/update";
+
+  static const String deletePath = "/delete";
+
   static const String noImageAssetPath =
       "assets/images/No-Image-Placeholder.svg.png";
 

@@ -21,6 +21,9 @@ class _TypeListState extends State<TypeList> {
   void initState() {
     super.initState();
     typeList = widget.selectedCategory.clothingTypes;
+    for (var i = 0; i < typeList.length; i++) {
+      typeList[i].category = widget.selectedCategory;
+    }
   }
 
   @override
@@ -34,7 +37,7 @@ class _TypeListState extends State<TypeList> {
       body: displayTypes(typeList),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.pushNamed('add_type');
+          context.pushNamed('add_type', extra: widget.selectedCategory);
         },
         backgroundColor: Colors.green,
         tooltip: 'Add Types',
@@ -74,12 +77,14 @@ class _TypeListState extends State<TypeList> {
                         Constants.getImageURL(types[index].id),
                         fit: BoxFit.fill,
                         errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(
-                              Constants.noImageAssetPath);
+                          return Image.asset(Constants.noImageAssetPath);
                         },
                       ),
                     ),
                   ),
+                  onTap: () {
+                    context.pushNamed('products', extra: types[index]);
+                  },
                   trailing: SizedBox(
                     width: MediaQuery.of(context).size.width / 4,
                     child: Row(

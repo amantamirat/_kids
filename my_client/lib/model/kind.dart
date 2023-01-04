@@ -1,6 +1,7 @@
 import 'package:abdu_kids/model/my_model.dart';
 
 class Kind extends MyModel<Kind> {
+  static const String path = "/kinds";
   static const String attributeColor = 'color';
   static const String attributeQuantity = 'quantity';
 
@@ -28,7 +29,14 @@ class Kind extends MyModel<Kind> {
   }
 
   @override
-  String path() {
-    return "/kind";
+  String basePath() {
+    // TODO: implement basePath
+    throw UnimplementedError();
+  }
+
+  @override
+  String paramsPath() {
+    // TODO: implement paramsPath
+    throw UnimplementedError();
   }
 }
