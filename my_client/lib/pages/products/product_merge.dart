@@ -76,7 +76,7 @@ class _ProductMerge extends State<ProductMerge> {
                   child: TextFormField(
                     controller: _descriptionController,
                     keyboardType: TextInputType.multiline,
-                    decoration: const InputDecoration(hintText: "Product Desc"),
+                    decoration: const InputDecoration(hintText: "Product Description"),
                   ),
                 ),
                 Padding(
@@ -127,7 +127,7 @@ class _ProductMerge extends State<ProductMerge> {
                         product.name = _nameController.text;
                         product.description = _descriptionController.text;
                         product.size = int.parse(_sizeController.text);
-                        product.price = double.parse(_priceController.text);
+                        product.price = num.parse(_priceController.text);
                         if (await MyService.saveItem(
                             product, widget.editMode)) {
                           Fluttertoast.showToast(

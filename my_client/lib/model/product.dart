@@ -11,7 +11,7 @@ class Product extends MyModel<Product> {
   late String? name;
   late String? description;
   late int? size;
-  late double? price;
+  late num price;
 
   late ClothingType? type;
 

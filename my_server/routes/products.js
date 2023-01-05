@@ -64,7 +64,7 @@ router.delete('/delete/:category_id/:type_id/:product_id', async (req, res) => {
         const product_id = req.params.product_id;
 
         await Category.findByIdAndUpdate(category_id,
-            { $pull: { 'clothing_types.$[t].products.$[p]': { _id: product_id } } },
+            { $pull: { 'clothing_types.$[t].products': { _id: product_id } } },
             { arrayFilters: [{ 't._id': type_id }] });
 
         res.status(204).json({
@@ -75,7 +75,7 @@ router.delete('/delete/:category_id/:type_id/:product_id', async (req, res) => {
             status: 'Failed to Delete Type',
             message: err
         })
-        console.log(err)
+        //console.log(err)
     }
 });
 
