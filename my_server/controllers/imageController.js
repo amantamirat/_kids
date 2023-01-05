@@ -6,19 +6,7 @@ exports.deleteImage = async (req, res, next) => {
         fs.unlink(path, (err) => {
             if (err) {
                 throw err;
-            }
-            /*
-            else {
-                return res.status(204).json({
-                    status: "Success",
-                    msg: "Removed",
-                });
-            }
-            */
+            }            
         });
     }
-    /*return res.status(204).json({
-        status: "Success",
-        msg: "Not Found!",
-    });*/
 }

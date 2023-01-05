@@ -22,6 +22,8 @@ mongoose.connect(process.env.MONGO_URL, {
 
 const categoryRouter = require("./routes/categories");
 app.use("/categories", categoryRouter);
+const brandRouter = require("./routes/brands");
+app.use("/brands", brandRouter);
 const typeRouter = require("./routes/types");
 app.use("/types", typeRouter);
 const productRouter = require("./routes/products");
