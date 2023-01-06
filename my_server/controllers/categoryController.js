@@ -31,6 +31,46 @@ exports.getCategory = async (req, res, next) => {
     next();
 }
 
+exports.createCategory = async (req, res, next) => {
+    try {
+        const category = await Category.create(req.body);
+        await category.save();
+        res.status(201).json({
+            status: 'Success',
+            data: category
+
+        })
+    } catch (err) {
+        res.status(500).json({
+            status: 'Failed to create department',
+            message: err
+        })
+    }
+}
+
+exports.editCategory = async (req, res, next) => {
+    try {
+        const updatedCategory = await Category.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true,
+                runValidators: true,
+            }
+        );
+        res.status(201).json({
+            status: "Success",
+            data: updatedCategory,
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: "Failed to Update Category",
+            message: err,
+        });
+    }
+}
+
+
 exports.deleteCategory = async (req, res, next) => {
     try {
         await Category.findByIdAndDelete(req.params.id);

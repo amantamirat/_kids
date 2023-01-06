@@ -21,16 +21,16 @@ class _KindList extends State<KindList> {
   void initState() {
     super.initState();
     kindList = widget.selectedProduct.kinds;
-    for (var i = 0; i < kindList.length; i++) {
+    /*for (var i = 0; i < kindList.length; i++) {
       kindList[i].product = widget.selectedProduct;
-    }
+    }*/
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.selectedProduct.name} Colors and Quantity"),
+        title: Text("${widget.selectedProduct.brand!.name} Colors and Quantity"),
         elevation: 0,
       ),
       backgroundColor: Colors.grey[200],
@@ -142,6 +142,6 @@ class _KindList extends State<KindList> {
             separatorBuilder: (BuildContext context, int index) =>
                 const Divider(),
           )
-        :  Center(child: Text('No Store Data about ${widget.selectedProduct.name} Product Found!'));
+        :  Center(child: Text('No Store Data about ${widget.selectedProduct.brand!.name} Product Found!'));
   }
 }

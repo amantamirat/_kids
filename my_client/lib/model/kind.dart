@@ -10,7 +10,6 @@ class Kind extends MyModel<Kind> {
   late int? quantity;
 
   late Product? product;
-
   Kind({this.product});
 
   @override
@@ -41,6 +40,6 @@ class Kind extends MyModel<Kind> {
   String paramsPath() {
     return "${product!.paramsPath()}/${product!.id}";
   }
-  static List<Kind> kindsFromJson(dynamic str) =>
-      List<Kind>.from((str).map((x) => Kind().fromJson(x)));
+  static List<Kind> kindsFromJson(dynamic str, Product product) =>
+      List<Kind>.from((str).map((x) => Kind(product: product).fromJson(x)));
 }

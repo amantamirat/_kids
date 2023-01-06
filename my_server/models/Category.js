@@ -1,6 +1,5 @@
 const mongoose = require('mongoose')
 
-
 const CategorySchema = new mongoose.Schema(
     {
         title: {
@@ -43,36 +42,7 @@ const CategorySchema = new mongoose.Schema(
                         }],
                     }
                 ]
-
             }],
-            products: [
-                {
-                    product_name: {
-                        type: String
-                    },
-                    product_description: {
-                        type: String
-                    },
-
-                    size: {
-                        type: Number,
-                        min: 0
-                    },
-                    price: {
-                        type: Number,
-                        min: 0
-                    },
-                    product_colors: [{
-                        color: {
-                            type: String
-                        },
-                        quantity: {
-                            type: Number,
-                            min: 0
-                        }
-                    }],
-                }
-            ]
         }
         ]
     }

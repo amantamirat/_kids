@@ -1,4 +1,5 @@
 import 'package:abdu_kids/model/brand.dart';
+import 'package:abdu_kids/model/type.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:flutter/material.dart';
@@ -6,63 +7,41 @@ import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class BrandList extends StatefulWidget {
-  const BrandList({super.key});
+  final ClothingType selectedType;
+  const BrandList({Key? key, required this.selectedType}) : super(key: key);
 
   @override
   State<BrandList> createState() => _BrandList();
 }
 
 class _BrandList extends State<BrandList> {
-  Future<List<Brand>?>? brandsList;
+  late List<Brand> brandsList;
 
   @override
   void initState() {
     super.initState();
-    brandsList = MyService.getBrands();
+    brandsList = widget.selectedType.brands;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product Brands and TM'),
+        title: Text(
+            "${widget.selectedType.category!.title} - ${widget.selectedType.type} Brands"),
         elevation: 0,
       ),
       backgroundColor: Colors.grey[200],
-      body: loadCategories(),
+      body: displayBrands(brandsList),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.goNamed('add_brand');
+          context.pushNamed('add_brand',
+              extra: Brand(type: widget.selectedType));
         },
         backgroundColor: Colors.green,
         tooltip: 'Apply Changes',
         child: const Icon(Icons.add),
       ),
-    );
-  }
-
-  Widget loadCategories() {
-    return FutureBuilder(
-      future: brandsList,
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<List<Brand>?> snapshot,
-      ) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            if (snapshot.hasError) {
-              return Center(
-                child: Text('Error: ${snapshot.error}'),
-              );
-            } else {
-              return displayBrands(snapshot.data);
-            }
-        }
-      },
     );
   }
 
@@ -96,7 +75,7 @@ class _BrandList extends State<BrandList> {
                             Constants.getImageURL(brands[index].id))),
                   ),
                   onTap: () {
-                    //context.pushNamed('types', extra: brands[index]);
+                    context.pushNamed('products', extra: brands[index]);
                   },
                   trailing: SizedBox(
                     width: MediaQuery.of(context).size.width / 4,
@@ -106,7 +85,8 @@ class _BrandList extends State<BrandList> {
                         GestureDetector(
                           child: const Icon(Icons.edit),
                           onTap: () {
-                            context.goNamed('edit_brand', extra: brands[index]);
+                            context.pushNamed('edit_brand',
+                                extra: brands[index]);
                           },
                         ),
                         GestureDetector(
@@ -157,6 +137,8 @@ class _BrandList extends State<BrandList> {
             separatorBuilder: (BuildContext context, int index) =>
                 const Divider(),
           )
-        : const Center(child: Text('No Brands Found!'));
+        : Center(
+            child: Text(
+                'No Brands Data Found in ${widget.selectedType.category!.title} - ${widget.selectedType.type}!'));
   }
 }

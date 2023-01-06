@@ -17,13 +17,13 @@ class TypeMerge extends StatefulWidget {
 class _TypeMerge extends State<TypeMerge> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   final _typeController = TextEditingController();
-  late String appBarTitle = "Add Type";
+  late String appBarTitle = "Add ${widget.selectedType.category!.title} Clothing Type";
   @override
   void initState() {
     super.initState();
     if (widget.editMode) {
       _typeController.text = widget.selectedType.type ?? '';
-      appBarTitle = "Edit Type";
+      appBarTitle = "Edit ${widget.selectedType.type} Clothing Type";
     }
   }
 
@@ -52,8 +52,7 @@ class _TypeMerge extends State<TypeMerge> {
                   ),
                   child: TextFormField(
                     controller: _typeController,
-                    decoration:
-                        const InputDecoration(hintText: "Type Name"),
+                    decoration: const InputDecoration(hintText: "Type Name"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter clothing type name';
@@ -68,9 +67,9 @@ class _TypeMerge extends State<TypeMerge> {
                       if (globalFormKey.currentState!.validate()) {
                         final clothingType = widget.selectedType;
                         clothingType.type = _typeController.text;
-                        
+
                         if (await MyService.saveItem(
-                            clothingType, widget.editMode)) {                              
+                            clothingType, widget.editMode)) {
                           Fluttertoast.showToast(
                               msg: 'Saved',
                               toastLength: Toast.LENGTH_SHORT,
@@ -80,7 +79,6 @@ class _TypeMerge extends State<TypeMerge> {
                               textColor: Colors.yellow);
                           context.pop();
                         }
-
                       }
                     }),
               ],

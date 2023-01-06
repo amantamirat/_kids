@@ -17,7 +17,7 @@ class ProductMerge extends StatefulWidget {
 
 class _ProductMerge extends State<ProductMerge> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  //final _nameController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _sizeController = TextEditingController();
   final _priceController = TextEditingController();
@@ -26,7 +26,7 @@ class _ProductMerge extends State<ProductMerge> {
   void initState() {
     super.initState();
     if (widget.editMode) {
-      _nameController.text = widget.selectedProduct.name ?? '';
+      //_nameController.text = widget.selectedProduct.name ?? '';
       _descriptionController.text = widget.selectedProduct.description ?? '';
       _sizeController.text = "${widget.selectedProduct.size}";
       _priceController.text = "${widget.selectedProduct.price}";
@@ -52,7 +52,7 @@ class _ProductMerge extends State<ProductMerge> {
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
             child: Column(
               children: <Widget>[
-                Padding(
+                /*Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
                     top: 10,
@@ -68,6 +68,7 @@ class _ProductMerge extends State<ProductMerge> {
                     },
                   ),
                 ),
+                */
                 Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
@@ -76,7 +77,8 @@ class _ProductMerge extends State<ProductMerge> {
                   child: TextFormField(
                     controller: _descriptionController,
                     keyboardType: TextInputType.multiline,
-                    decoration: const InputDecoration(hintText: "Product Description"),
+                    decoration:
+                        const InputDecoration(hintText: "Product Description"),
                   ),
                 ),
                 Padding(
@@ -106,7 +108,8 @@ class _ProductMerge extends State<ProductMerge> {
                   ),
                   child: TextFormField(
                     controller: _priceController,
-                    decoration: const InputDecoration(hintText: "Product Price"),
+                    decoration:
+                        const InputDecoration(hintText: "Product Price"),
                     keyboardType: TextInputType.number,
                     inputFormatters: <TextInputFormatter>[
                       FilteringTextInputFormatter.digitsOnly
@@ -124,7 +127,7 @@ class _ProductMerge extends State<ProductMerge> {
                     onPressed: () async {
                       if (globalFormKey.currentState!.validate()) {
                         final product = widget.selectedProduct;
-                        product.name = _nameController.text;
+                        //product.name = _nameController.text;
                         product.description = _descriptionController.text;
                         product.size = int.parse(_sizeController.text);
                         product.price = num.parse(_priceController.text);

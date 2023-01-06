@@ -1,16 +1,16 @@
+import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/my_model.dart';
-import 'package:abdu_kids/model/product.dart';
 
 class ClothingType extends MyModel<ClothingType> {
   
   static const String path = "/types";
   static const String attributeType = 'type';
-  static const String attributeProducts = 'products';
+  static const String attributeBrands = 'brands';
   
   late String? type;
   late Category? category;
-  late List<Product> products;
+  late List<Brand> brands;
   
   ClothingType({this.category});
 
@@ -18,7 +18,7 @@ class ClothingType extends MyModel<ClothingType> {
   ClothingType fromJson(Map<String, dynamic> json) {
     id = json["_id"];
     type = json[attributeType];
-    products = Product.productsFromJson(json[attributeProducts]);
+    brands = Brand.brandsFromJson(json[attributeBrands], this);
     return this;
   }
 

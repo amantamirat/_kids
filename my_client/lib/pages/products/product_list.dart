@@ -1,5 +1,5 @@
+import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/product.dart';
-import 'package:abdu_kids/model/type.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:flutter/material.dart';
@@ -7,8 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class ProductList extends StatefulWidget {
-  final ClothingType selectedType;
-  const ProductList({Key? key, required this.selectedType}) : super(key: key);
+  final Brand selectedBrand;
+  const ProductList({Key? key, required this.selectedBrand}) : super(key: key);
 
   @override
   State<ProductList> createState() => _ProductListState();
@@ -20,25 +20,27 @@ class _ProductListState extends State<ProductList> {
   @override
   void initState() {
     super.initState();
-    productList = widget.selectedType.products;
+    productList = widget.selectedBrand.products;
+    /*
     for (var i = 0; i < productList.length; i++) {
       productList[i].type = widget.selectedType;
     }
+    */
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("${widget.selectedType.type} Products"),
+        title: Text("${widget.selectedBrand.name} Products"),
         elevation: 0,
       ),
       backgroundColor: Colors.grey[200],
-      body: displayTypes(productList),
+      body: displayProds(productList),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           context.pushNamed('add_product',
-              extra: Product(type: widget.selectedType));
+              extra: Product(brand: widget.selectedBrand));
         },
         backgroundColor: Colors.green,
         tooltip: 'Add Types',
@@ -47,7 +49,7 @@ class _ProductListState extends State<ProductList> {
     );
   }
 
-  Widget displayTypes(products) {
+  Widget displayProds(products) {
     return products.isNotEmpty
         ? ListView.separated(
             shrinkWrap: true,
@@ -61,7 +63,7 @@ class _ProductListState extends State<ProductList> {
                 child: ListTile(
                   title: Center(
                       child: Text(
-                    "${products[index].name}",
+                    "${products[index].description}",
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,

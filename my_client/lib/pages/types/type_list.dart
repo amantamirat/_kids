@@ -38,7 +38,7 @@ class _TypeListState extends State<TypeList> {
       body: displayTypes(typeList),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.pushNamed('add_type', extra: widget.selectedCategory);
+          context.pushNamed('add_type', extra: ClothingType(category: widget.selectedCategory));
         },
         backgroundColor: Colors.green,
         tooltip: 'Add Types',
@@ -84,7 +84,7 @@ class _TypeListState extends State<TypeList> {
                     ),
                   ),
                   onTap: () {
-                    context.pushNamed('products', extra: types[index]);
+                    context.pushNamed('brands', extra: types[index]);
                   },
                   trailing: SizedBox(
                     width: MediaQuery.of(context).size.width / 4,

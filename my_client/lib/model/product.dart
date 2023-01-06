@@ -1,35 +1,33 @@
+import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
-import 'package:abdu_kids/model/type.dart';
 
 class Product extends MyModel<Product> {
   static const String path = "/products";
-  static const String attributeProductName = 'product_name';
+  //static const String attributeProductName = 'product_name';
   static const String attributeDescription = 'product_description';
   static const String attributeSize = 'size';
   static const String attributePrice = 'price';
-  static const String attributeKinds = 'product_colors';
+  static const String attributeKinds = 'product_kinds';
 
-  late String? name;
+  //late String? name;
   late String? description;
   late int? size;
   late num price;
 
-  late ClothingType? type;
+  late Brand? brand;
   late List<Kind> kinds;
 
-  Product({this.type});
-
-  //Product({this.name, this.description, this.size, this.price});
+  Product({this.brand});
 
   @override
   Product fromJson(Map<String, dynamic> json) {
     id = json["_id"];
-    name = json[attributeProductName];
+    //name = json[attributeProductName];
     description = json[attributeDescription];
     size = json[attributeSize];
     price = json[attributePrice];
-    kinds = Kind.kindsFromJson(json[attributeKinds]);
+    kinds = Kind.kindsFromJson(json[attributeKinds], this);
     return this;
   }
 
@@ -39,7 +37,7 @@ class Product extends MyModel<Product> {
     if (includeId) {
       data["_id"] = id;
     }
-    data[attributeProductName] = name;
+    //data[attributeProductName] = name;
     data[attributeDescription] = description;
     data[attributeSize] = size;
     data[attributePrice] = price;
@@ -53,9 +51,9 @@ class Product extends MyModel<Product> {
 
   @override
   String paramsPath() {
-    return "${type!.paramsPath()}/${type!.id}";
+    return "${brand!.paramsPath()}/${brand!.id}";
   }
 
-  static List<Product> productsFromJson(dynamic str) =>
-      List<Product>.from((str).map((x) => Product().fromJson(x)));
+  static List<Product> productsFromJson(dynamic str, Brand brand) =>
+      List<Product>.from((str).map((x) => Product(brand: brand).fromJson(x)));
 }

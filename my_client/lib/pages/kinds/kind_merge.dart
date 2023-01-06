@@ -54,7 +54,7 @@ class _KindMerge extends State<KindMerge> {
                     decoration: const InputDecoration(hintText: "Color"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please provide color kind of ${widget.selectedKind.product!.name}';
+                        return 'Please provide color kind of ${widget.selectedKind.product!.brand!.name}';
                       }
                       return null;
                     },

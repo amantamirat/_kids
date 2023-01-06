@@ -35,24 +35,6 @@ final GoRouter _router = GoRouter(
       },
       routes: <RouteBase>[
         GoRoute(
-            path: 'brands',
-            name: 'brands',
-            builder: (context, state) => const BrandList(),
-            routes: <RouteBase>[
-              GoRoute(
-                path: 'brands/add_brand',
-                name: 'add_brand',
-                builder: (context, state) =>
-                    BrandMerge(editMode: false, selectedBrand: Brand()),
-              ),
-              GoRoute(
-                path: 'brands/edit_brand',
-                name: 'edit_brand',
-                builder: (context, state) => BrandMerge(
-                    editMode: true, selectedBrand: state.extra as Brand),
-              ),
-            ]),
-        GoRoute(
           path: 'categories',
           name: 'categories',
           builder: (BuildContext context, GoRouterState state) {
@@ -68,56 +50,79 @@ final GoRouter _router = GoRouter(
                 },
                 routes: <RouteBase>[
                   GoRoute(
-                      path: 'categories/types/products',
-                      name: 'products',
-                      builder: (context, state) => ProductList(
-                          selectedType: state.extra as ClothingType),
+                      path: 'categories/types/brands',
+                      name: 'brands',
+                      builder: (context, state) =>
+                          BrandList(selectedType: state.extra as ClothingType),
                       routes: <RouteBase>[
                         GoRoute(
-                            path: 'categories/types/products/kinds',
-                            name: 'kinds',
-                            builder: (context, state) => KindList(
-                                selectedProduct: state.extra as Product),
+                            path: 'categories/types/brands/products',
+                            name: 'products',
+                            builder: (context, state) => ProductList(
+                                selectedBrand: state.extra as Brand),
                             routes: <RouteBase>[
                               GoRoute(
+                                  path:
+                                      'categories/types/brands/products/kinds',
+                                  name: 'kinds',
+                                  builder: (context, state) => KindList(
+                                      selectedProduct: state.extra as Product),
+                                  routes: <RouteBase>[
+                                    GoRoute(
+                                      path:
+                                          'categories/types/brands/products/kinds/add_kind',
+                                      name: 'add_kind',
+                                      builder: (context, state) => KindMerge(
+                                          editMode: false,
+                                          selectedKind: state.extra as Kind),
+                                    ),
+                                    GoRoute(
+                                      path:
+                                          'categories/types/brands/products/kinds/edit_kind',
+                                      name: 'edit_kind',
+                                      builder: (context, state) => KindMerge(
+                                          editMode: true,
+                                          selectedKind: state.extra as Kind),
+                                    ),
+                                  ]),
+                              GoRoute(
                                 path:
-                                    'categories/types/products/kinds/add_kind',
-                                name: 'add_kind',
-                                builder: (context, state) => KindMerge(
+                                    'categories/types/brands/products/add_product',
+                                name: 'add_product',
+                                builder: (context, state) => ProductMerge(
                                     editMode: false,
-                                    selectedKind: state.extra as Kind),
+                                    selectedProduct: state.extra as Product),
                               ),
                               GoRoute(
                                 path:
-                                    'categories/types/products/kinds/edit_kind',
-                                name: 'edit_kind',
-                                builder: (context, state) => KindMerge(
+                                    'categories/types/brands/products/edit_product',
+                                name: 'edit_product',
+                                builder: (context, state) => ProductMerge(
                                     editMode: true,
-                                    selectedKind: state.extra as Kind),
-                              ),
+                                    selectedProduct: state.extra as Product),
+                              )
                             ]),
                         GoRoute(
-                          path: 'categories/types/products/add_product',
-                          name: 'add_product',
-                          builder: (context, state) => ProductMerge(
+                          path: 'categories/types/brands/add_brand',
+                          name: 'add_brand',
+                          builder: (context, state) => BrandMerge(
                               editMode: false,
-                              selectedProduct: state.extra as Product),
+                              selectedBrand: state.extra as Brand),
                         ),
                         GoRoute(
-                          path: 'categories/types/products/edit_product',
-                          name: 'edit_product',
-                          builder: (context, state) => ProductMerge(
+                          path: 'categories/types/brands/edit_brand',
+                          name: 'edit_brand',
+                          builder: (context, state) => BrandMerge(
                               editMode: true,
-                              selectedProduct: state.extra as Product),
-                        )
+                              selectedBrand: state.extra as Brand),
+                        ),
                       ]),
                   GoRoute(
                     path: 'categories/types/add_type',
                     name: 'add_type',
                     builder: (context, state) => TypeMerge(
                         editMode: false,
-                        selectedType:
-                            ClothingType(category: state.extra as Category)),
+                        selectedType: state.extra as ClothingType),
                   ),
                   GoRoute(
                     path: 'categories/types/edit_type',
@@ -178,7 +183,7 @@ class MyHome extends StatefulWidget {
   State<MyHome> createState() => _MyHomeState();
 }
 
-enum Menu { itemBrand, itemCategory, itemSettings }
+enum Menu { itemCategory, itemSettings }
 
 class _MyHomeState extends State<MyHome> {
   @override
@@ -191,18 +196,11 @@ class _MyHomeState extends State<MyHome> {
                 if (item == Menu.itemCategory) {
                   context.goNamed('categories');
                 }
-                if (item == Menu.itemBrand) {
-                  context.goNamed('brands');
-                }
                 if (item == Menu.itemSettings) {
                   context.go('/settings');
                 }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-                    const PopupMenuItem<Menu>(
-                      value: Menu.itemBrand,
-                      child: Text('Brands'),
-                    ),
                     const PopupMenuItem<Menu>(
                       value: Menu.itemCategory,
                       child: Text('Categories'),
