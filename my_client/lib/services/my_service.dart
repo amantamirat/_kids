@@ -1,3 +1,4 @@
+import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:http/http.dart' as http;
@@ -7,6 +8,20 @@ import '../util/constants.dart';
 
 class MyService {
   static var client = http.Client();
+
+  static Future<List<Brand>?> getBrands() async {
+    String url = "${Constants.apiURL}${Brand.path}";
+    var response = await client.get(
+      Uri.parse(url),
+      headers: Constants.requestHeaders,
+    );
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      return Brand.brandsFromJson(data["brands"]);
+    } else {
+      return null;
+    }
+  }
 
   static Future<List<Category>?> getCategories() async {
     String url = "${Constants.apiURL}${Category.path}";
@@ -40,12 +55,7 @@ class MyService {
         body: jsonEncode(myModel.toJson(includeId: false)),
       );
     }
-    print(url);
-    print(response.statusCode);
-    if (response.statusCode != 201) {
-      return false;
-    }
-    return true;
+    return response.statusCode == 201;
   }
 
   static Future<bool> deleteModel(MyModel myModel) async {
@@ -55,11 +65,7 @@ class MyService {
       Uri.parse(url),
       headers: Constants.requestHeaders,
     );
-    print(url);
-    if (response.statusCode == 204) {
-      return true;
-    } else {
-      return false;
-    }
+    //print(url);
+    return response.statusCode == 204;
   }
 }

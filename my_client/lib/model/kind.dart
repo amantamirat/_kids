@@ -1,4 +1,5 @@
 import 'package:abdu_kids/model/my_model.dart';
+import 'package:abdu_kids/model/product.dart';
 
 class Kind extends MyModel<Kind> {
   static const String path = "/kinds";
@@ -8,13 +9,16 @@ class Kind extends MyModel<Kind> {
   late String? color;
   late int? quantity;
 
+  late Product? product;
+
+  Kind({this.product});
+
   @override
   Kind fromJson(Map<String, dynamic> json) {
-    Kind kind = Kind();
-    kind.id = json[MyModel.attributeId];
-    kind.color = json[attributeColor];
-    kind.quantity = json[attributeQuantity];
-    return kind;
+    id = json[MyModel.attributeId];
+    color = json[attributeColor];
+    quantity = json[attributeQuantity];
+    return this;
   }
 
   @override
@@ -30,13 +34,13 @@ class Kind extends MyModel<Kind> {
 
   @override
   String basePath() {
-    // TODO: implement basePath
-    throw UnimplementedError();
+    return path;
   }
 
   @override
   String paramsPath() {
-    // TODO: implement paramsPath
-    throw UnimplementedError();
+    return "${product!.paramsPath()}/${product!.id}";
   }
+  static List<Kind> kindsFromJson(dynamic str) =>
+      List<Kind>.from((str).map((x) => Kind().fromJson(x)));
 }

@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 
 const BrandSchema = new mongoose.Schema(
     {
-        brand_name: {
+        name: {
             type: String,
             required: true,
             unique: true

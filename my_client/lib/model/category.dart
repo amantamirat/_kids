@@ -19,7 +19,7 @@ class Category extends MyModel<Category> {
     title = json[attributeTitle];
     description = json[attributeDescription];
     clothingTypes =
-        ClothingType.clothingTypesFromJson(json[attributeClothingTypes]);
+        ClothingType.clothingTypesFromJson(json[attributeClothingTypes], this);
     return this;
   }
 

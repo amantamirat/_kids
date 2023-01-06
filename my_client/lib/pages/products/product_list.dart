@@ -37,7 +37,8 @@ class _ProductListState extends State<ProductList> {
       body: displayTypes(productList),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.pushNamed('add_product', extra: Product(type: widget.selectedType));
+          context.pushNamed('add_product',
+              extra: Product(type: widget.selectedType));
         },
         backgroundColor: Colors.green,
         tooltip: 'Add Types',
@@ -68,7 +69,8 @@ class _ProductListState extends State<ProductList> {
                   )),
                   leading: GestureDetector(
                     onTap: () {
-                      context.pushNamed('upload_image', extra: products[index].id);
+                      context.pushNamed('upload_image',
+                          extra: products[index].id);
                     },
                     child: CircleAvatar(
                       backgroundColor: Colors.transparent,
@@ -82,6 +84,9 @@ class _ProductListState extends State<ProductList> {
                       ),
                     ),
                   ),
+                  onTap: () {
+                    context.pushNamed('kinds', extra: products[index]);
+                  },
                   trailing: SizedBox(
                     width: MediaQuery.of(context).size.width / 4,
                     child: Row(
@@ -90,7 +95,8 @@ class _ProductListState extends State<ProductList> {
                         GestureDetector(
                           child: const Icon(Icons.edit),
                           onTap: () {
-                            context.pushNamed('edit_product', extra: products[index]);
+                            context.pushNamed('edit_product',
+                                extra: products[index]);
                           },
                         ),
                         GestureDetector(

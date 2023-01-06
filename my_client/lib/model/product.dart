@@ -1,3 +1,4 @@
+import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/type.dart';
 
@@ -7,6 +8,7 @@ class Product extends MyModel<Product> {
   static const String attributeDescription = 'product_description';
   static const String attributeSize = 'size';
   static const String attributePrice = 'price';
+  static const String attributeKinds = 'product_colors';
 
   late String? name;
   late String? description;
@@ -14,6 +16,7 @@ class Product extends MyModel<Product> {
   late num price;
 
   late ClothingType? type;
+  late List<Kind> kinds;
 
   Product({this.type});
 
@@ -26,6 +29,7 @@ class Product extends MyModel<Product> {
     description = json[attributeDescription];
     size = json[attributeSize];
     price = json[attributePrice];
+    kinds = Kind.kindsFromJson(json[attributeKinds]);
     return this;
   }
 
@@ -49,7 +53,7 @@ class Product extends MyModel<Product> {
 
   @override
   String paramsPath() {
-    return "/${type!.category!.id}/${type!.id}";
+    return "${type!.paramsPath()}/${type!.id}";
   }
 
   static List<Product> productsFromJson(dynamic str) =>

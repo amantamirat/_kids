@@ -39,10 +39,10 @@ router.patch('/update/:category_id/:type_id', async (req, res) => {
     }
 });
 
-router.delete('/delete/:category_id/:type_id', async (req, res) => {
+router.delete('/delete/:category_id/:id', async (req, res) => {
     try {
         await Category.findByIdAndUpdate(req.params.category_id,
-            { $pull: { clothing_types: { _id: req.params.type_id } } },
+            { $pull: { clothing_types: { _id: req.params.id } } },
             { new: true, runValidators: true }
         );
         await imageController.deleteImage(req, res);

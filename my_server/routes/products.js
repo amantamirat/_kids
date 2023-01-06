@@ -57,11 +57,11 @@ router.patch('/update/:category_id/:type_id/:product_id', async (req, res) => {
     }
 });
 
-router.delete('/delete/:category_id/:type_id/:product_id', async (req, res) => {
+router.delete('/delete/:category_id/:type_id/:id', async (req, res) => {
     try {
         const category_id = req.params.category_id;
         const type_id = req.params.type_id;
-        const product_id = req.params.product_id;
+        const product_id = req.params.id;
 
         await Category.findByIdAndUpdate(category_id,
             { $pull: { 'clothing_types.$[t].products': { _id: product_id } } },

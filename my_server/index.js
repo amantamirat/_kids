@@ -20,14 +20,17 @@ mongoose.connect(process.env.MONGO_URL, {
   console.log('Database connection established...');
 });
 
-const categoryRouter = require("./routes/categories");
-app.use("/categories", categoryRouter);
 const brandRouter = require("./routes/brands");
 app.use("/brands", brandRouter);
+const categoryRouter = require("./routes/categories");
+app.use("/categories", categoryRouter);
 const typeRouter = require("./routes/types");
 app.use("/types", typeRouter);
 const productRouter = require("./routes/products");
 app.use("/products", productRouter);
+const kindRouter = require("./routes/kinds");
+app.use("/kinds", kindRouter);
+
 const uploadRouter = require("./routes/uploadImage");
 app.use("/upload", uploadRouter);
 

@@ -17,13 +17,14 @@ class TypeList extends StatefulWidget {
 class _TypeListState extends State<TypeList> {
   late List<ClothingType> typeList;
 
+
   @override
   void initState() {
     super.initState();
     typeList = widget.selectedCategory.clothingTypes;
-    for (var i = 0; i < typeList.length; i++) {
+    /*for (var i = 0; i < typeList.length; i++) {
       typeList[i].category = widget.selectedCategory;
-    }
+    }*/
   }
 
   @override

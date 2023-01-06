@@ -15,6 +15,36 @@ const CategorySchema = new mongoose.Schema(
             type: {
                 type: String,
             },
+            brands: [{
+                brand_name: {
+                    type: String
+                },
+                products: [
+                    {
+                        product_description: {
+                            type: String
+                        },
+                        size: {
+                            type: Number,
+                            min: 0
+                        },
+                        price: {
+                            type: Number,
+                            min: 0
+                        },
+                        product_kinds: [{
+                            color: {
+                                type: String
+                            },
+                            quantity: {
+                                type: Number,
+                                min: 0
+                            }
+                        }],
+                    }
+                ]
+
+            }],
             products: [
                 {
                     product_name: {
@@ -23,6 +53,7 @@ const CategorySchema = new mongoose.Schema(
                     product_description: {
                         type: String
                     },
+
                     size: {
                         type: Number,
                         min: 0
