@@ -5,14 +5,14 @@ import 'package:abdu_kids/model/my_model.dart';
 class Product extends MyModel<Product> {
   static const String path = "/products";
   //static const String attributeProductName = 'product_name';
-  static const String attributeDescription = 'product_description';
+  //static const String attributeDescription = 'product_description';
   static const String attributeSize = 'size';
   static const String attributePrice = 'price';
   static const String attributeKinds = 'product_kinds';
 
   //late String? name;
-  late String? description;
-  late int? size;
+  //late String? description;
+  late num size;
   late num price;
 
   late Brand? brand;
@@ -24,7 +24,7 @@ class Product extends MyModel<Product> {
   Product fromJson(Map<String, dynamic> json) {
     id = json["_id"];
     //name = json[attributeProductName];
-    description = json[attributeDescription];
+    //description = json[attributeDescription];
     size = json[attributeSize];
     price = json[attributePrice];
     kinds = Kind.kindsFromJson(json[attributeKinds], this);
@@ -38,7 +38,7 @@ class Product extends MyModel<Product> {
       data["_id"] = id;
     }
     //data[attributeProductName] = name;
-    data[attributeDescription] = description;
+    //data[attributeDescription] = description;
     data[attributeSize] = size;
     data[attributePrice] = price;
     return data;

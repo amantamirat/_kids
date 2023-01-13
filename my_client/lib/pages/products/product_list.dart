@@ -21,11 +21,6 @@ class _ProductListState extends State<ProductList> {
   void initState() {
     super.initState();
     productList = widget.selectedBrand.products;
-    /*
-    for (var i = 0; i < productList.length; i++) {
-      productList[i].type = widget.selectedType;
-    }
-    */
   }
 
   @override
@@ -63,7 +58,7 @@ class _ProductListState extends State<ProductList> {
                 child: ListTile(
                   title: Center(
                       child: Text(
-                    "${products[index].description}",
+                    "${products[index].brand.name} Size ${products[index].size}",
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,

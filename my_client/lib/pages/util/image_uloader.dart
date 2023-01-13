@@ -25,7 +25,7 @@ class _ImageUploader extends State<ImageUploader> {
       Constants.getImageURL(widget.id),
       width: 200,
       height: 200,
-      fit: BoxFit.scaleDown,
+      fit: BoxFit.fill,
       errorBuilder: (context, error, stackTrace) => Image.asset(
         Constants.noImageAssetPath,
         width: 200,

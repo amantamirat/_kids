@@ -18,7 +18,7 @@ class ProductMerge extends StatefulWidget {
 class _ProductMerge extends State<ProductMerge> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   //final _nameController = TextEditingController();
-  final _descriptionController = TextEditingController();
+  //final _descriptionController = TextEditingController();
   final _sizeController = TextEditingController();
   final _priceController = TextEditingController();
   late String appBarTitle = "Add Product";
@@ -27,7 +27,7 @@ class _ProductMerge extends State<ProductMerge> {
     super.initState();
     if (widget.editMode) {
       //_nameController.text = widget.selectedProduct.name ?? '';
-      _descriptionController.text = widget.selectedProduct.description ?? '';
+      //_descriptionController.text = widget.selectedProduct.description ?? '';
       _sizeController.text = "${widget.selectedProduct.size}";
       _priceController.text = "${widget.selectedProduct.price}";
       appBarTitle = "Edit Product";
@@ -68,7 +68,7 @@ class _ProductMerge extends State<ProductMerge> {
                     },
                   ),
                 ),
-                */
+                
                 Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
@@ -81,6 +81,7 @@ class _ProductMerge extends State<ProductMerge> {
                         const InputDecoration(hintText: "Product Description"),
                   ),
                 ),
+                */
                 Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
@@ -128,7 +129,7 @@ class _ProductMerge extends State<ProductMerge> {
                       if (globalFormKey.currentState!.validate()) {
                         final product = widget.selectedProduct;
                         //product.name = _nameController.text;
-                        product.description = _descriptionController.text;
+                        //product.description = _descriptionController.text;
                         product.size = int.parse(_sizeController.text);
                         product.price = num.parse(_priceController.text);
                         if (await MyService.saveItem(
