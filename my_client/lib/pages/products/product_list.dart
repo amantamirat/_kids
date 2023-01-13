@@ -124,6 +124,7 @@ class _ProductListState extends State<ProductList> {
                                             timeInSecForIosWeb: 1,
                                             backgroundColor: Colors.red,
                                             textColor: Colors.yellow);
+                                        productList.removeAt(index);
                                         setState(() {});
                                         context.pop();
                                       }

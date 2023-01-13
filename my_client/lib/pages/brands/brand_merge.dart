@@ -76,6 +76,10 @@ class _BrandMerge extends State<BrandMerge> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.yellow);
+                              if (!widget.editMode) {                           
+                            brand.type!.brands
+                                .add(brand);
+                          }
                           context.pop();
                         }
                       }

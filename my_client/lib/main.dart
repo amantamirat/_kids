@@ -9,6 +9,7 @@ import 'package:abdu_kids/pages/categories/category_list.dart';
 import 'package:abdu_kids/pages/categories/category_merge.dart';
 import 'package:abdu_kids/pages/kinds/kind_list.dart';
 import 'package:abdu_kids/pages/kinds/kind_merge.dart';
+import 'package:abdu_kids/pages/kinds/view_kinds.dart';
 import 'package:abdu_kids/pages/products/product_list.dart';
 import 'package:abdu_kids/pages/products/product_merge.dart';
 import 'package:abdu_kids/pages/products/view_products.dart';
@@ -78,6 +79,13 @@ final GoRouter _router = GoRouter(
                                       selectedKind: state.extra as Kind),
                                 ),
                               ]),
+                          GoRoute(
+                            path:
+                                'categories/types/brands/products/view_kinds',
+                            name: 'view_kinds',
+                            builder: (context, state) => ViewKinds(                                
+                                selectedProduct: state.extra as Product),
+                          ),
                           GoRoute(
                             path:
                                 'categories/types/brands/products/add_product',

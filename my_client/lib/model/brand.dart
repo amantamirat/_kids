@@ -8,15 +8,15 @@ class Brand extends MyModel<Brand> {
   static const String attributeProducts = 'products';
   late String? name;
   late ClothingType? type;
-  late List<Product> products;
-  
+  late List<Product> products = List.empty(growable: true);
+
   Brand({this.type});
 
   @override
   Brand fromJson(Map<String, dynamic> json) {
     id = json[MyModel.attributeId];
     name = json[attributeName];
-    products =  Product.productsFromJson(json[attributeProducts], this);
+    products = Product.productsFromJson(json[attributeProducts], this);
     return this;
   }
 
@@ -37,7 +37,7 @@ class Brand extends MyModel<Brand> {
 
   @override
   String paramsPath() {
-     return "${type!.paramsPath()}/${type!.id}";
+    return "${type!.paramsPath()}/${type!.id}";
   }
 
   static List<Brand> brandsFromJson(dynamic str, ClothingType type) =>

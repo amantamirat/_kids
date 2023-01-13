@@ -18,7 +18,7 @@ class ProductMerge extends StatefulWidget {
 class _ProductMerge extends State<ProductMerge> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   //final _nameController = TextEditingController();
-  //final _descriptionController = TextEditingController();
+  final _detailController = TextEditingController();
   final _sizeController = TextEditingController();
   final _priceController = TextEditingController();
   late String appBarTitle = "Add Product";
@@ -27,7 +27,7 @@ class _ProductMerge extends State<ProductMerge> {
     super.initState();
     if (widget.editMode) {
       //_nameController.text = widget.selectedProduct.name ?? '';
-      //_descriptionController.text = widget.selectedProduct.description ?? '';
+      _detailController.text = widget.selectedProduct.detail ?? '';
       _sizeController.text = "${widget.selectedProduct.size}";
       _priceController.text = "${widget.selectedProduct.price}";
       appBarTitle = "Edit Product";
@@ -52,36 +52,23 @@ class _ProductMerge extends State<ProductMerge> {
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
             child: Column(
               children: <Widget>[
-                /*Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10,
-                    top: 10,
-                  ),
-                  child: TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(hintText: "Product Name"),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter clothing type name';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                
                 Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
                     top: 10,
                   ),
                   child: TextFormField(
-                    controller: _descriptionController,
-                    keyboardType: TextInputType.multiline,
+                    controller: _detailController,
                     decoration:
-                        const InputDecoration(hintText: "Product Description"),
+                        const InputDecoration(hintText: "Product Detail"),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter detail info';
+                      }
+                      return null;
+                    },
                   ),
                 ),
-                */
                 Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
@@ -129,7 +116,7 @@ class _ProductMerge extends State<ProductMerge> {
                       if (globalFormKey.currentState!.validate()) {
                         final product = widget.selectedProduct;
                         //product.name = _nameController.text;
-                        //product.description = _descriptionController.text;
+                        product.detail = _detailController.text;
                         product.size = int.parse(_sizeController.text);
                         product.price = num.parse(_priceController.text);
                         if (await MyService.saveItem(
@@ -141,6 +128,9 @@ class _ProductMerge extends State<ProductMerge> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.yellow);
+                          if (!widget.editMode) {
+                            product.brand!.products.add(product);
+                          }
                           context.pop();
                         }
                       }

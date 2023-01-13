@@ -61,15 +61,14 @@ class _ViewProductsState extends State<ViewProducts> {
                     },
                     child: InkWell(
                       onTap: () {
-                        //context.pushNamed('brands', extra: type);
+                        context.pushNamed('view_kinds', extra: product);
                       },
                     ),
                   ),
-                  Text("${product.brand!.name} - ${product.size} (${product.price} Birr)",
+                  Text("${product.brand!.name}-${product.detail} /${product.size}/ (${product.price} Birr)",
                       style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.bold,
+                          color: Colors.black,                          
                           backgroundColor: Colors.amber)),
                 ],
               ),

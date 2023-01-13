@@ -122,6 +122,7 @@ class _KindList extends State<KindList> {
                                             timeInSecForIosWeb: 1,
                                             backgroundColor: Colors.red,
                                             textColor: Colors.yellow);
+                                            kindList.removeAt(index);
                                         setState(() {});
                                         context.pop();
                                       }

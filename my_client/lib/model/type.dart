@@ -10,7 +10,7 @@ class ClothingType extends MyModel<ClothingType> {
   
   late String? type;
   late Category? category;
-  late List<Brand> brands;
+  late List<Brand> brands = List.empty(growable: true);
   
   ClothingType({this.category});
 

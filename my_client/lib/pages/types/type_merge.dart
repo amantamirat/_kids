@@ -17,7 +17,8 @@ class TypeMerge extends StatefulWidget {
 class _TypeMerge extends State<TypeMerge> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   final _typeController = TextEditingController();
-  late String appBarTitle = "Add ${widget.selectedType.category!.title} Clothing Type";
+  late String appBarTitle =
+      "Add ${widget.selectedType.category!.title} Clothing Type";
   @override
   void initState() {
     super.initState();
@@ -32,11 +33,11 @@ class _TypeMerge extends State<TypeMerge> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(title: Text(appBarTitle)),
-      body: Form(key: globalFormKey, child: typeForm()),
+      body: Form(key: globalFormKey, child: _typeForm()),
     ));
   }
 
-  Widget typeForm() {
+  Widget _typeForm() {
     return SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -67,16 +68,22 @@ class _TypeMerge extends State<TypeMerge> {
                       if (globalFormKey.currentState!.validate()) {
                         final clothingType = widget.selectedType;
                         clothingType.type = _typeController.text;
-
                         if (await MyService.saveItem(
                             clothingType, widget.editMode)) {
                           Fluttertoast.showToast(
-                              msg: 'Saved',
+                              msg: widget.editMode
+                                  ? 'Saved'
+                                  : " Saved with id ${clothingType.id}",
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.yellow);
+                          if (!widget.editMode) {
+                            //clothingType.brands = List.empty(growable: true);
+                            clothingType.category!.clothingTypes
+                                .add(clothingType);
+                          }
                           context.pop();
                         }
                       }

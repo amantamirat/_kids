@@ -93,6 +93,9 @@ class _KindMerge extends State<KindMerge> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.yellow);
+                          if (!widget.editMode) {
+                            kind.product!.kinds.add(kind);
+                          }
                           context.pop();
                         }
                       }

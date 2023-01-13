@@ -7,7 +7,6 @@ import '../util/constants.dart';
 
 class MyService {
   static var client = http.Client();
-  
 
   static Future<List<Category>?> getCategories() async {
     String url = "${Constants.apiURL}${Category.path}";
@@ -33,15 +32,20 @@ class MyService {
         headers: Constants.requestHeaders,
         body: jsonEncode(myModel.toJson()),
       );
-    } else {
-      url = "$url${Constants.newPath}${myModel.paramsPath()}";
-      response = await http.post(
-        Uri.parse(url),
-        headers: Constants.requestHeaders,
-        body: jsonEncode(myModel.toJson(includeId: false)),
-      );
+      return response.statusCode == 201;
     }
-    return response.statusCode == 201;
+    url = "$url${Constants.newPath}${myModel.paramsPath()}";
+    response = await http.post(
+      Uri.parse(url),
+      headers: Constants.requestHeaders,
+      body: jsonEncode(myModel.toJson(includeId: false)),
+    );
+    if (response.statusCode != 201) {
+      return false;
+    }
+    var data = jsonDecode(response.body);
+    myModel.id = data["data"]["_id"];
+    return true;
   }
 
   static Future<bool> deleteModel(MyModel myModel) async {
