@@ -57,7 +57,7 @@ exports.editKind = async (req, res, next) => {
             { arrayFilters: [{ 't._id': type_id }, { 'p._id': product_id }, { 'b._id': brand_id }, { 'k._id': kind_id }] });
         res.status(201).json({
             status: 'Success',
-            kind: kind
+            data: kind
         });
     } catch (err) {
         res.status(205).json({
@@ -78,8 +78,8 @@ exports.deleteKind = async (req, res, next) => {
         const kind_id = req.params.id;
 
         await Category.findByIdAndUpdate(category_id,
-            { $pull: { 'clothing_types.$[t].products.$[p].brands.$[b].product_kinds': { _id: kind_id } } },
-            { arrayFilters: [{ 't._id': type_id }, { 'p._id': product_id },{ 'b._id': brand_id }] });
+            { $pull: { 'clothing_types.$[t].brands.$[b].products.$[p].product_kinds': { _id: kind_id } } },
+            { arrayFilters: [{ 't._id': type_id }, { 'b._id': brand_id }, { 'p._id': product_id }] });
 
         await imageController.deleteImage(req, res);
 

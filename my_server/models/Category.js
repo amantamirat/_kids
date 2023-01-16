@@ -20,7 +20,7 @@ const CategorySchema = new mongoose.Schema(
                 },
                 products: [
                     {
-                        product_description: {
+                        product_detail: {
                             type: String
                         },
                         size: {

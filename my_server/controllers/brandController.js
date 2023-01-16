@@ -10,12 +10,12 @@ exports.createBrand = async (req, res, next) => {
         let types = category.clothing_types;
         for (let i = 0; i < types.length; i++) {
             if (types[i]._id.toString() === type_id) {
-                product = types[i]['brands'].create(brand);
+                brand = types[i]['brands'].create(brand);
                 types[i]['brands'].push(brand);
                 await category.save();
                 return res.status(201).json({
                     status: 'Success',
-                    brand: brand
+                    data: brand
                 });
             }
         }
@@ -43,7 +43,7 @@ exports.editBrand = async (req, res, next) => {
             { arrayFilters: [{ 't._id': type_id }, { 'b._id': brand_id }] });
         res.status(201).json({
             status: 'Success',
-            brand: brand
+            data: brand
         });
     } catch (err) {
         res.status(205).json({
