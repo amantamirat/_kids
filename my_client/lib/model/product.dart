@@ -8,12 +8,14 @@ class Product extends MyModel<Product> {
   static const String attributeDetail = 'product_detail';
   static const String attributeSize = 'size';
   static const String attributePrice = 'price';
+  static const String attributeMOQ = 'minimum_order_quanity';
   static const String attributeKinds = 'product_kinds';
 
   //late String? name;
   late String? detail;
   late num size;
   late num price;
+  late num moq;
 
   late Brand? brand;
   late List<Kind> kinds = List.empty(growable: true);
@@ -27,6 +29,7 @@ class Product extends MyModel<Product> {
     detail = json[attributeDetail];
     size = json[attributeSize];
     price = json[attributePrice];
+    moq = json[attributeMOQ] ?? 0 ;
     kinds = Kind.kindsFromJson(json[attributeKinds], this);
     return this;
   }
@@ -41,6 +44,7 @@ class Product extends MyModel<Product> {
     data[attributeDetail] = detail;
     data[attributeSize] = size;
     data[attributePrice] = price;
+    data[attributeMOQ] = moq;
     return data;
   }
 
@@ -52,6 +56,11 @@ class Product extends MyModel<Product> {
   @override
   String paramsPath() {
     return "${brand!.paramsPath()}/${brand!.id}";
+  }
+
+  @override
+  String toString() {
+    return detail!;
   }
 
   final List<Kind> _avialiableKinds = List.empty(growable: true);

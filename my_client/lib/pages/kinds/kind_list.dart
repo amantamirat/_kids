@@ -8,6 +8,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 
 class KindList extends StatefulWidget {
   final Product selectedProduct;
+  
   const KindList({Key? key, required this.selectedProduct}) : super(key: key);
 
   @override
@@ -21,9 +22,6 @@ class _KindList extends State<KindList> {
   void initState() {
     super.initState();
     kindList = widget.selectedProduct.kinds;
-    /*for (var i = 0; i < kindList.length; i++) {
-      kindList[i].product = widget.selectedProduct;
-    }*/
   }
 
   @override

@@ -55,7 +55,6 @@ class MyService {
       Uri.parse(url),
       headers: Constants.requestHeaders,
     );
-    //print(url);
     return response.statusCode == 204;
   }
 }

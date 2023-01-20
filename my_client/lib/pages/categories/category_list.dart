@@ -1,10 +1,12 @@
 import 'package:abdu_kids/model/category.dart';
+import 'package:abdu_kids/util/my_extra_wrapper.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/util/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-enum Menu { itemSettings }
+enum Menu { itemManage, itemSettings }
 
 class CategoryList extends StatefulWidget {
   const CategoryList({super.key});
@@ -14,7 +16,7 @@ class CategoryList extends StatefulWidget {
 
 class _CategoryListState extends State<CategoryList> {
   Future<List<Category>?>? categoriesList;
-
+  bool manageMode = false;
   @override
   void initState() {
     super.initState();
@@ -32,9 +34,17 @@ class _CategoryListState extends State<CategoryList> {
               onSelected: (Menu item) {
                 if (item == Menu.itemSettings) {
                   context.pushNamed('settings');
+                } else if (item == Menu.itemManage) {
+                  setState(
+                    () => {manageMode = !manageMode},
+                  );
                 }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+                    PopupMenuItem<Menu>(
+                      value: Menu.itemManage,
+                      child: Text(manageMode ? 'View Mode' : 'Manage Mode'),
+                    ),
                     const PopupMenuItem<Menu>(
                       value: Menu.itemSettings,
                       child: Text('Settings'),
@@ -44,14 +54,18 @@ class _CategoryListState extends State<CategoryList> {
       ),
       backgroundColor: Colors.grey[200],
       body: loadCategories(),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          context.pushNamed('add_category');
-        },
-        backgroundColor: Colors.green,
-        tooltip: 'Apply Changes',
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: manageMode
+          ? FloatingActionButton(
+              onPressed: () {
+                context.goNamed('merge_category',
+                    params: {Constants.editMode: false.toString()},
+                    extra: Category());
+              },
+              backgroundColor: Colors.green,
+              tooltip: 'Add New Category',
+              child: const Icon(Icons.add),
+            )
+          : Container(),
     );
   }
 
@@ -70,17 +84,146 @@ class _CategoryListState extends State<CategoryList> {
           default:
             if (snapshot.hasError) {
               return Center(
-                child: Text('Error: ${snapshot.error}'),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Error: ${snapshot.error}'),
+                    ElevatedButton(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: const [
+                            Icon(
+                              Icons.refresh,
+                            ),
+                            SizedBox(
+                              width: 5,
+                            ),
+                            Text('Referesh'),
+                          ],
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            categoriesList = MyService.getCategories();
+                          });
+                        }),
+                  ],
+                ),
               );
             } else {
-              return _display(snapshot.data);
+              if (snapshot.data!.isNotEmpty) {
+                return manageMode
+                    ? _displayCategoryList(snapshot.data!)
+                    : _display(snapshot.data!);
+              }
+              return const Center(child: Text('No Category Data is Found!'));
             }
         }
       },
     );
   }
 
-  Widget _display(List<Category>? categories) {
+  Widget _displayCategoryList(List<Category> categories) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: const ClampingScrollPhysics(),
+      scrollDirection: Axis.vertical,
+      padding: const EdgeInsets.all(8),
+      itemCount: categories.length,
+      itemBuilder: (BuildContext context, int index) {
+        final category = categories.elementAt(index);
+        return Container(
+          color: Colors.amberAccent[index * 10],
+          child: ListTile(
+            title: Center(
+                child: Text(
+              "${category.title}",
+              style: const TextStyle(
+                color: Colors.black,
+                fontWeight: FontWeight.bold,
+              ),
+            )),
+            leading: GestureDetector(
+              onTap: () {
+                context.pushNamed('upload_image', extra: category.id);
+              },
+              child: CachedNetworkImage(
+                imageUrl: Constants.getImageURL(category.id),
+                imageBuilder: (context, imageProvider) => Container(
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    image: DecorationImage(
+                        image: imageProvider, fit: BoxFit.fill),
+                  ),
+                ),
+                placeholder: (context, url) =>
+                    const CircularProgressIndicator(),
+                errorWidget: (context, url, error) => const Icon(Icons.error),
+              ),
+            ),
+            onTap: () {
+              final extra = MyExtraWrapper(
+                  data: category, editMode: false, manageMode: manageMode);
+              GoRouter.of(context).pushNamed('types', extra: extra);
+            },
+            trailing: SizedBox(
+              width: MediaQuery.of(context).size.width / 6,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    child: const Icon(Icons.edit),
+                    onTap: () {
+                      GoRouter.of(context).pushNamed('merge_category',
+                          params: {Constants.editMode: true.toString()},
+                          extra: category);
+                    },
+                  ),
+                  GestureDetector(
+                    child: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                    onTap: () {
+                      showDialog<String>(
+                        context: context,
+                        builder: (BuildContext context) => AlertDialog(
+                          title: const Text('Delete Category'),
+                          content: Text(
+                              'Are you sure, delete ${category.title} and its Contenet?'),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () async {
+                                if (await MyService.deleteModel(category)) {
+                                  setState(() {
+                                    categoriesList = MyService.getCategories();
+                                  });
+                                  context.pop();
+                                }
+                              },
+                              child: const Text('Yes'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+      separatorBuilder: (BuildContext context, int index) => const Divider(),
+    );
+  }
+
+  Widget _display(List<Category> categories) {
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: const BoxDecoration(
@@ -89,9 +232,9 @@ class _CategoryListState extends State<CategoryList> {
       child: ListView.builder(
         scrollDirection: Axis.vertical,
         shrinkWrap: true,
-        itemCount: categories?.length,
+        itemCount: categories.length,
         itemBuilder: (BuildContext context, int index) {
-          final category = categories!.elementAt(index);
+          final category = categories.elementAt(index);
           return SizedBox(
             height: MediaQuery.of(context).orientation == Orientation.portrait
                 ? (MediaQuery.of(context).size.height / 3)
@@ -124,17 +267,27 @@ class _CategoryListState extends State<CategoryList> {
               Expanded(
                 child: Stack(
                   children: [
-                    Ink.image(
-                      image: NetworkImage(Constants.getImageURL(category.id)),
-                      fit: BoxFit.fill,
-                      onImageError: (exception, stackTrace) => {
-                        Image.asset(Constants.noImageAssetPath,
-                            fit: BoxFit.fill)
+                    InkWell(
+                      onTap: () {
+                        final extra = MyExtraWrapper(
+                            data: category,
+                            editMode: false,
+                            manageMode: manageMode);
+                        GoRouter.of(context).pushNamed('types', extra: extra);
                       },
-                      child: InkWell(
-                        onTap: () {
-                          context.pushNamed('types', extra: category);
-                        },
+                      child: CachedNetworkImage(
+                        imageUrl: Constants.getImageURL(category.id),
+                        imageBuilder: (context, imageProvider) => Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            image: DecorationImage(
+                                image: imageProvider, fit: BoxFit.cover),
+                          ),
+                        ),
+                        placeholder: (context, url) =>
+                            const CircularProgressIndicator(),
+                        errorWidget: (context, url, error) =>
+                            const Icon(Icons.error),
                       ),
                     ),
                     Text(
@@ -146,79 +299,6 @@ class _CategoryListState extends State<CategoryList> {
                           backgroundColor: Colors.amber),
                     )
                   ],
-                ),
-              ),
-              //const SizedBox(height: 6),
-              Padding(
-                padding: const EdgeInsets.all(2).copyWith(bottom: 0),
-                child: ListTile(
-                  leading: GestureDetector(
-                    onTap: () {
-                      context.pushNamed('upload_image',
-                          extra: category.id);
-                    },
-                    child: CircleAvatar(                    
-                        backgroundImage: NetworkImage(
-                            Constants.getImageURL(category.id))),
-                  ),
-                  title: Center(
-                    child: Text(
-                      "${category.clothingTypes.length} types",
-                      style: const TextStyle(fontSize: 12),
-                    ),
-                  ),
-                  onTap: () {
-                    //context.pushNamed('types', extra: category);
-                  },
-                  trailing: SizedBox(
-                    width: MediaQuery.of(context).size.width / 6,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          child: const Icon(Icons.edit),
-                          onTap: () {
-                            context.goNamed('edit_category', extra: category);
-                          },
-                        ),
-                        GestureDetector(
-                          child: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onTap: () {
-                            showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: const Text('Delete Category'),
-                                content: const Text('Are you sure, proceed?'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'Cancel'),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      if (await MyService.deleteModel(
-                                          category)) {
-                                        setState(() {
-                                          categoriesList =
-                                              MyService.getCategories();
-                                        });
-                                        context.pop();
-                                      }
-                                    },
-                                    child: const Text('Yes'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
             ],
@@ -244,17 +324,24 @@ class _CategoryListState extends State<CategoryList> {
                     child: Card(
                       child: Stack(
                         children: [
-                          Ink.image(
-                            image: NetworkImage(Constants.getImageURL(type.id)),
-                            fit: BoxFit.fill,
-                            onImageError: (exception, stackTrace) => {
-                              Image.asset(Constants.noImageAssetPath,
-                                  fit: BoxFit.fill)
+                          InkWell(
+                            onTap: () {
+                              context.pushNamed('view_products', extra: type);
                             },
-                            child: InkWell(
-                              onTap: () {
-                                context.pushNamed('view_products', extra: type);
-                              },
+                            child: CachedNetworkImage(
+                              imageUrl: Constants.getImageURL(type.id),
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.rectangle,
+                                  image: DecorationImage(
+                                      image: imageProvider, fit: BoxFit.cover),
+                                ),
+                              ),
+                              placeholder: (context, url) =>
+                                  const CircularProgressIndicator(),
+                              errorWidget: (context, url, error) =>
+                                  const Icon(Icons.error),
                             ),
                           ),
                           Text("${type.type}",

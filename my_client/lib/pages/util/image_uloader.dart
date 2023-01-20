@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'package:abdu_kids/services/image_service.dart';
 import 'package:abdu_kids/util/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
@@ -15,13 +17,32 @@ class ImageUploader extends StatefulWidget {
 class _ImageUploader extends State<ImageUploader> {
   final ImagePicker _picker = ImagePicker();
   File? _image;
-  Image? _remoteImage;
+  CachedNetworkImage? _remoteImage;
   bool _isImageSelected = false;
 
   @override
   void initState() {
     super.initState();
-    _remoteImage = Image.network(
+    _remoteImage = CachedNetworkImage(
+        imageUrl: Constants.getImageURL(widget.id),
+        progressIndicatorBuilder: (context, url, progress) => Center(
+              child: CircularProgressIndicator(
+                value: progress.progress,
+              ),
+            ),
+        errorWidget: (context, url, error) => Image.asset(
+              Constants.noImageAssetPath,
+            ),
+        imageBuilder: (context, imageProvider) => Container(
+              width: 200,
+              height: 200,
+              decoration: BoxDecoration(
+                shape: BoxShape.rectangle,
+                image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
+              ),
+            ));
+
+    /*Image.network(
       Constants.getImageURL(widget.id),
       width: 200,
       height: 200,
@@ -31,7 +52,7 @@ class _ImageUploader extends State<ImageUploader> {
         width: 200,
         height: 200,
       ),
-    );
+    );*/
   }
 
   @override
@@ -41,10 +62,23 @@ class _ImageUploader extends State<ImageUploader> {
       appBar: AppBar(title: const Text("upload image")),
       body: imagePicker(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
+        onPressed: () async {
           if (_isImageSelected) {
-            ImageService.uploadImage(widget.id, _image!.path);
-            context.pop();
+            bool uploded =
+                await ImageService.uploadImage(widget.id, _image!.path);
+            if (uploded) {
+              await CachedNetworkImage.evictFromCache(
+                      Constants.getImageURL(widget.id))
+                  .then((value) {
+                //ignore: avoid_print
+                print('File removed');
+              }).onError((error, stackTrace) {
+                //ignore: avoid_print
+                print(error);
+              });
+
+              context.pop();
+            }
           }
         },
         backgroundColor: Colors.green,

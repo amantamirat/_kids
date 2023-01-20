@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MySharedPreferences extends StatefulWidget {
-  
   const MySharedPreferences({Key? key}) : super(key: key);
 
   @override
@@ -16,16 +15,19 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
   final _protocolController = TextEditingController();
   final _hostAddressController = TextEditingController();
   final _portNumberController = TextEditingController();
+  //final _defaultMOQController = TextEditingController();
 
   late Future<String> _protocol;
   late Future<String> _hostAddress;
   late Future<int> _portNumber;
+  //late Future<int> _defaultMOQ;
 
   Future<void> _updateParams() async {
     final SharedPreferences prefs = await _prefs;
     final String protocol = _protocolController.text;
     final String hostAddress = _hostAddressController.text;
     final int portNumber = int.parse(_portNumberController.text);
+    //final int defaultMOQ = int.parse(_defaultMOQController.text);
     setState(() {
       _protocol = prefs
           .setString(SharedPrefs.keyProtocol, protocol)
@@ -42,6 +44,12 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
           .then((bool success) {
         return portNumber;
       });
+      /*
+      _defaultMOQ =
+          prefs.setInt(SharedPrefs.keyMOQ, defaultMOQ).then((bool success) {
+        return defaultMOQ;
+      });
+      */
     });
   }
 
@@ -56,8 +64,12 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
     });
     _portNumber = _prefs.then((SharedPreferences prefs) {
       return prefs.getInt(SharedPrefs.keyPortNumber) ?? 8080;
-      //return 8080;
     });
+    /*
+    _defaultMOQ = _prefs.then((SharedPreferences prefs) {
+      return prefs.getInt(SharedPrefs.keyMOQ) ?? 4;
+    });
+    */
   }
 
   @override
@@ -80,6 +92,7 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
                   _protocolController.text = snapshot.data![0];
                   _hostAddressController.text = snapshot.data![1];
                   _portNumberController.text = "${snapshot.data![2]}";
+                  //_defaultMOQController.text = "${snapshot.data![3]}";
                   return myForm();
                 }
             }
@@ -131,6 +144,19 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
                       decoration:
                           const InputDecoration(hintText: "Port Number")),
                 ),
+                /*
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 10,
+                    top: 10,
+                  ),
+                  child: TextField(
+                      controller: _defaultMOQController,
+                      keyboardType: TextInputType.number,
+                      decoration:
+                          const InputDecoration(hintText: "Default MOQ")),
+                )
+                */
               ],
             ),
           )

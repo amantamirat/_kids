@@ -45,6 +45,11 @@ class Category extends MyModel<Category> {
     return "";
   }
 
+  @override
+  String toString() {
+    return title!;
+  }
+
   static List<Category> categoriesFromJson(dynamic str) =>
       List<Category>.from((str).map((x) => Category().fromJson(x)));
 }

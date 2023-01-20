@@ -42,6 +42,11 @@ class ClothingType extends MyModel<ClothingType> {
     return "/${category!.id}";
   }
 
+  @override
+  String toString() {
+    return type!;
+  }
+
   static List<ClothingType> clothingTypesFromJson(dynamic str, Category category) =>
       List<ClothingType>.from((str).map((x) => ClothingType(category: category).fromJson(x)));
 }

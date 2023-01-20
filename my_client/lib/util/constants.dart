@@ -2,6 +2,7 @@ import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
 
 class Constants {
+  
   static const String appName = "abdu_kids";
 
   static const String newPath = "/new";
@@ -10,14 +11,18 @@ class Constants {
 
   static const String deletePath = "/delete";
 
-  static const String noImageAssetPath =
-      "assets/images/No-Image-Placeholder.svg.png";
+  static const String editMode = "editMode";
 
-  static Image noImagePlaceHolder = Image.asset(noImageAssetPath);
+  static const String manageMode = "manageMode";
 
   static const Map<String, String> requestHeaders = {
     'Content-Type': 'application/json',
   };
+
+  static const String noImageAssetPath =
+      "assets/images/No-Image-Placeholder.svg.png";
+
+  static Image noImagePlaceHolder = Image.asset(noImageAssetPath);
 
   static String getImageURL(id) {
     return "${Constants.imageFileURL}/$id";
@@ -38,4 +43,9 @@ class Constants {
   static int portNumber() {
     return SharedPrefs.instance.getInt(SharedPrefs.keyPortNumber) ?? 8080;
   }
+
+  /*
+  static int defaultMOQ() {
+    return SharedPrefs.instance.getInt(SharedPrefs.keyMOQ) ?? 4;
+  }*/
 }

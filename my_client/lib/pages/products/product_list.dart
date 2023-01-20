@@ -58,7 +58,7 @@ class _ProductListState extends State<ProductList> {
                 child: ListTile(
                   title: Center(
                       child: Text(
-                    "${products[index].brand.name} Size ${products[index].size}",
+                    "${products[index].brand.name} ${products[index]} Size ${products[index].size}",
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,

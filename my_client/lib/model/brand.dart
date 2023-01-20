@@ -40,6 +40,11 @@ class Brand extends MyModel<Brand> {
     return "${type!.paramsPath()}/${type!.id}";
   }
 
+  @override
+  String toString() {
+    return name!;
+  }
+
   static List<Brand> brandsFromJson(dynamic str, ClothingType type) =>
       List<Brand>.from((str).map((x) => Brand(type: type).fromJson(x)));
 }

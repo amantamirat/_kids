@@ -1,5 +1,6 @@
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/services/my_service.dart';
+import 'package:abdu_kids/util/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
@@ -21,16 +22,21 @@ class _ProductMerge extends State<ProductMerge> {
   final _detailController = TextEditingController();
   final _sizeController = TextEditingController();
   final _priceController = TextEditingController();
-  late String appBarTitle = "Add Product";
+  final _moqController = TextEditingController();
+  late String appBarTitle =
+      "Add ${widget.selectedProduct.brand} ${widget.selectedProduct.brand!.type} Product";
   @override
   void initState() {
     super.initState();
+    //_moqController.text = "${Constants.defaultMOQ()}";
     if (widget.editMode) {
       //_nameController.text = widget.selectedProduct.name ?? '';
       _detailController.text = widget.selectedProduct.detail ?? '';
       _sizeController.text = "${widget.selectedProduct.size}";
       _priceController.text = "${widget.selectedProduct.price}";
-      appBarTitle = "Edit Product";
+      _moqController.text = "${widget.selectedProduct.moq}";
+      appBarTitle =
+          "Edit ${widget.selectedProduct.brand} ${widget.selectedProduct}  Product";
     }
   }
 
@@ -110,6 +116,27 @@ class _ProductMerge extends State<ProductMerge> {
                     },
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 10,
+                    top: 10,
+                  ),
+                  child: TextFormField(
+                    controller: _moqController,
+                    decoration: const InputDecoration(hintText: "Product MOQ"),
+                    keyboardType: TextInputType.number,
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.digitsOnly
+                    ],
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'MOQ can not be empty';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(height: 25),
                 ElevatedButton(
                     child: const Text("Save"),
                     onPressed: () async {
@@ -119,6 +146,7 @@ class _ProductMerge extends State<ProductMerge> {
                         product.detail = _detailController.text;
                         product.size = int.parse(_sizeController.text);
                         product.price = num.parse(_priceController.text);
+                        product.moq = num.parse(_moqController.text);
                         if (await MyService.saveItem(
                             product, widget.editMode)) {
                           Fluttertoast.showToast(

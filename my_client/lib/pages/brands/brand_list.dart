@@ -117,8 +117,9 @@ class _BrandList extends State<BrandList> {
                                             timeInSecForIosWeb: 1,
                                             backgroundColor: Colors.red,
                                             textColor: Colors.yellow);
-                                            brandsList.removeAt(index);                                            
-                                        setState(() {});
+                                        setState(() {
+                                          brandsList.removeAt(index);
+                                        });
                                         context.pop();
                                       }
                                     },
