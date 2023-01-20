@@ -57,9 +57,8 @@ class _CategoryListState extends State<CategoryList> {
       floatingActionButton: manageMode
           ? FloatingActionButton(
               onPressed: () {
-                context.goNamed('merge_category',
-                    params: {Constants.editMode: false.toString()},
-                    extra: Category());
+                context.goNamed('merge_category',                   
+                    extra: MyExtraWrapper(data: Category(), editMode: false, manageMode: manageMode));
               },
               backgroundColor: Colors.green,
               tooltip: 'Add New Category',
@@ -175,9 +174,8 @@ class _CategoryListState extends State<CategoryList> {
                   GestureDetector(
                     child: const Icon(Icons.edit),
                     onTap: () {
-                      GoRouter.of(context).pushNamed('merge_category',
-                          params: {Constants.editMode: true.toString()},
-                          extra: category);
+                      GoRouter.of(context).pushNamed('merge_category',                         
+                          extra: MyExtraWrapper(data: category, editMode: true, manageMode: manageMode));
                     },
                   ),
                   GestureDetector(

@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/kind.dart';
@@ -19,10 +17,9 @@ import 'package:abdu_kids/pages/types/type_list.dart';
 import 'package:abdu_kids/pages/types/type_merge.dart';
 import 'package:abdu_kids/pages/util/image_uloader.dart';
 import 'package:abdu_kids/util/my_extra_wrapper.dart';
-import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
-import 'package:abdu_kids/pages/util/my_preferences.dart';
+import 'package:abdu_kids/pages/shared_preferences/my_preferences.dart';
 import 'package:go_router/go_router.dart';
 
 void main() async {
@@ -36,6 +33,7 @@ final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
+      name: 'home',
       builder: (BuildContext context, GoRouterState state) {
         return const CategoryList();
       },
@@ -69,16 +67,14 @@ final GoRouter _router = GoRouter(
                                   selectedProduct: state.extra as Product),
                               routes: <RouteBase>[
                                 GoRoute(
-                                  path:
-                                      'add_kind',
+                                  path: 'add_kind',
                                   name: 'add_kind',
                                   builder: (context, state) => KindMerge(
                                       editMode: false,
                                       selectedKind: state.extra as Kind),
                                 ),
                                 GoRoute(
-                                  path:
-                                      'edit_kind',
+                                  path: 'edit_kind',
                                   name: 'edit_kind',
                                   builder: (context, state) => KindMerge(
                                       editMode: true,
@@ -92,16 +88,14 @@ final GoRouter _router = GoRouter(
                                 selectedProduct: state.extra as Product),
                           ),
                           GoRoute(
-                            path:
-                                'add_product',
+                            path: 'add_product',
                             name: 'add_product',
                             builder: (context, state) => ProductMerge(
                                 editMode: false,
                                 selectedProduct: state.extra as Product),
                           ),
                           GoRoute(
-                            path:
-                                'edit_product',
+                            path: 'edit_product',
                             name: 'edit_product',
                             builder: (context, state) => ProductMerge(
                                 editMode: true,
@@ -141,13 +135,13 @@ final GoRouter _router = GoRouter(
               )
             ]),
         GoRoute(
-            path: 'categories/merge_category/:${Constants.editMode}',
+            path: 'categories/merge_category',
             name: 'merge_category',
             builder: (context, state) {
-              Category category = state.extra as Category;
+              final extra = state.extra as MyExtraWrapper;
               return CategoryMerge(
-                  editMode: state.params[Constants.editMode] == 'true',
-                  selectedCategory: category);
+                  editMode: extra.editMode,
+                  selectedCategory: extra.data as Category);
             }),
       ],
     ),

@@ -1,7 +1,6 @@
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter/services.dart';
 
@@ -81,18 +80,18 @@ class _KindMerge extends State<KindMerge> {
                         final kind = widget.selectedKind;
                         kind.color = _colorController.text;
                         kind.quantity = int.parse(_quantityController.text);
-                        /*ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                              content: Text('Processing Request...')),
-                        );*/
                         if (await MyService.saveItem(kind, widget.editMode)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Saving...')),
+                          );
+                          /*
                           Fluttertoast.showToast(
                               msg: 'Saved',
                               toastLength: Toast.LENGTH_SHORT,
                               gravity: ToastGravity.BOTTOM,
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
-                              textColor: Colors.yellow);
+                              textColor: Colors.yellow);*/
                           if (!widget.editMode) {
                             kind.product!.kinds.add(kind);
                           }

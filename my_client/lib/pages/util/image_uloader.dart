@@ -41,18 +41,6 @@ class _ImageUploader extends State<ImageUploader> {
                 image: DecorationImage(image: imageProvider, fit: BoxFit.cover),
               ),
             ));
-
-    /*Image.network(
-      Constants.getImageURL(widget.id),
-      width: 200,
-      height: 200,
-      fit: BoxFit.fill,
-      errorBuilder: (context, error, stackTrace) => Image.asset(
-        Constants.noImageAssetPath,
-        width: 200,
-        height: 200,
-      ),
-    );*/
   }
 
   @override

@@ -5,7 +5,7 @@ class ImageService {
   static var client = http.Client();
   static Future<bool> uploadImage(String id, String imagePath) async {
     var request = http.MultipartRequest(
-        "PUT", Uri.parse("${Constants.apiURL}/upload/$id"));
+        "PUT", Uri.parse("${Constants.apiURL()}/upload/$id"));
     http.MultipartFile multipartFile = await http.MultipartFile.fromPath(
       "image",
       imagePath,
@@ -19,7 +19,7 @@ class ImageService {
   }
 
   static Future<bool> deleteImage(String id) async {
-    String url = "${Constants.apiURL}/upload/remove/$id";
+    String url = "${Constants.apiURL()}/upload/remove/$id";
     var response = await client.delete(
       Uri.parse(url),
       headers: Constants.requestHeaders,

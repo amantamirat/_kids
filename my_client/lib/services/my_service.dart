@@ -6,10 +6,11 @@ import 'dart:convert';
 import '../util/constants.dart';
 
 class MyService {
+  
   static var client = http.Client();
 
   static Future<List<Category>?> getCategories() async {
-    String url = "${Constants.apiURL}${Category.path}";
+    String url = "${Constants.apiURL()}${Category.path}";
     var response = await client.get(
       Uri.parse(url),
       headers: Constants.requestHeaders,
@@ -23,7 +24,7 @@ class MyService {
   }
 
   static Future<bool> saveItem(MyModel myModel, bool isEditMode) async {
-    String url = "${Constants.apiURL}${myModel.basePath()}";
+    String url = "${Constants.apiURL()}${myModel.basePath()}";
     var response = http.Response("{}", 404);
     if (isEditMode) {
       url = "$url${Constants.updatePath}${myModel.paramsPath()}/${myModel.id}";
@@ -50,7 +51,7 @@ class MyService {
 
   static Future<bool> deleteModel(MyModel myModel) async {
     String url =
-        "${Constants.apiURL}${myModel.basePath()}${Constants.deletePath}${myModel.paramsPath()}/${myModel.id}";
+        "${Constants.apiURL()}${myModel.basePath()}${Constants.deletePath}${myModel.paramsPath()}/${myModel.id}";
     var response = await client.delete(
       Uri.parse(url),
       headers: Constants.requestHeaders,
