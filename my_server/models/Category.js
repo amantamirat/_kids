@@ -31,6 +31,10 @@ const CategorySchema = new mongoose.Schema(
                             type: Number,
                             min: 0
                         },
+                        minimum_order_quanity: {
+                            type: Number,
+                            min: 0
+                        },
                         product_kinds: [{
                             color: {
                                 type: String
