@@ -1,4 +1,6 @@
 import 'package:abdu_kids/model/category.dart';
+import 'package:abdu_kids/pages/categories/category_merge.dart';
+import 'package:abdu_kids/pages/util/delete_dialog.dart';
 import 'package:abdu_kids/util/my_extra_wrapper.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/util/constants.dart';
@@ -15,12 +17,11 @@ class CategoryList extends StatefulWidget {
 }
 
 class _CategoryListState extends State<CategoryList> {
-  Future<List<Category>?>? categoriesList;
-  bool manageMode = false;
+  late List<Category> _categories = List.empty(growable: true);
+  late bool _manageMode = false;
   @override
   void initState() {
     super.initState();
-    categoriesList = MyService.getCategories();
   }
 
   @override
@@ -31,19 +32,19 @@ class _CategoryListState extends State<CategoryList> {
         elevation: 0,
         actions: <Widget>[
           PopupMenuButton<Menu>(
-              onSelected: (Menu item) {
+              onSelected: (Menu item) async {
                 if (item == Menu.itemSettings) {
-                  context.pushNamed('settings');
+                  GoRouter.of(context).pushNamed("settings");
                 } else if (item == Menu.itemManage) {
                   setState(
-                    () => {manageMode = !manageMode},
+                    () => {_manageMode = !_manageMode},
                   );
                 }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
                     PopupMenuItem<Menu>(
                       value: Menu.itemManage,
-                      child: Text(manageMode ? 'View Mode' : 'Manage Mode'),
+                      child: Text(_manageMode ? 'View Mode' : 'Manage Mode'),
                     ),
                     const PopupMenuItem<Menu>(
                       value: Menu.itemSettings,
@@ -53,12 +54,20 @@ class _CategoryListState extends State<CategoryList> {
         ],
       ),
       backgroundColor: Colors.grey[200],
-      body: loadCategories(),
-      floatingActionButton: manageMode
+      body: _loadCategories(),
+      floatingActionButton: _manageMode
           ? FloatingActionButton(
-              onPressed: () {
-                context.goNamed('merge_category',                   
-                    extra: MyExtraWrapper(data: Category(), editMode: false, manageMode: manageMode));
+              onPressed: () async {
+                final Category? category = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => CategoryMerge(
+                            editMode: false, selectedCategory: Category())));
+                if (category != null) {
+                  setState(() {
+                    _categories.add(category);
+                  });
+                }
               },
               backgroundColor: Colors.green,
               tooltip: 'Add New Category',
@@ -68,9 +77,9 @@ class _CategoryListState extends State<CategoryList> {
     );
   }
 
-  Widget loadCategories() {
+  Widget _loadCategories() {
     return FutureBuilder(
-      future: categoriesList,
+      future: MyService.getCategories(),
       builder: (
         BuildContext context,
         AsyncSnapshot<List<Category>?> snapshot,
@@ -97,22 +106,21 @@ class _CategoryListState extends State<CategoryList> {
                             SizedBox(
                               width: 5,
                             ),
-                            Text('Referesh'),
+                            Text('Try Again'),
                           ],
                         ),
                         onPressed: () {
                           setState(() {
-                            categoriesList = MyService.getCategories();
+                            //categoriesList = MyService.getCategories();
                           });
                         }),
                   ],
                 ),
               );
             } else {
-              if (snapshot.data!.isNotEmpty) {
-                return manageMode
-                    ? _displayCategoryList(snapshot.data!)
-                    : _display(snapshot.data!);
+              if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                _categories = snapshot.data!;
+                return _manageMode ? _displayCategoryList() : _display();
               }
               return const Center(child: Text('No Category Data is Found!'));
             }
@@ -121,21 +129,21 @@ class _CategoryListState extends State<CategoryList> {
     );
   }
 
-  Widget _displayCategoryList(List<Category> categories) {
+  Widget _displayCategoryList() {
     return ListView.separated(
       shrinkWrap: true,
       physics: const ClampingScrollPhysics(),
       scrollDirection: Axis.vertical,
       padding: const EdgeInsets.all(8),
-      itemCount: categories.length,
+      itemCount: _categories.length,
       itemBuilder: (BuildContext context, int index) {
-        final category = categories.elementAt(index);
+        final category = _categories.elementAt(index);
         return Container(
           color: Colors.amberAccent[index * 10],
           child: ListTile(
             title: Center(
                 child: Text(
-              "${category.title}",
+              category.title!,
               style: const TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -153,7 +161,7 @@ class _CategoryListState extends State<CategoryList> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     image: DecorationImage(
-                        image: imageProvider, fit: BoxFit.fill),
+                        image: imageProvider, fit: BoxFit.cover),
                   ),
                 ),
                 placeholder: (context, url) =>
@@ -163,7 +171,7 @@ class _CategoryListState extends State<CategoryList> {
             ),
             onTap: () {
               final extra = MyExtraWrapper(
-                  data: category, editMode: false, manageMode: manageMode);
+                  data: category, editMode: false, manageMode: _manageMode);
               GoRouter.of(context).pushNamed('types', extra: extra);
             },
             trailing: SizedBox(
@@ -174,8 +182,11 @@ class _CategoryListState extends State<CategoryList> {
                   GestureDetector(
                     child: const Icon(Icons.edit),
                     onTap: () {
-                      GoRouter.of(context).pushNamed('merge_category',                         
-                          extra: MyExtraWrapper(data: category, editMode: true, manageMode: manageMode));
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => CategoryMerge(
+                                  editMode: true, selectedCategory: category)));
                     },
                   ),
                   GestureDetector(
@@ -183,32 +194,16 @@ class _CategoryListState extends State<CategoryList> {
                       Icons.delete,
                       color: Colors.red,
                     ),
-                    onTap: () {
-                      showDialog<String>(
-                        context: context,
-                        builder: (BuildContext context) => AlertDialog(
-                          title: const Text('Delete Category'),
-                          content: Text(
-                              'Are you sure, delete ${category.title} and its Contenet?'),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, 'Cancel'),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () async {
-                                if (await MyService.deleteModel(category)) {
-                                  setState(() {
-                                    categoriesList = MyService.getCategories();
-                                  });
-                                  context.pop();
-                                }
-                              },
-                              child: const Text('Yes'),
-                            ),
-                          ],
-                        ),
-                      );
+                    onTap: () async {
+                      int? result = await showDialog<int>(
+                          context: context,
+                          builder: (BuildContext context) =>
+                              DeleteDialog(model: category));
+                      if (result == 0) {
+                        setState(() {
+                          _categories.remove(category);
+                        });
+                      }
                     },
                   ),
                 ],
@@ -221,140 +216,134 @@ class _CategoryListState extends State<CategoryList> {
     );
   }
 
-  Widget _display(List<Category> categories) {
+  Widget _display() {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(12.0),
       decoration: const BoxDecoration(
         color: Colors.black26,
       ),
-      child: ListView.builder(
-        scrollDirection: Axis.vertical,
-        shrinkWrap: true,
-        itemCount: categories.length,
-        itemBuilder: (BuildContext context, int index) {
-          final category = categories.elementAt(index);
-          return SizedBox(
-            height: MediaQuery.of(context).orientation == Orientation.portrait
-                ? (MediaQuery.of(context).size.height / 3)
-                : (MediaQuery.of(context).size.height / 1.5),
-            width: MediaQuery.of(context).size.width - 3,
-            child: Card(
+      child: GridView.builder(
+          itemCount: _categories.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount:
+                MediaQuery.of(context).orientation == Orientation.portrait
+                    ? 1
+                    : 2,
+            crossAxisSpacing: 3.0,
+            mainAxisSpacing: 3.0,
+          ),
+          itemBuilder: (BuildContext context, int index) {
+            final category = _categories.elementAt(index);
+            return Card(
+                color: Colors.amber,
                 clipBehavior: Clip.antiAlias,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24)),
                 shadowColor: Colors.amber[index * 10],
                 elevation: 8,
-                child: _displayCategory(category)),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _displayCategory(Category category) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        Expanded(
-          flex: MediaQuery.of(context).orientation == Orientation.portrait
-              ? 2
-              : 1,
-          child: Card(
-              child: Column(
-            children: [
-              Expanded(
-                child: Stack(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    InkWell(
-                      onTap: () {
-                        final extra = MyExtraWrapper(
-                            data: category,
-                            editMode: false,
-                            manageMode: manageMode);
-                        GoRouter.of(context).pushNamed('types', extra: extra);
-                      },
-                      child: CachedNetworkImage(
-                        imageUrl: Constants.getImageURL(category.id),
-                        imageBuilder: (context, imageProvider) => Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            image: DecorationImage(
-                                image: imageProvider, fit: BoxFit.cover),
-                          ),
-                        ),
-                        placeholder: (context, url) =>
-                            const CircularProgressIndicator(),
-                        errorWidget: (context, url, error) =>
-                            const Icon(Icons.error),
-                      ),
-                    ),
-                    Text(
-                      "${category.title}",
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                          fontSize: 24,
-                          backgroundColor: Colors.amber),
-                    )
-                  ],
-                ),
-              ),
-            ],
-          )),
-        ),
-        Expanded(
-          child: SizedBox(
-            child: GridView.builder(
-                itemCount: category.clothingTypes.length,
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount:
-                      MediaQuery.of(context).orientation == Orientation.portrait
-                          ? 2
-                          : 3,
-                  crossAxisSpacing: 4.0,
-                  mainAxisSpacing: 4.0,
-                  childAspectRatio: 0.75,
-                ),
-                itemBuilder: (BuildContext context, int index) {
-                  final type = category.clothingTypes.elementAt(index);
-                  return SizedBox(
-                    //height: (MediaQuery.of(context).size.height * 0.5),
-                    child: Card(
-                      child: Stack(
+                    Expanded(
+                      flex: 2,
+                      child: Column(
                         children: [
-                          InkWell(
-                            onTap: () {
-                              context.pushNamed('view_products', extra: type);
-                            },
-                            child: CachedNetworkImage(
-                              imageUrl: Constants.getImageURL(type.id),
-                              imageBuilder: (context, imageProvider) =>
-                                  Container(
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.rectangle,
-                                  image: DecorationImage(
-                                      image: imageProvider, fit: BoxFit.cover),
+                          Expanded(
+                            child: Stack(
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    final extra = MyExtraWrapper(
+                                        data: category,
+                                        editMode: false,
+                                        manageMode: _manageMode);
+                                    GoRouter.of(context)
+                                        .pushNamed('types', extra: extra);
+                                  },
+                                  child: CachedNetworkImage(
+                                    imageUrl:
+                                        Constants.getImageURL(category.id),
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.cover),
+                                      ),
+                                    ),
+                                    placeholder: (context, url) =>
+                                        const CircularProgressIndicator(),
+                                    errorWidget: (context, url, error) =>
+                                        Image.asset(
+                                      Constants.noImageAssetPath,
+                                      width: 200,
+                                      height: 200,
+                                    ),
+                                  ),
                                 ),
-                              ),
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) =>
-                                  const Icon(Icons.error),
+                                Text(category.title!,
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold,
+                                        backgroundColor: Colors.amber)),
+                              ],
                             ),
-                          ),
-                          Text("${type.type}",
-                              style: const TextStyle(
-                                  fontSize: 8,
-                                  color: Colors.black,
-                                  backgroundColor: Colors.amber)),
+                          )
                         ],
                       ),
                     ),
-                  );
-                }),
-          ),
-        ),
-      ],
+                    Expanded(child: _typesView(category))
+                  ],
+                ));
+          }),
     );
+  }
+
+  Widget _typesView(Category category) {
+    return GridView.builder(
+        itemCount: category.clothingTypes.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 2,
+          crossAxisSpacing: 3.0,
+          mainAxisSpacing: 3.0,
+        ),
+        itemBuilder: (BuildContext context, int index) {
+          final type = category.clothingTypes.elementAt(index);
+          return Card(
+            child: Stack(
+              children: [
+                InkWell(
+                  onTap: () {
+                    context.pushNamed('view_products', extra: type);
+                  },
+                  child: CachedNetworkImage(
+                    imageUrl: Constants.getImageURL(type.id),
+                    imageBuilder: (context, imageProvider) => Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.rectangle,
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover),
+                      ),
+                    ),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Image.asset(
+                      Constants.noImageAssetPath,
+                      width: 80,
+                      height: 80,
+                    ),
+                  ),
+                ),
+                Text("${type.type}",
+                    style: const TextStyle(
+                        fontSize: 8,
+                        color: Colors.black,
+                        backgroundColor: Colors.amber)),
+              ],
+            ),
+          );
+        });
   }
 }

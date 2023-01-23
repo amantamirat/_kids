@@ -55,8 +55,8 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
     prefs.setString(SharedPrefs.keyProtocol, protocol);
     prefs.setString(SharedPrefs.keyHostAddress, hostAddress);
     prefs.setInt(SharedPrefs.keyPortNumber, portNumber);
-    //context.pushNamed("home");
-    context.pushReplacementNamed("home");
+    //GoRouter.of(context).pop(1);
+    GoRouter.of(context).goNamed("home");
   }
 
   Widget _myForm() {

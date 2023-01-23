@@ -1,11 +1,10 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/type.dart';
-import 'package:abdu_kids/services/my_service.dart';
+import 'package:abdu_kids/pages/util/delete_dialog.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class TypeList extends StatefulWidget {
   final bool manageMode;
@@ -19,12 +18,11 @@ class TypeList extends StatefulWidget {
 }
 
 class _TypeListState extends State<TypeList> {
-  late List<ClothingType> typeList;
-
+  late List<ClothingType> _typeList;
   @override
   void initState() {
     super.initState();
-    typeList = widget.selectedCategory.clothingTypes;
+    _typeList = widget.selectedCategory.clothingTypes;
   }
 
   @override
@@ -35,7 +33,7 @@ class _TypeListState extends State<TypeList> {
         elevation: 0,
       ),
       backgroundColor: Colors.grey[200],
-      body: widget.manageMode ? _displayList(typeList) : _display(typeList),
+      body: widget.manageMode ? _displayList(_typeList) : _display(_typeList),
       floatingActionButton: widget.manageMode
           ? FloatingActionButton(
               onPressed: () {
@@ -172,37 +170,16 @@ class _TypeListState extends State<TypeList> {
                 Icons.delete,
                 color: Colors.red,
               ),
-              onTap: () {
-                showDialog<String>(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    title: const Text('Delete Type'),
-                    content: const Text('Are you sure, proceed?'),
-                    actions: <Widget>[
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, 'Cancel'),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () async {
-                          if (await MyService.deleteModel(type)) {
-                            Fluttertoast.showToast(
-                                msg: 'Removed!',
-                                toastLength: Toast.LENGTH_SHORT,
-                                gravity: ToastGravity.BOTTOM,
-                                timeInSecForIosWeb: 1,
-                                backgroundColor: Colors.red,
-                                textColor: Colors.yellow);
-                            typeList.remove(type);
-                            setState(() {});
-                            context.pop();
-                          }
-                        },
-                        child: const Text('Yes'),
-                      ),
-                    ],
-                  ),
-                );
+              onTap: () async {
+                int? result = await showDialog<int>(
+                    context: context,
+                    builder: (BuildContext context) =>
+                        DeleteDialog(model: type));
+                if (result == 0) {
+                  setState(() {
+                    _typeList.remove(type);
+                  });
+                }
               },
             ),
           ],

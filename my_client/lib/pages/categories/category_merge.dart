@@ -2,7 +2,6 @@ import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:go_router/go_router.dart';
 
 class CategoryMerge extends StatefulWidget {
   final bool editMode;
@@ -15,7 +14,7 @@ class CategoryMerge extends StatefulWidget {
 }
 
 class _CategoryMerge extends State<CategoryMerge> {
-  static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
+  static final GlobalKey<FormState> _globalFormKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
 
@@ -30,7 +29,7 @@ class _CategoryMerge extends State<CategoryMerge> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(title: Text(appBarTitle)),
-      body: Form(key: globalFormKey, child: categoryForm()),
+      body: Form(key: _globalFormKey, child: categoryForm()),
     ));
   }
 
@@ -75,11 +74,10 @@ class _CategoryMerge extends State<CategoryMerge> {
                 ElevatedButton(
                     child: const Text("Save"),
                     onPressed: () async {
-                      if (globalFormKey.currentState!.validate()) {
+                      if (_globalFormKey.currentState!.validate()) {
                         final category = widget.selectedCategory;
                         category.title = _titleController.text;
                         category.description = _descriptionController.text;
-
                         /*ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                               content: Text('Processing Request...')),
@@ -93,7 +91,8 @@ class _CategoryMerge extends State<CategoryMerge> {
                               timeInSecForIosWeb: 1,
                               backgroundColor: Colors.red,
                               textColor: Colors.yellow);
-                          context.pop();
+                          //context.pop();
+                          Navigator.pop(context, category);
                         }
                       }
                     }),

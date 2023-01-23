@@ -1,7 +1,7 @@
-import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
 import 'package:abdu_kids/util/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -53,22 +53,31 @@ class _ViewProductsState extends State<ViewProducts> {
               color: Colors.amber,
               child: Stack(
                 children: [
-                  Ink.image(
-                    image: NetworkImage(Constants.getImageURL(product.id)),
-                    fit: BoxFit.fill,
-                    onImageError: (exception, stackTrace) => {
-                      Image.asset(Constants.noImageAssetPath, fit: BoxFit.fill)
+                  InkWell(
+                    onTap: () {
+                      context.pushNamed('view_kinds', extra: product);
                     },
-                    child: InkWell(
-                      onTap: () {
-                        context.pushNamed('view_kinds', extra: product);
-                      },
+                    child: CachedNetworkImage(
+                      imageUrl: Constants.getImageURL(product.id),
+                      imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.rectangle,
+                          image: DecorationImage(
+                              image: imageProvider, fit: BoxFit.cover),
+                        ),
+                      ),
+                      placeholder: (context, url) =>
+                          const CircularProgressIndicator(),
+                      errorWidget: (context, url, error) => Image.asset(
+                          Constants.noImageAssetPath,
+                          fit: BoxFit.cover),
                     ),
                   ),
-                  Text("${product.brand!.name}-${product.detail} /${product.size}/ (${product.price} Birr)",
+                  Text(
+                      "${product.brand!.name}-${product.detail} /${product.size}/ (${product.price} Birr)",
                       style: const TextStyle(
                           fontSize: 12,
-                          color: Colors.black,                          
+                          color: Colors.black,
                           backgroundColor: Colors.amber)),
                 ],
               ),

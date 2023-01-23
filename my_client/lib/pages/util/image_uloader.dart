@@ -3,7 +3,6 @@ import 'package:abdu_kids/services/image_service.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,6 +31,8 @@ class _ImageUploader extends State<ImageUploader> {
             ),
         errorWidget: (context, url, error) => Image.asset(
               Constants.noImageAssetPath,
+              width: 200,
+              height: 200,
             ),
         imageBuilder: (context, imageProvider) => Container(
               width: 200,
@@ -48,7 +49,7 @@ class _ImageUploader extends State<ImageUploader> {
     return SafeArea(
         child: Scaffold(
       appBar: AppBar(title: const Text("upload image")),
-      body: imagePicker(),
+      body: _imagePicker(),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           if (_isImageSelected) {
@@ -59,13 +60,12 @@ class _ImageUploader extends State<ImageUploader> {
                       Constants.getImageURL(widget.id))
                   .then((value) {
                 //ignore: avoid_print
-                print('File removed');
+                //print('File removed');
               }).onError((error, stackTrace) {
                 //ignore: avoid_print
                 print(error);
               });
-
-              context.pop();
+              GoRouter.of(context).pop();
             }
           }
         },
@@ -76,7 +76,7 @@ class _ImageUploader extends State<ImageUploader> {
     ));
   }
 
-  Widget imagePicker() {
+  Widget _imagePicker() {
     return Column(
       children: [
         SizedBox(

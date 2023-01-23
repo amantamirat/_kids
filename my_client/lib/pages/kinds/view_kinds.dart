@@ -1,12 +1,9 @@
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/product.dart';
-import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinbox/material.dart';
-import 'package:go_router/go_router.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class ViewKinds extends StatefulWidget {
@@ -26,7 +23,7 @@ class _ViewKinds extends State<ViewKinds> {
   void initState() {
     super.initState();
     kindList = widget.selectedProduct.kinds;
-    if(kindList.isNotEmpty){
+    if (kindList.isNotEmpty) {
       _computeMinMax();
     }
     imageSliders = _imageSliders();
@@ -53,7 +50,7 @@ class _ViewKinds extends State<ViewKinds> {
               options: CarouselOptions(
                 enlargeCenterPage: true,
                 viewportFraction: 1.0,
-                height: MediaQuery.of(context).size.height / 3,
+                height: MediaQuery.of(context).size.height / 2,
                 onPageChanged: (index, reason) => setState(() {
                   activeIndex = index;
                   _computeMinMax();
@@ -84,7 +81,7 @@ class _ViewKinds extends State<ViewKinds> {
                   child: Stack(
                     children: <Widget>[
                       Image.network(Constants.getImageURL(item.id),
-                          fit: BoxFit.cover, width: 1000.0),
+                          fit: BoxFit.contain, width: 1000.0),
                       Positioned(
                         bottom: 0.0,
                         left: 0.0,

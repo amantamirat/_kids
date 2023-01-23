@@ -6,7 +6,6 @@ import 'package:abdu_kids/model/type.dart';
 import 'package:abdu_kids/pages/brands/brand_list.dart';
 import 'package:abdu_kids/pages/brands/brand_merge.dart';
 import 'package:abdu_kids/pages/categories/category_list.dart';
-import 'package:abdu_kids/pages/categories/category_merge.dart';
 import 'package:abdu_kids/pages/kinds/kind_list.dart';
 import 'package:abdu_kids/pages/kinds/kind_merge.dart';
 import 'package:abdu_kids/pages/kinds/view_kinds.dart';
@@ -19,7 +18,7 @@ import 'package:abdu_kids/pages/util/image_uloader.dart';
 import 'package:abdu_kids/util/my_extra_wrapper.dart';
 import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
-import 'package:abdu_kids/pages/shared_preferences/my_preferences.dart';
+import 'package:abdu_kids/pages/util/my_preferences.dart';
 import 'package:go_router/go_router.dart';
 
 void main() async {
@@ -134,15 +133,29 @@ final GoRouter _router = GoRouter(
                     ViewProducts(selectedType: state.extra as ClothingType),
               )
             ]),
+        /*
         GoRoute(
-            path: 'categories/merge_category',
-            name: 'merge_category',
+          path: 'categories/merge_category',
+          name: 'merge_category',
+          pageBuilder: (context, state) {
+            final extra = state.extra as MyExtraWrapper;
+            return MaterialPage<int>(
+              key: state.pageKey,
+              child: CategoryMerge(
+                  editMode: extra.editMode,
+                  selectedCategory: extra.data as Category),
+            );
+          },
+          /*
             builder: (context, state) {
               final extra = state.extra as MyExtraWrapper;
               return CategoryMerge(
                   editMode: extra.editMode,
                   selectedCategory: extra.data as Category);
-            }),
+            }
+            */
+        ),
+        */
       ],
     ),
     GoRoute(
@@ -156,6 +169,7 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const MySharedPreferences(),
     ),
   ],
+  //error page goes here....
 );
 
 class MyApp extends StatelessWidget {

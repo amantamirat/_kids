@@ -1,7 +1,9 @@
 import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/product.dart';
+import 'package:abdu_kids/pages/util/delete_dialog.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/util/constants.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -44,7 +46,7 @@ class _ProductListState extends State<ProductList> {
     );
   }
 
-  Widget displayProds(products) {
+  Widget displayProds(List<Product> products) {
     return products.isNotEmpty
         ? ListView.separated(
             shrinkWrap: true,
@@ -53,12 +55,13 @@ class _ProductListState extends State<ProductList> {
             padding: const EdgeInsets.all(8),
             itemCount: products.length,
             itemBuilder: (BuildContext context, int index) {
+              final product = products.elementAt(index);
               return Container(
                 color: Colors.amber[index * 10],
                 child: ListTile(
                   title: Center(
                       child: Text(
-                    "${products[index].brand.name} ${products[index]} Size ${products[index].size}",
+                    "${product.brand!.name} ${product.toString()} Size ${product.size}",
                     style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.bold,
@@ -66,20 +69,26 @@ class _ProductListState extends State<ProductList> {
                   )),
                   leading: GestureDetector(
                     onTap: () {
-                      context.pushNamed('upload_image',
-                          extra: products[index].id);
+                      context.pushNamed('upload_image', extra: product.id);
                     },
-                    child: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      radius: 30,
-                      child: Image.network(
-                        Constants.getImageURL(products[index].id),
-                        fit: BoxFit.fill,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.asset(Constants.noImageAssetPath);
-                        },
-                      ),
-                    ),
+                    child: CachedNetworkImage(
+                        imageUrl: Constants.getImageURL(product.id),
+                        imageBuilder: (context, imageProvider) => Container(
+                              width: 80.0,
+                              height: 80.0,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                    image: imageProvider, fit: BoxFit.cover),
+                              ),
+                            ),
+                        placeholder: (context, url) =>
+                            const CircularProgressIndicator(),
+                        errorWidget: (context, url, error) => Image.asset(
+                              Constants.noImageAssetPath,
+                              width: 200,
+                              height: 200,
+                            )),
                   ),
                   onTap: () {
                     context.pushNamed('kinds', extra: products[index]);
@@ -92,8 +101,7 @@ class _ProductListState extends State<ProductList> {
                         GestureDetector(
                           child: const Icon(Icons.edit),
                           onTap: () {
-                            context.pushNamed('edit_product',
-                                extra: products[index]);
+                            context.pushNamed('edit_product', extra: product);
                           },
                         ),
                         GestureDetector(
@@ -101,39 +109,16 @@ class _ProductListState extends State<ProductList> {
                             Icons.delete,
                             color: Colors.red,
                           ),
-                          onTap: () {
-                            showDialog<String>(
-                              context: context,
-                              builder: (BuildContext context) => AlertDialog(
-                                title: const Text('Delete Product'),
-                                content: const Text('Are you sure, proceed?'),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.pop(context, 'Cancel'),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      if (await MyService.deleteModel(
-                                          products[index])) {
-                                        Fluttertoast.showToast(
-                                            msg: 'Removed!',
-                                            toastLength: Toast.LENGTH_SHORT,
-                                            gravity: ToastGravity.BOTTOM,
-                                            timeInSecForIosWeb: 1,
-                                            backgroundColor: Colors.red,
-                                            textColor: Colors.yellow);
-                                        productList.removeAt(index);
-                                        setState(() {});
-                                        context.pop();
-                                      }
-                                    },
-                                    child: const Text('Yes'),
-                                  ),
-                                ],
-                              ),
-                            );
+                          onTap: () async {
+                            int? result = await showDialog<int>(
+                                context: context,
+                                builder: (BuildContext context) =>
+                                    DeleteDialog(model: product));
+                            if (result == 0) {
+                              setState(() {
+                                productList.remove(product);
+                              });
+                            }
                           },
                         ),
                       ],
