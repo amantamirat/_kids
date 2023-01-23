@@ -1,6 +1,7 @@
 import 'package:abdu_kids/util/preference_util.dart';
 
 class Constants {
+  
   static const String appName = "abdu_kids";
 
   static const String newPath = "/new";

@@ -2,7 +2,7 @@ import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/my_model.dart';
 
-class ClothingType extends MyModel<ClothingType> {
+class ClothingType extends MyModel {
   
   static const String path = "/types";
   static const String attributeType = 'type';

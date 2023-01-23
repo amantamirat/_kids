@@ -2,16 +2,14 @@ import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
 
-class Brand extends MyModel<Brand> {
+class Brand extends MyModel {
   static const String path = "/brands";
   static const String attributeName = 'brand_name';
   static const String attributeProducts = 'products';
   late String? name;
   late ClothingType? type;
   late List<Product> products = List.empty(growable: true);
-
   Brand({this.type});
-
   @override
   Brand fromJson(Map<String, dynamic> json) {
     id = json[MyModel.attributeId];
@@ -19,7 +17,6 @@ class Brand extends MyModel<Brand> {
     products = Product.productsFromJson(json[attributeProducts], this);
     return this;
   }
-
   @override
   Map<String, dynamic> toJson({bool includeId = true}) {
     final data = <String, dynamic>{};

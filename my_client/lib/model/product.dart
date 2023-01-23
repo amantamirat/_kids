@@ -2,7 +2,7 @@ import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 
-class Product extends MyModel<Product> {
+class Product extends MyModel {
   static const String path = "/products";
   //static const String attributeProductName = 'product_name';
   static const String attributeDetail = 'product_detail';

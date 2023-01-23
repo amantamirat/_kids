@@ -1,7 +1,7 @@
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/type.dart';
 
-class Category extends MyModel<Category> {
+class Category extends MyModel {
   static const String path = "/categories";
   static const String attributeTitle = 'title';
   static const String attributeDescription = 'description';

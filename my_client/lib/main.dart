@@ -1,21 +1,22 @@
 import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/kind.dart';
+import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
 import 'package:abdu_kids/pages/brands/brand_list.dart';
 import 'package:abdu_kids/pages/brands/brand_merge.dart';
 import 'package:abdu_kids/pages/categories/category_list.dart';
+import 'package:abdu_kids/pages/categories/category_merge.dart';
 import 'package:abdu_kids/pages/kinds/kind_list.dart';
 import 'package:abdu_kids/pages/kinds/kind_merge.dart';
-import 'package:abdu_kids/pages/kinds/view_kinds.dart';
 import 'package:abdu_kids/pages/products/product_list.dart';
 import 'package:abdu_kids/pages/products/product_merge.dart';
-import 'package:abdu_kids/pages/products/view_products.dart';
 import 'package:abdu_kids/pages/types/type_list.dart';
 import 'package:abdu_kids/pages/types/type_merge.dart';
 import 'package:abdu_kids/pages/util/image_uloader.dart';
-import 'package:abdu_kids/util/my_extra_wrapper.dart';
+import 'package:abdu_kids/services/my_service.dart';
+import 'package:abdu_kids/util/page_names.dart';
 import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:abdu_kids/pages/util/my_preferences.dart';
@@ -34,34 +35,75 @@ final GoRouter _router = GoRouter(
       path: '/',
       name: 'home',
       builder: (BuildContext context, GoRouterState state) {
-        return const CategoryList();
+        return FutureBuilder(
+          future: MyService.getCategories(),
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<List<Category>?> snapshot,
+          ) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              default:
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('Error: ${snapshot.error}'),
+                        ElevatedButton(
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: const [
+                                Icon(
+                                  Icons.refresh,
+                                ),
+                                SizedBox(
+                                  width: 5,
+                                ),
+                                Text('Try Again'),
+                              ],
+                            ),
+                            onPressed: () {}),
+                      ],
+                    ),
+                  );
+                } else {
+                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                    return CategoryList(categories: snapshot.data!);
+                  }
+                  return const Center(child: Text('No Data is Found!'));
+                }
+            }
+          },
+        );
       },
       routes: <RouteBase>[
         GoRoute(
             path: 'categories/types',
-            name: 'types',
+            name: PageName.types,
             builder: (context, state) {
-              final extra = state.extra as MyExtraWrapper;
-              return TypeList(
-                  manageMode: extra.manageMode,
-                  selectedCategory: extra.data as Category);
+              //final extra = state.extra as MyExtraWrapper;
+              return TypeList(selectedCategory: state.extra as Category);
             },
             routes: <RouteBase>[
               GoRoute(
-                  path: 'brands',
-                  name: 'brands',
+                  path: PageName.brands,
+                  name: PageName.brands,
                   builder: (context, state) =>
                       BrandList(selectedType: state.extra as ClothingType),
                   routes: <RouteBase>[
                     GoRoute(
-                        path: 'products',
-                        name: 'products',
+                        path: PageName.products,
+                        name: PageName.products,
                         builder: (context, state) =>
-                            ProductList(selectedBrand: state.extra as Brand),
+                            ProductList(selectedModel: state.extra as MyModel),
                         routes: <RouteBase>[
                           GoRoute(
-                              path: 'kinds',
-                              name: 'kinds',
+                              path: PageName.kinds,
+                              name: PageName.kinds,
                               builder: (context, state) => KindList(
                                   selectedProduct: state.extra as Product),
                               routes: <RouteBase>[
@@ -80,70 +122,71 @@ final GoRouter _router = GoRouter(
                                       selectedKind: state.extra as Kind),
                                 ),
                               ]),
+                          /*
                           GoRoute(
                             path: 'view_kinds',
                             name: 'view_kinds',
                             builder: (context, state) => ViewKinds(
                                 selectedProduct: state.extra as Product),
                           ),
+                          */
                           GoRoute(
-                            path: 'add_product',
-                            name: 'add_product',
+                            path: PageName.addProduct,
+                            name: PageName.addProduct,
                             builder: (context, state) => ProductMerge(
                                 editMode: false,
                                 selectedProduct: state.extra as Product),
                           ),
                           GoRoute(
-                            path: 'edit_product',
-                            name: 'edit_product',
+                            path: PageName.editProduct,
+                            name: PageName.editProduct,
                             builder: (context, state) => ProductMerge(
                                 editMode: true,
                                 selectedProduct: state.extra as Product),
                           )
                         ]),
                     GoRoute(
-                      path: 'add_brand',
-                      name: 'add_brand',
+                      path: PageName.addBrand,
+                      name: PageName.addBrand,
                       builder: (context, state) => BrandMerge(
                           editMode: false, selectedBrand: state.extra as Brand),
                     ),
                     GoRoute(
-                      path: 'edit_brand',
-                      name: 'edit_brand',
+                      path: PageName.editBrand,
+                      name: PageName.editBrand,
                       builder: (context, state) => BrandMerge(
                           editMode: true, selectedBrand: state.extra as Brand),
                     ),
                   ]),
               GoRoute(
-                path: 'add_type',
-                name: 'add_type',
+                path: PageName.addType,
+                name: PageName.addType,
                 builder: (context, state) => TypeMerge(
                     editMode: false, selectedType: state.extra as ClothingType),
               ),
               GoRoute(
-                path: 'edit_type',
-                name: 'edit_type',
+                path: PageName.editType,
+                name: PageName.editType,
                 builder: (context, state) => TypeMerge(
                     editMode: true, selectedType: state.extra as ClothingType),
               ),
+              /*
               GoRoute(
-                path: 'view_products',
-                name: 'view_products',
+                path: PageName.viewProducts,
+                name: PageName.viewProducts,
                 builder: (context, state) =>
                     ViewProducts(selectedType: state.extra as ClothingType),
               )
+              */
             ]),
-        /*
         GoRoute(
           path: 'categories/merge_category',
-          name: 'merge_category',
+          name: PageName.editCategory,
           pageBuilder: (context, state) {
-            final extra = state.extra as MyExtraWrapper;
             return MaterialPage<int>(
               key: state.pageKey,
               child: CategoryMerge(
-                  editMode: extra.editMode,
-                  selectedCategory: extra.data as Category),
+                  editMode: true, selectedCategory: state.extra as Category),
             );
           },
           /*
@@ -155,7 +198,6 @@ final GoRouter _router = GoRouter(
             }
             */
         ),
-        */
       ],
     ),
     GoRoute(

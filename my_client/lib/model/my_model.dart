@@ -1,7 +1,7 @@
-abstract class MyModel<T> {
+abstract class MyModel {
   static const String attributeId = '_id';
   late String? id;
-  T fromJson(Map<String, dynamic> json);
+  MyModel fromJson(Map<String, dynamic> json);
   Map<String, dynamic> toJson({bool includeId = true});
   String basePath();
   String paramsPath();

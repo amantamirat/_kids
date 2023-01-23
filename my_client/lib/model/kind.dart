@@ -1,7 +1,7 @@
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 
-class Kind extends MyModel<Kind> {
+class Kind extends MyModel {
   static const String path = "/kinds";
   static const String attributeColor = 'color';
   static const String attributeQuantity = 'quantity';
@@ -40,6 +40,12 @@ class Kind extends MyModel<Kind> {
   String paramsPath() {
     return "${product!.paramsPath()}/${product!.id}";
   }
+
+  @override
+  String toString() {
+    return "${product!.detail} $color";
+  }
+
   static List<Kind> kindsFromJson(dynamic str, Product product) =>
       List<Kind>.from((str).map((x) => Kind(product: product).fromJson(x)));
 }
