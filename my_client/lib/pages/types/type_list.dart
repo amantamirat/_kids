@@ -9,6 +9,7 @@ class TypeList extends MyModelPage {
   final Category selectedCategory;
   TypeList({Key? key, required this.selectedCategory})
       : super(
+            key: key,
             title: "${selectedCategory.title} Types",
             myList: selectedCategory.clothingTypes,
             editPage: PageName.editType,

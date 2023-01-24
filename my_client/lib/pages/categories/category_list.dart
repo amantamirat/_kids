@@ -12,6 +12,7 @@ class CategoryList extends MyModelPage {
 
   CategoryList({Key? key, required this.categories})
       : super(
+            key: key,
             myList: categories,
             title: "ABDU KIDS",
             editPage: PageName.editCategory,

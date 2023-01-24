@@ -35,50 +35,7 @@ final GoRouter _router = GoRouter(
       path: '/',
       name: 'home',
       builder: (BuildContext context, GoRouterState state) {
-        return FutureBuilder(
-          future: MyService.getCategories(),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<List<Category>?> snapshot,
-          ) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              default:
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('Error: ${snapshot.error}'),
-                        ElevatedButton(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: const [
-                                Icon(
-                                  Icons.refresh,
-                                ),
-                                SizedBox(
-                                  width: 5,
-                                ),
-                                Text('Try Again'),
-                              ],
-                            ),
-                            onPressed: () {}),
-                      ],
-                    ),
-                  );
-                } else {
-                  if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-                    return CategoryList(categories: snapshot.data!);
-                  }
-                  return const Center(child: Text('No Data is Found!'));
-                }
-            }
-          },
-        );
+        return const Home();
       },
       routes: <RouteBase>[
         GoRoute(
@@ -108,28 +65,20 @@ final GoRouter _router = GoRouter(
                                   selectedProduct: state.extra as Product),
                               routes: <RouteBase>[
                                 GoRoute(
-                                  path: 'add_kind',
-                                  name: 'add_kind',
+                                  path: PageName.addKind,
+                                  name: PageName.addKind,
                                   builder: (context, state) => KindMerge(
                                       editMode: false,
                                       selectedKind: state.extra as Kind),
                                 ),
                                 GoRoute(
-                                  path: 'edit_kind',
-                                  name: 'edit_kind',
+                                  path: PageName.editKind,
+                                  name: PageName.editKind,
                                   builder: (context, state) => KindMerge(
                                       editMode: true,
                                       selectedKind: state.extra as Kind),
                                 ),
                               ]),
-                          /*
-                          GoRoute(
-                            path: 'view_kinds',
-                            name: 'view_kinds',
-                            builder: (context, state) => ViewKinds(
-                                selectedProduct: state.extra as Product),
-                          ),
-                          */
                           GoRoute(
                             path: PageName.addProduct,
                             name: PageName.addProduct,
@@ -170,14 +119,6 @@ final GoRouter _router = GoRouter(
                 builder: (context, state) => TypeMerge(
                     editMode: true, selectedType: state.extra as ClothingType),
               ),
-              /*
-              GoRoute(
-                path: PageName.viewProducts,
-                name: PageName.viewProducts,
-                builder: (context, state) =>
-                    ViewProducts(selectedType: state.extra as ClothingType),
-              )
-              */
             ]),
         GoRoute(
           path: 'categories/merge_category',
@@ -189,16 +130,14 @@ final GoRouter _router = GoRouter(
                   editMode: true, selectedCategory: state.extra as Category),
             );
           },
-          /*
-            builder: (context, state) {
-              final extra = state.extra as MyExtraWrapper;
-              return CategoryMerge(
-                  editMode: extra.editMode,
-                  selectedCategory: extra.data as Category);
-            }
-            */
         ),
       ],
+    ),
+    GoRoute(
+      path: '/${PageName.categories}',
+      name: PageName.categories,
+      builder: (context, state) =>
+          CategoryList(categories: state.extra as List<Category>),
     ),
     GoRoute(
       path: '/upload',
@@ -207,7 +146,7 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: '/settings',
-      name: 'settings',
+      name: PageName.settings,
       builder: (context, state) => const MySharedPreferences(),
     ),
   ],
@@ -223,6 +162,69 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.yellow,
       ),
       routerConfig: _router,
+    );
+  }
+}
+
+class Home extends StatefulWidget {
+  const Home({super.key});
+  @override
+  State<Home> createState() => _Home();
+}
+
+class _Home extends State<Home> {
+  late Future<List<Category>?> _myFuture;
+  @override
+  void initState() {
+    _myFuture = MyService.getCategories();
+    super.initState();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: _myFuture,
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<List<Category>?> snapshot,
+      ) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          default:
+            if (snapshot.hasError) {
+              return Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text('Error: ${snapshot.error}'),
+                      ElevatedButton(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(
+                                Icons.refresh,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('Try Again'),
+                            ],
+                          ),
+                          onPressed: () {
+                            GoRouter.of(context).pushNamed(PageName.settings);
+                          }),
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return CategoryList(categories: snapshot.data!);
+            }
+        }
+      },
     );
   }
 }

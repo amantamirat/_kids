@@ -11,6 +11,7 @@ class BrandList extends MyModelPage {
     Key? key,
     required this.selectedType,
   }) : super(
+            key: key,
             title: "${selectedType.type} Brands",
             myList: selectedType.brands,
             editPage: PageName.editBrand,
