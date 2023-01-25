@@ -7,7 +7,6 @@ class PageName {
   static const String brands = "brands";
   static const String addBrand = "add_brand";
   static const String editBrand = "edit_brand";
-  //static const String viewProducts = "view_products";
   static const String products = "products";  
   static const String addProduct = "add_product";
   static const String editProduct = "edit_product";
@@ -16,4 +15,5 @@ class PageName {
   static const String editKind = "edit_kind";
 
   static const String settings = "settings";
+  static const String myShoppingCart = "my_shopping_cart";
 }

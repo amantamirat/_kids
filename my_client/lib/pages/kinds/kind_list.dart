@@ -1,8 +1,13 @@
+import 'dart:ffi';
+
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/pages/model/my_model_page.dart';
+import 'package:abdu_kids/model/util/cart_item.dart';
+import 'package:abdu_kids/services/database_util.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -10,7 +15,6 @@ import 'package:flutter_spinbox/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class KindList extends MyModelPage {
-  
   final Product selectedProduct;
 
   KindList({Key? key, required this.selectedProduct})
@@ -27,14 +31,15 @@ class KindList extends MyModelPage {
 
 class _KindList extends MyModelPageState<KindList> {
   final CarouselController _controller = CarouselController();
-  late List<Kind> kindList;
+  late List<Kind> _kindList;
   late List<Widget> imageSliders;
-  int activeIndex = 0;
+  int _activeIndex = 0;
+  late double _quantity = 0;
   @override
   void initState() {
     super.initState();
-    kindList = widget.selectedProduct.kinds;
-    if (kindList.isNotEmpty) {
+    _kindList = widget.selectedProduct.kinds;
+    if (_kindList.isNotEmpty) {
       _computeMinMax();
     }
     imageSliders = _imageSliders();
@@ -48,20 +53,20 @@ class _KindList extends MyModelPageState<KindList> {
 
   @override
   Widget displayGrid() {
-    return SingleChildScrollView(child: _displayKinds(kindList));
+    return SingleChildScrollView(child: _displayKinds());
   }
 
-  Widget _displayKinds(List<Kind> kinds) {
-    return kinds.isNotEmpty
+  Widget _displayKinds() {
+    return _kindList.isNotEmpty
         ? Column(children: <Widget>[
             CarouselSlider(
               items: imageSliders,
               options: CarouselOptions(
                 enlargeCenterPage: true,
                 viewportFraction: 1.0,
-                height: MediaQuery.of(context).size.height / 2,
+                height: MediaQuery.of(context).size.height / 2.5,
                 onPageChanged: (index, reason) => setState(() {
-                  activeIndex = index;
+                  _activeIndex = index;
                   _computeMinMax();
                 }),
               ),
@@ -82,7 +87,7 @@ class _KindList extends MyModelPageState<KindList> {
   }
 
   List<Widget> _imageSliders() {
-    return kindList
+    return _kindList
         .map((item) => Container(
               margin: const EdgeInsets.all(5.0),
               child: ClipRRect(
@@ -126,8 +131,8 @@ class _KindList extends MyModelPageState<KindList> {
 
   Widget _buildIndicator() {
     return AnimatedSmoothIndicator(
-        activeIndex: activeIndex,
-        count: kindList.length,
+        activeIndex: _activeIndex,
+        count: _kindList.length,
         onDotClicked: (index) => _controller.animateToPage(index),
         effect: const ScrollingDotsEffect(
           activeStrokeWidth: 2.6,
@@ -176,36 +181,48 @@ class _KindList extends MyModelPageState<KindList> {
   }
 
   Widget _buildTable() {
+    double width = MediaQuery.of(context).size.width;
+    double textSize = width * 0.050;
     return Center(
         child: Table(
       border: TableBorder.all(),
-      defaultColumnWidth: const FixedColumnWidth(120),
+      columnWidths: {
+        0: const FlexColumnWidth(60),
+        1: FlexColumnWidth(width / 3),
+      },
       children: <TableRow>[
         TableRow(children: [
-          Column(children: const [
-            Text('Color', style: TextStyle(fontSize: 20.0))
+          Column(children: [
+            Text('Product', style: TextStyle(fontSize: textSize))
           ]),
           Column(children: [
-            Text("${kindList.elementAt(activeIndex).color}",
-                style: const TextStyle(fontSize: 20.0))
+            Text(_kindList.elementAt(_activeIndex).header(),
+                style: TextStyle(fontSize: textSize))
           ]),
         ]),
         TableRow(children: [
-          Column(children: const [
-            Text('Price', style: TextStyle(fontSize: 20.0))
-          ]),
+          Column(
+              children: [Text('Color', style: TextStyle(fontSize: textSize))]),
           Column(children: [
-            Text("${kindList.elementAt(activeIndex).product!.price} Birr",
-                style: const TextStyle(fontSize: 20.0))
+            Text("${_kindList.elementAt(_activeIndex).color}",
+                style: TextStyle(fontSize: textSize))
           ]),
         ]),
         TableRow(children: [
-          Column(children: const [
-            Text('Quantity', style: TextStyle(fontSize: 20.0))
+          Column(
+              children: [Text('Price', style: TextStyle(fontSize: textSize))]),
+          Column(children: [
+            Text("${_kindList.elementAt(_activeIndex).product!.price} Birr",
+                style: TextStyle(fontSize: textSize))
+          ]),
+        ]),
+        TableRow(children: [
+          Column(children: [
+            Text('Quantity', style: TextStyle(fontSize: textSize))
           ]),
           Column(children: [
-            Text("${kindList.elementAt(activeIndex).quantity}",
-                style: const TextStyle(fontSize: 20.0))
+            Text("${_kindList.elementAt(_activeIndex).quantity}",
+                style: TextStyle(fontSize: textSize))
           ]),
         ]),
       ],
@@ -216,8 +233,9 @@ class _KindList extends MyModelPageState<KindList> {
   double _max = 0;
 
   void _computeMinMax() {
-    _min = double.parse('${kindList.elementAt(activeIndex).product!.moq}');
-    _max = double.parse('${kindList.elementAt(activeIndex).quantity}');
+    _min = double.parse('${_kindList.elementAt(_activeIndex).product!.moq}');
+    _max = double.parse('${_kindList.elementAt(_activeIndex).quantity}');
+    _quantity = _min;
     if (_min > _max || _min == 0) {
       _min = 0;
       _max = 0;
@@ -235,6 +253,9 @@ class _KindList extends MyModelPageState<KindList> {
             width: MediaQuery.of(context).size.width / 2,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             child: SpinBox(
+              onChanged: (value) {
+                _quantity = value;
+              },
               min: _min,
               step: _min,
               max: _max,
@@ -249,8 +270,26 @@ class _KindList extends MyModelPageState<KindList> {
                   style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(
                           vertical: 12, horizontal: 12)),
-                  onPressed: () => _controller.nextPage(
-                      duration: const Duration(microseconds: 500)),
+                  onPressed: () async {
+                    if (_quantity > 0) {
+                      final kind = _kindList.elementAt(_activeIndex);
+                      final item = CartItem(
+                          id: kind.id!,
+                          selectedKind: kind,
+                          quantity: _quantity.round());
+                      int result = await CartDataBase.insertItem(item);
+                      print(await CartDataBase.cartItems());
+                      if (result != 0) {
+                        Fluttertoast.showToast(
+                            msg: 'Item added to cart',
+                            toastLength: Toast.LENGTH_SHORT,
+                            gravity: ToastGravity.BOTTOM,
+                            timeInSecForIosWeb: 1,
+                            backgroundColor: Colors.red,
+                            textColor: Colors.yellow);
+                      }
+                    }
+                  },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: const [

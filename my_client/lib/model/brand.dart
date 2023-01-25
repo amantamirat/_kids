@@ -6,6 +6,7 @@ class Brand extends MyModel {
   static const String path = "/brands";
   static const String attributeName = 'brand_name';
   static const String attributeProducts = 'products';
+  //static const String attributeType = 'type';
   late String? name;
   late ClothingType? type;
   late List<Product> products = List.empty(growable: true);
@@ -14,17 +15,32 @@ class Brand extends MyModel {
   Brand fromJson(Map<String, dynamic> json) {
     id = json[MyModel.attributeId];
     name = json[attributeName];
+    //if (json.containsKey(attributeProducts)) {
     products = Product.productsFromJson(json[attributeProducts], this);
+    //}
     return this;
   }
+
   @override
-  Map<String, dynamic> toJson({bool includeId = true}) {
+  Map<String, dynamic> toJson(
+      {bool includeId = true, bool includeLocal = false}) {
     final data = <String, dynamic>{};
     if (includeId) {
-      data["_id"] = id;
+      data[MyModel.attributeId] = id;
     }
     data[attributeName] = name;
+    /*
+    if (includeLocal) {
+      data[attributeType] =
+          jsonEncode(type!.toJson(includeLocal: includeLocal));
+    }
+    */
     return data;
+  }
+
+  @override
+  String header() {
+    return name!;
   }
 
   @override

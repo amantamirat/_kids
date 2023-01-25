@@ -15,6 +15,12 @@ class CategoryList extends MyModelPage {
             key: key,
             myList: categories,
             title: "ABDU KIDS",
+            leading: GestureDetector(
+              onTap: () {/* Write listener code here */},
+              child: const Icon(
+                Icons.menu, // add custom icons also
+              ),
+            ),
             editPage: PageName.editCategory,
             nextPage: PageName.types);
   @override

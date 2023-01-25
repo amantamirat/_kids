@@ -16,8 +16,6 @@ class SharedPrefs {
 
   static String hostName() => instance.getString(keyHostAddress) ?? 'localhost';
 
-  static int portNumber() => instance.getInt(keyPortNumber) ?? 8080;
-
-  
+  static int portNumber() => instance.getInt(keyPortNumber) ?? 8080;  
   
 }

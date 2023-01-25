@@ -9,7 +9,7 @@ class Category extends MyModel {
   late String? title;
   late String? description;
 
-  List<ClothingType> clothingTypes = List.empty();
+  List<ClothingType> clothingTypes = List.empty(growable: true);
 
   Category({this.title, this.description});
 
@@ -18,21 +18,28 @@ class Category extends MyModel {
     id = json[MyModel.attributeId];
     title = json[attributeTitle];
     description = json[attributeDescription];
+    //if (json.containsKey(attributeClothingTypes)) {
     clothingTypes =
         ClothingType.clothingTypesFromJson(json[attributeClothingTypes], this);
+    //}
     return this;
   }
 
   @override
-  Map<String, dynamic> toJson({bool includeId = true}) {
+  Map<String, dynamic> toJson(
+      {bool includeId = true,}) {
     final data = <String, dynamic>{};
     if (includeId) {
-      data["_id"] = id;
+      data[MyModel.attributeId] = id;
     }
     data[attributeTitle] = title;
     data[attributeDescription] = description;
-    //data[attributeClothingTypes] = clothingTypes;
     return data;
+  }
+
+  @override
+  String header() {
+    return title!;
   }
 
   @override

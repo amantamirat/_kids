@@ -6,8 +6,11 @@ import 'dart:convert';
 import '../util/constants.dart';
 
 class MyService {
-  
   static var client = http.Client();
+
+  //static late List<Category>? data;
+
+  //static Future<void> init() async => data = await _getCategories();
 
   static Future<List<Category>?> getCategories() async {
     String url = "${Constants.apiURL()}${Category.path}";

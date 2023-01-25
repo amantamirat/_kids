@@ -1,6 +1,7 @@
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/pages/util/delete_dialog.dart';
 import 'package:abdu_kids/util/constants.dart';
+import 'package:abdu_kids/util/page_names.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -13,14 +14,16 @@ abstract class MyModelPage extends StatefulWidget {
   final String? editPage;
   final String? nextPage;
   final String? nextGridPage;
+  final Widget? leading;
 
-  MyModelPage(
+  const MyModelPage(
       {Key? key,
       required this.myList,
       this.title,
       this.editPage,
       this.nextPage,
-      this.nextGridPage})
+      this.nextGridPage,
+      this.leading})
       : super(key: key);
 }
 
@@ -42,13 +45,18 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.title}'),
+        leading: widget.leading,
         elevation: 0,
         actions: <Widget>[
+          IconButton(
+            onPressed: () {
+              GoRouter.of(context).pushNamed(PageName.myShoppingCart);
+            },
+            icon: const Icon(Icons.shopping_cart),
+          ),
           PopupMenuButton<Menu>(
               onSelected: (Menu item) async {
-                if (item == Menu.itemSettings) {
-                  GoRouter.of(context).pushNamed("settings");
-                } else if (item == Menu.itemManage) {
+                if (item == Menu.itemManage) {
                   setState(
                     () => {_manageMode = !_manageMode},
                   );
@@ -59,15 +67,15 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
                       value: Menu.itemManage,
                       child: Text(_manageMode ? 'View Mode' : 'Manage Mode'),
                     ),
-                    const PopupMenuItem<Menu>(
-                      value: Menu.itemSettings,
-                      child: Text('Settings'),
-                    ),
                   ]),
         ],
       ),
       backgroundColor: Colors.grey[200],
-      body: _manageMode ? displayList() : displayGrid(),
+      body: myList.isNotEmpty
+          ? _manageMode
+              ? displayList()
+              : displayGrid()
+          : const Center(child: Text('No Data Found!')),
       floatingActionButton: _manageMode
           ? FloatingActionButton(
               onPressed: () {
@@ -82,161 +90,162 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
   }
 
   Widget displayList() {
-    return myList.isNotEmpty
-        ? ListView.separated(
-            shrinkWrap: true,
-            physics: const ClampingScrollPhysics(),
-            scrollDirection: Axis.vertical,
-            padding: const EdgeInsets.all(8),
-            itemCount: myList.length,
-            itemBuilder: (BuildContext context, int index) {
-              final model = myList.elementAt(index);
-              return Container(
-                color: Colors.amberAccent[index * 10],
-                child: ListTile(
-                  title: Center(
-                      child: Text(
-                    model.toString(),
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  )),
-                  leading: GestureDetector(
-                    onTap: () {
-                      GoRouter.of(context)
-                          .pushNamed('upload_image', extra: model.id);
-                    },
-                    child: CachedNetworkImage(
-                      imageUrl: Constants.getImageURL(model.id),
-                      imageBuilder: (context, imageProvider) => Container(
-                        width: 80.0,
-                        height: 80.0,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: imageProvider, fit: BoxFit.cover),
-                        ),
-                      ),
-                      placeholder: (context, url) =>
-                          const CircularProgressIndicator(),
-                      errorWidget: (context, url, error) => Image.asset(
-                        Constants.noImageAssetPath,
-                        width: 80,
-                        height: 80,
-                      ),
-                    ),
+    return Container(
+        padding: const EdgeInsets.all(4.0),
+        child: ListView.separated(
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          scrollDirection: Axis.vertical,
+          padding: const EdgeInsets.all(8),
+          itemCount: myList.length,
+          itemBuilder: (BuildContext context, int index) {
+            final model = myList.elementAt(index);
+            return Container(
+              color: Colors.amberAccent[index * 10],
+              child: ListTile(
+                title: Center(
+                    child: Text(
+                  model.header(),
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
                   ),
+                )),
+                leading: GestureDetector(
                   onTap: () {
-                    if (widget.nextPage != null) {
-                      context.pushNamed(widget.nextPage!, extra: model);
-                    }
+                    GoRouter.of(context)
+                        .pushNamed('upload_image', extra: model.id);
                   },
-                  trailing: SizedBox(
-                    width: MediaQuery.of(context).size.width / 4,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        GestureDetector(
-                          child: const Icon(Icons.edit),
-                          onTap: () {
-                            if (widget.editPage != null) {
-                              context.pushNamed(widget.editPage!, extra: model);
-                            }
-                          },
-                        ),
-                        GestureDetector(
-                          child: const Icon(
-                            Icons.delete,
-                            color: Colors.red,
-                          ),
-                          onTap: () async {
-                            int? result = await showDialog<int>(
-                                context: context,
-                                builder: (BuildContext context) =>
-                                    DeleteDialog(model: model));
-                            if (result == 0) {
-                              setState(() {
-                                myList.remove(model);
-                              });
-                            }
-                          },
-                        ),
-                      ],
+                  child: CachedNetworkImage(
+                    imageUrl: Constants.getImageURL(model.id),
+                    imageBuilder: (context, imageProvider) => Container(
+                      width: 80.0,
+                      height: 80.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        image: DecorationImage(
+                            image: imageProvider, fit: BoxFit.cover),
+                      ),
+                    ),
+                    placeholder: (context, url) =>
+                        const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) => Image.asset(
+                      Constants.noImageAssetPath,
+                      width: 80,
+                      height: 80,
                     ),
                   ),
                 ),
-              );
-            },
-            separatorBuilder: (BuildContext context, int index) =>
-                const Divider(),
-          )
-        : const Center(child: Text('No Data Found!'));
+                onTap: () {
+                  if (widget.nextPage != null) {
+                    context.pushNamed(widget.nextPage!, extra: model);
+                  }
+                },
+                trailing: SizedBox(
+                  width: MediaQuery.of(context).size.width / 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        child: const Icon(Icons.edit),
+                        onTap: () {
+                          if (widget.editPage != null) {
+                            context.pushNamed(widget.editPage!, extra: model);
+                          }
+                        },
+                      ),
+                      GestureDetector(
+                        child: const Icon(
+                          Icons.delete,
+                          color: Colors.red,
+                        ),
+                        onTap: () async {
+                          int? result = await showDialog<int>(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  DeleteDialog(model: model));
+                          if (result == 0) {
+                            setState(() {
+                              myList.remove(model);
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          separatorBuilder: (BuildContext context, int index) =>
+              const Divider(),
+        ));
   }
 
   Widget displayGrid() {
     return Container(
-      padding: const EdgeInsets.all(12.0),
-      child: GridView.builder(
-          itemCount: myList.length,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount:
-                MediaQuery.of(context).orientation == Orientation.portrait
-                    ? 2
-                    : 4,
-            crossAxisSpacing: 4.0,
-            mainAxisSpacing: 4.0,
-          ),
-          itemBuilder: (BuildContext context, int index) {
-            final model = myList.elementAt(index);
-            return Card(
-              color: Colors.amber,
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Stack(
-                      children: [
-                        InkWell(
-                          onTap: () {
-                            if (widget.nextGridPage != null) {
-                              context.pushNamed(widget.nextGridPage!,
-                                  extra: model);
-                            } else if (widget.nextPage != null) {
-                              context.pushNamed(widget.nextPage!, extra: model);
-                            }
-                          },
-                          child: CachedNetworkImage(
-                              imageUrl: Constants.getImageURL(model.id),
-                              imageBuilder: (context, imageProvider) =>
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      image: DecorationImage(
-                                          image: imageProvider,
-                                          fit: BoxFit.fill),
+        padding: const EdgeInsets.all(4.0),
+        child: GridView.builder(
+            itemCount: myList.length,
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount:
+                  MediaQuery.of(context).orientation == Orientation.portrait
+                      ? 2
+                      : 4,
+              crossAxisSpacing: 4.0,
+              mainAxisSpacing: 4.0,
+            ),
+            itemBuilder: (BuildContext context, int index) {
+              final model = myList.elementAt(index);
+              return Card(
+                color: Colors.amber,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: Stack(
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              if (widget.nextGridPage != null) {
+                                context.pushNamed(widget.nextGridPage!,
+                                    extra: model);
+                              } else if (widget.nextPage != null) {
+                                context.pushNamed(widget.nextPage!,
+                                    extra: model);
+                              }
+                            },
+                            child: CachedNetworkImage(
+                                imageUrl: Constants.getImageURL(model.id),
+                                imageBuilder: (context, imageProvider) =>
+                                    Container(
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.rectangle,
+                                        image: DecorationImage(
+                                            image: imageProvider,
+                                            fit: BoxFit.fill),
+                                      ),
                                     ),
-                                  ),
-                              placeholder: (context, url) =>
-                                  const CircularProgressIndicator(),
-                              errorWidget: (context, url, error) => Image.asset(
-                                    Constants.noImageAssetPath,
-                                    width: 200,
-                                    height: 200,
-                                  )),
-                        ),
-                        Text(model.toString(),
-                            style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black,
-                                fontWeight: FontWeight.bold,
-                                backgroundColor: Colors.amber)),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            );
-          }),
-    );
+                                placeholder: (context, url) =>
+                                    const CircularProgressIndicator(),
+                                errorWidget: (context, url, error) =>
+                                    Image.asset(
+                                      Constants.noImageAssetPath,
+                                      width: 200,
+                                      height: 200,
+                                    )),
+                          ),
+                          Text(model.header(),
+                              style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold,
+                                  backgroundColor: Colors.amber)),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              );
+            }));
   }
 }

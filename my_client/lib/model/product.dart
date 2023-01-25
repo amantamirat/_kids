@@ -1,17 +1,18 @@
+import 'dart:convert';
+
 import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 
 class Product extends MyModel {
   static const String path = "/products";
-  //static const String attributeProductName = 'product_name';
   static const String attributeDetail = 'product_detail';
   static const String attributeSize = 'size';
   static const String attributePrice = 'price';
   static const String attributeMOQ = 'minimum_order_quanity';
   static const String attributeKinds = 'product_kinds';
+  //static const String attributeBrand = 'brand';
 
-  //late String? name;
   late String? detail;
   late num size;
   late num price;
@@ -24,27 +25,34 @@ class Product extends MyModel {
 
   @override
   Product fromJson(Map<String, dynamic> json) {
-    id = json["_id"];
-    //name = json[attributeProductName];
+    id = json[MyModel.attributeId];
     detail = json[attributeDetail];
     size = json[attributeSize];
     price = json[attributePrice];
-    moq = json[attributeMOQ] ?? 0 ;
+    moq = json[attributeMOQ] ?? 0;
+    //if (json.containsKey(attributeKinds)) {
     kinds = Kind.kindsFromJson(json[attributeKinds], this);
+    //}
     return this;
   }
 
   @override
-  Map<String, dynamic> toJson({bool includeId = true}) {
+  Map<String, dynamic> toJson(
+      {bool includeId = true, bool includeLocal = false}) {
     final data = <String, dynamic>{};
     if (includeId) {
-      data["_id"] = id;
+      data[MyModel.attributeId] = id;
     }
-    //data[attributeProductName] = name;
     data[attributeDetail] = detail;
     data[attributeSize] = size;
     data[attributePrice] = price;
     data[attributeMOQ] = moq;
+    /*
+    if (includeLocal) {
+      data[attributeBrand] =
+          jsonEncode(brand!.toJson(includeLocal: includeLocal));
+    }
+    */
     return data;
   }
 
@@ -59,25 +67,13 @@ class Product extends MyModel {
   }
 
   @override
-  String toString() {
-    return detail!;
+  String header() {
+    return "${brand!.name}/$detail/$size";
   }
 
-  final List<Kind> _avialiableKinds = List.empty(growable: true);
-
-  List<Kind> avialiableKinds() {
-    for (Kind k in kinds) {
-      if (k.quantity! > 0) {
-        if (!_avialiableKinds.contains(k)) {
-          _avialiableKinds.add(k);
-        }
-      } else {
-        if (_avialiableKinds.contains(k)) {
-          _avialiableKinds.remove(k);
-        }
-      }
-    }
-    return _avialiableKinds;
+  @override
+  String toString() {
+    return detail!;
   }
 
   static List<Product> productsFromJson(dynamic str, Brand brand) =>

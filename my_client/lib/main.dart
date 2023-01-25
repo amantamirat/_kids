@@ -15,17 +15,20 @@ import 'package:abdu_kids/pages/products/product_merge.dart';
 import 'package:abdu_kids/pages/types/type_list.dart';
 import 'package:abdu_kids/pages/types/type_merge.dart';
 import 'package:abdu_kids/pages/util/image_uloader.dart';
+import 'package:abdu_kids/pages/util/shoping_cart.dart';
 import 'package:abdu_kids/services/my_service.dart';
+import 'package:abdu_kids/services/database_util.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:abdu_kids/util/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:abdu_kids/pages/util/my_preferences.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Initialize SharedPrefs instance.
   await SharedPrefs.init();
+  await CartDataBase.init();
   runApp(const MyApp());
 }
 
@@ -140,6 +143,11 @@ final GoRouter _router = GoRouter(
           CategoryList(categories: state.extra as List<Category>),
     ),
     GoRoute(
+      path: '/${PageName.myShoppingCart}',
+      name: PageName.myShoppingCart,
+      builder: (context, state) => const ShoppingCart(),
+    ),
+    GoRoute(
       path: '/upload',
       name: 'upload_image',
       builder: (context, state) => ImageUploader(id: state.extra as String),
@@ -179,6 +187,7 @@ class _Home extends State<Home> {
     _myFuture = MyService.getCategories();
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -210,11 +219,31 @@ class _Home extends State<Home> {
                               SizedBox(
                                 width: 5,
                               ),
-                              Text('Try Again'),
+                              Text('Refresh'),
                             ],
                           ),
                           onPressed: () {
-                            GoRouter.of(context).pushNamed(PageName.settings);
+                            setState(() {
+                              _myFuture = MyService.getCategories();
+                            });
+                          }),
+                      ElevatedButton(
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Icon(
+                                Icons.settings,
+                              ),
+                              SizedBox(
+                                width: 5,
+                              ),
+                              Text('Configure'),
+                            ],
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              GoRouter.of(context).pushNamed(PageName.settings);
+                            });
                           }),
                     ],
                   ),

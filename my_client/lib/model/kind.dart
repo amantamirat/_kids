@@ -5,6 +5,7 @@ class Kind extends MyModel {
   static const String path = "/kinds";
   static const String attributeColor = 'color';
   static const String attributeQuantity = 'quantity';
+  //static const String attributeProduct = 'product';
 
   late String? color;
   late int? quantity;
@@ -17,18 +18,36 @@ class Kind extends MyModel {
     id = json[MyModel.attributeId];
     color = json[attributeColor];
     quantity = json[attributeQuantity];
+    /*
+    if (includeLocal) {
+      product = Product().fromJson(json[attributeProduct]);
+    }
+    */
+
     return this;
   }
 
   @override
-  Map<String, dynamic> toJson({bool includeId = true}) {
+  Map<String, dynamic> toJson(
+      {bool includeId = true, bool includeLocal = false}) {
     final data = <String, dynamic>{};
     if (includeId) {
       data[MyModel.attributeId] = id;
     }
     data[attributeColor] = color;
     data[attributeQuantity] = quantity;
+    /*
+    if (includeLocal) {
+      data[attributeProduct] =
+          jsonEncode(product!.toJson(includeLocal: includeLocal));
+    }
+    */
     return data;
+  }
+
+  @override
+  String header() {
+    return "${product!.brand!.name} - ${product!.detail} - ${product!.size}";
   }
 
   @override
