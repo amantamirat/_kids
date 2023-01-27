@@ -1,4 +1,4 @@
-import 'package:abdu_kids/util/preference_util.dart';
+import 'package:abdu_kids/services/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';

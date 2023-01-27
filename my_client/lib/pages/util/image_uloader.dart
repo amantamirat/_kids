@@ -59,11 +59,8 @@ class _ImageUploader extends State<ImageUploader> {
               await CachedNetworkImage.evictFromCache(
                       Constants.getImageURL(widget.id))
                   .then((value) {
-                //ignore: avoid_print
-                //print('File removed');
               }).onError((error, stackTrace) {
-                //ignore: avoid_print
-                print(error);
+               // print(error);
               });
               GoRouter.of(context).pop();
             }

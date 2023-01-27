@@ -1,9 +1,10 @@
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/util/page_names.dart';
 
 class Brand extends MyModel {
-  static const String path = "/brands";
+  //static const String path = "/brands";
   static const String attributeName = 'brand_name';
   static const String attributeProducts = 'products';
   //static const String attributeType = 'type';
@@ -45,7 +46,7 @@ class Brand extends MyModel {
 
   @override
   String basePath() {
-    return path;
+    return "/${PageName.brands}";
   }
 
   @override

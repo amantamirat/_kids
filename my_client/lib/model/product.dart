@@ -3,9 +3,10 @@ import 'dart:convert';
 import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
+import 'package:abdu_kids/util/page_names.dart';
 
 class Product extends MyModel {
-  static const String path = "/products";
+  //static const String path = "/products";
   static const String attributeDetail = 'product_detail';
   static const String attributeSize = 'size';
   static const String attributePrice = 'price';
@@ -58,7 +59,7 @@ class Product extends MyModel {
 
   @override
   String basePath() {
-    return path;
+    return "/${PageName.products}";
   }
 
   @override

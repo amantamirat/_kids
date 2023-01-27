@@ -1,5 +1,10 @@
+import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/category.dart';
+import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
+import 'package:abdu_kids/model/product.dart';
+import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/util/page_names.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -8,19 +13,18 @@ import '../util/constants.dart';
 class MyService {
   static var client = http.Client();
 
-  //static late List<Category>? data;
-
-  //static Future<void> init() async => data = await _getCategories();
+  static late List<Category>? _data;
 
   static Future<List<Category>?> getCategories() async {
-    String url = "${Constants.apiURL()}${Category.path}";
+    String url = "${Constants.apiURL()}/${PageName.categories}";
     var response = await client.get(
       Uri.parse(url),
       headers: Constants.requestHeaders,
     );
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      return Category.categoriesFromJson(data["categories"]);
+      _data = Category.categoriesFromJson(data["categories"]);
+      return _data;
     } else {
       return null;
     }
@@ -60,5 +64,22 @@ class MyService {
       headers: Constants.requestHeaders,
     );
     return response.statusCode == 204;
+  }
+
+  static Kind? findKindById(String id) {
+    for (Category category in _data!) {
+      for (ClothingType type in category.clothingTypes) {
+        for (Brand brand in type.brands) {
+          for (Product product in brand.products) {
+            for (Kind kind in product.kinds) {
+              if (kind.id == id) {
+                return kind;
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
   }
 }

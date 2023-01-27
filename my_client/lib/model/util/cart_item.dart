@@ -1,21 +1,19 @@
-import 'dart:convert';
-
 import 'package:abdu_kids/model/kind.dart';
 
 class CartItem {
-  
   static const String tableName = "cart_items";
   static const String attributeId = "id";
   //static const String attributeKind = "kind";
   static const String attributeQuantity = "quantity";
 
   final String id;
+  late int quantity;
   final Kind? selectedKind;
-  final int quantity;
+
   CartItem({
     required this.id,
-    this.selectedKind,
     required this.quantity,
+    this.selectedKind,
   });
 
   Map<String, dynamic> toMap() {
@@ -25,6 +23,7 @@ class CartItem {
       attributeQuantity: quantity,
     };
   }
+
   @override
   String toString() {
     return 'Cart Item{id: $id, kind : $selectedKind, quantity: $quantity}';

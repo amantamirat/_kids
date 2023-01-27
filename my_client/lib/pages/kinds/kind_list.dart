@@ -1,11 +1,10 @@
-import 'dart:ffi';
-
 import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/pages/model/my_model_page.dart';
 import 'package:abdu_kids/model/util/cart_item.dart';
 import 'package:abdu_kids/services/database_util.dart';
 import 'package:abdu_kids/util/page_names.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
@@ -16,14 +15,16 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class KindList extends MyModelPage {
   final Product selectedProduct;
+  final Kind? selectedKind;
 
-  KindList({Key? key, required this.selectedProduct})
+  KindList({Key? key, required this.selectedProduct, this.selectedKind})
       : super(
-          key: key,
-          myList: selectedProduct.kinds,
-          title: "${selectedProduct.brand} Product Colors",
-          editPage: PageName.editKind,
-        );
+            key: key,
+            myList: selectedProduct.kinds,
+            title: "${selectedProduct.brand} Product Colors",
+            editPage: PageName.editKind,
+            showCartIcon: selectedKind == null,
+            showManageIcon: selectedKind == null);
 
   @override
   State<KindList> createState() => _KindList();
@@ -31,14 +32,18 @@ class KindList extends MyModelPage {
 
 class _KindList extends MyModelPageState<KindList> {
   final CarouselController _controller = CarouselController();
-  late List<Kind> _kindList;
+  late List<Kind> _kindList = List.empty(growable: true);
   late List<Widget> imageSliders;
   int _activeIndex = 0;
   late double _quantity = 0;
   @override
   void initState() {
     super.initState();
-    _kindList = widget.selectedProduct.kinds;
+    if (widget.selectedKind == null) {
+      _kindList = widget.selectedProduct.kinds;
+    } else {
+      _kindList.add(widget.selectedKind!);
+    }
     if (_kindList.isNotEmpty) {
       _computeMinMax();
     }
@@ -72,14 +77,23 @@ class _KindList extends MyModelPageState<KindList> {
               ),
               carouselController: _controller,
             ),
-            const SizedBox(height: 10),
-            _buildIndicator(),
-            const SizedBox(height: 10),
-            _buildController(),
+            widget.selectedKind == null
+                ? Column(
+                    children: [
+                      const SizedBox(height: 10),
+                      _buildIndicator(),
+                      const SizedBox(height: 10),
+                      _buildController()
+                    ],
+                  )
+                : Container(),
             const SizedBox(height: 10),
             _buildTable(),
-            const SizedBox(height: 10),
-            _buildCartForm(),
+            widget.selectedKind == null
+                ? Column(
+                    children: [const SizedBox(height: 10), _buildCartForm()],
+                  )
+                : Container(),
           ])
         : Center(
             child: Text(
@@ -94,8 +108,10 @@ class _KindList extends MyModelPageState<KindList> {
                   borderRadius: const BorderRadius.all(Radius.circular(5.0)),
                   child: Stack(
                     children: <Widget>[
-                      Image.network(Constants.getImageURL(item.id),
-                          fit: BoxFit.contain, width: 1000.0),
+                      CachedNetworkImage(
+                          imageUrl: Constants.getImageURL(item.id),
+                          fit: BoxFit.contain,
+                          width: 1000.0),
                       Positioned(
                         bottom: 0.0,
                         left: 0.0,
@@ -273,20 +289,19 @@ class _KindList extends MyModelPageState<KindList> {
                   onPressed: () async {
                     if (_quantity > 0) {
                       final kind = _kindList.elementAt(_activeIndex);
-                      final item = CartItem(
-                          id: kind.id!,
-                          selectedKind: kind,
-                          quantity: _quantity.round());
-                      int result = await CartDataBase.insertItem(item);
-                      print(await CartDataBase.cartItems());
-                      if (result != 0) {
-                        Fluttertoast.showToast(
-                            msg: 'Item added to cart',
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.red,
-                            textColor: Colors.yellow);
+                      final item =
+                          CartItem(id: kind.id!, quantity: _quantity.toInt());
+                      if (widget.selectedKind == null) {
+                        int result = await CartDataBase.insertItem(item);
+                        if (result != 0) {
+                          Fluttertoast.showToast(
+                              msg: 'Item added to cart',
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.red,
+                              textColor: Colors.yellow);
+                        }
                       }
                     }
                   },

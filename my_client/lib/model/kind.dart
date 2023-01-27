@@ -1,8 +1,9 @@
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
+import 'package:abdu_kids/util/page_names.dart';
 
 class Kind extends MyModel {
-  static const String path = "/kinds";
+  //static const String path = "/kinds";
   static const String attributeColor = 'color';
   static const String attributeQuantity = 'quantity';
   //static const String attributeProduct = 'product';
@@ -52,7 +53,7 @@ class Kind extends MyModel {
 
   @override
   String basePath() {
-    return path;
+    return "/${PageName.kinds}";
   }
 
   @override

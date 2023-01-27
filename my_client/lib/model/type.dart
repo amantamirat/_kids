@@ -1,11 +1,10 @@
-import 'dart:convert';
-
 import 'package:abdu_kids/model/brand.dart';
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/model/my_model.dart';
+import 'package:abdu_kids/util/page_names.dart';
 
 class ClothingType extends MyModel {
-  static const String path = "/types";
+  //static const String path = "/types";
   static const String attributeType = 'type';
   static const String attributeBrands = 'brands';
   //static const String attributeCategory = 'category';
@@ -48,7 +47,7 @@ class ClothingType extends MyModel {
 
   @override
   String basePath() {
-    return path;
+    return "/${PageName.types}";
   }
 
   @override

@@ -19,7 +19,7 @@ import 'package:abdu_kids/pages/util/shoping_cart.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/services/database_util.dart';
 import 'package:abdu_kids/util/page_names.dart';
-import 'package:abdu_kids/util/preference_util.dart';
+import 'package:abdu_kids/services/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:abdu_kids/pages/util/my_preferences.dart';
 import 'package:go_router/go_router.dart';
@@ -64,8 +64,17 @@ final GoRouter _router = GoRouter(
                           GoRoute(
                               path: PageName.kinds,
                               name: PageName.kinds,
-                              builder: (context, state) => KindList(
-                                  selectedProduct: state.extra as Product),
+                              builder: (context, state) {
+                                if (state.extra is Kind) {
+                                  final kind = state.extra as Kind;
+                                  return KindList(
+                                    selectedProduct: kind.product!,
+                                    selectedKind: kind,
+                                  );
+                                }
+                                return KindList(
+                                    selectedProduct: state.extra as Product);
+                              },
                               routes: <RouteBase>[
                                 GoRoute(
                                   path: PageName.addKind,

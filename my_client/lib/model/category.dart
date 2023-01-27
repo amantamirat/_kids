@@ -1,8 +1,9 @@
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/util/page_names.dart';
 
 class Category extends MyModel {
-  static const String path = "/categories";
+  //static const String path = "/categories";
   static const String attributeTitle = 'title';
   static const String attributeDescription = 'description';
   static const String attributeClothingTypes = 'clothing_types';
@@ -26,8 +27,9 @@ class Category extends MyModel {
   }
 
   @override
-  Map<String, dynamic> toJson(
-      {bool includeId = true,}) {
+  Map<String, dynamic> toJson({
+    bool includeId = true,
+  }) {
     final data = <String, dynamic>{};
     if (includeId) {
       data[MyModel.attributeId] = id;
@@ -44,7 +46,7 @@ class Category extends MyModel {
 
   @override
   String basePath() {
-    return path;
+    return "/${PageName.categories}";
   }
 
   @override

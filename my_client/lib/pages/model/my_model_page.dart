@@ -15,6 +15,8 @@ abstract class MyModelPage extends StatefulWidget {
   final String? nextPage;
   final String? nextGridPage;
   final Widget? leading;
+  final bool showCartIcon;
+  final bool showManageIcon;
 
   const MyModelPage(
       {Key? key,
@@ -23,7 +25,9 @@ abstract class MyModelPage extends StatefulWidget {
       this.editPage,
       this.nextPage,
       this.nextGridPage,
-      this.leading})
+      this.leading,
+      this.showCartIcon = true,
+      this.showManageIcon = true})
       : super(key: key);
 }
 
@@ -48,26 +52,31 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
         leading: widget.leading,
         elevation: 0,
         actions: <Widget>[
-          IconButton(
-            onPressed: () {
-              GoRouter.of(context).pushNamed(PageName.myShoppingCart);
-            },
-            icon: const Icon(Icons.shopping_cart),
-          ),
-          PopupMenuButton<Menu>(
-              onSelected: (Menu item) async {
-                if (item == Menu.itemManage) {
-                  setState(
-                    () => {_manageMode = !_manageMode},
-                  );
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-                    PopupMenuItem<Menu>(
-                      value: Menu.itemManage,
-                      child: Text(_manageMode ? 'View Mode' : 'Manage Mode'),
-                    ),
-                  ]),
+          (widget.showCartIcon && !_manageMode)
+              ? IconButton(
+                  onPressed: () {
+                    GoRouter.of(context).pushNamed(PageName.myShoppingCart);
+                  },
+                  icon: const Icon(Icons.shopping_cart),
+                )
+              : Container(),
+          widget.showManageIcon
+              ? PopupMenuButton<Menu>(
+                  onSelected: (Menu item) async {
+                    if (item == Menu.itemManage) {
+                      setState(
+                        () => {_manageMode = !_manageMode},
+                      );
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
+                        PopupMenuItem<Menu>(
+                          value: Menu.itemManage,
+                          child:
+                              Text(_manageMode ? 'View Mode' : 'Manage Mode'),
+                        ),
+                      ])
+              : Container(),
         ],
       ),
       backgroundColor: Colors.grey[200],
