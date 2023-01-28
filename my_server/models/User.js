@@ -1,7 +1,5 @@
 const mongoose = require('mongoose')
 
-const bcrypt = require('bcrypt')
-
 const UserSchema = new mongoose.Schema(
     {
         first_name: {
@@ -15,6 +13,7 @@ const UserSchema = new mongoose.Schema(
         },
         email: {
             type: String,
+            required: true,
             unique: true
         },
         phone_number: {
@@ -26,18 +25,20 @@ const UserSchema = new mongoose.Schema(
         },
         user_name: {
             type: String,
-            required: true,
             unique: true
         },
         password: {
             type: String,
             required: true
         },
-        verified: {
-            type: Boolean
+        token: {
+            type: String,
+            default: null
         },
-        blocked: {
-            type: Boolean
+        user_status: {
+            type: String,
+            default: 'Pending',
+            enum: ['Pending', 'Verified', 'Blocked']
         },
         role: {
             type: String,
@@ -47,21 +48,6 @@ const UserSchema = new mongoose.Schema(
     }
 );
 
-UserSchema.statics.register = async function (user) {
-    const exist = this.exists({ username: user.username });
-
-    if (exist === true) {
-        throw Error("username already exist! " + user.username);
-    }
-
-    const salt = await bcrypt.genSalt(10);
-
-    const hashed = await bcrypt.hash(user.password, salt);
-
-    user = await this.create({ username: user.username, password: hashed, email: user.email, role: user.role });
-
-    return user;
-}
 
 const User = mongoose.model('User', UserSchema);
 
