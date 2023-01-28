@@ -14,6 +14,8 @@ import 'package:abdu_kids/pages/products/product_list.dart';
 import 'package:abdu_kids/pages/products/product_merge.dart';
 import 'package:abdu_kids/pages/types/type_list.dart';
 import 'package:abdu_kids/pages/types/type_merge.dart';
+import 'package:abdu_kids/pages/user/log_in.dart';
+import 'package:abdu_kids/pages/user/user_list.dart';
 import 'package:abdu_kids/pages/util/image_uloader.dart';
 import 'package:abdu_kids/pages/util/shoping_cart.dart';
 import 'package:abdu_kids/services/my_service.dart';
@@ -150,6 +152,16 @@ final GoRouter _router = GoRouter(
       name: PageName.categories,
       builder: (context, state) =>
           CategoryList(categories: state.extra as List<Category>),
+    ),
+    GoRoute(
+      path: '/${PageName.users}',
+      name: PageName.users,
+      builder: (context, state) => const UserList(),
+    ),
+    GoRoute(
+      path: '/${PageName.login}',
+      name: PageName.login,
+      builder: (context, state) => const Login(),
     ),
     GoRoute(
       path: '/${PageName.myShoppingCart}',

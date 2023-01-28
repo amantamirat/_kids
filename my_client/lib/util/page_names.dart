@@ -13,7 +13,9 @@ class PageName {
   static const String kinds = "kinds";
   static const String addKind = "add_kind";
   static const String editKind = "edit_kind";
+  static const String users= "users";
 
   static const String settings = "settings";
   static const String myShoppingCart = "my_shopping_cart";
+  static const String login= "login";
 }

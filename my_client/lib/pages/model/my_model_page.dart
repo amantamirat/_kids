@@ -9,38 +9,45 @@ import 'package:go_router/go_router.dart';
 enum Menu { itemManage, itemSettings }
 
 abstract class MyModelPage extends StatefulWidget {
-  final List<MyModel> myList;
+  final List<MyModel>? myList;
   final String? title;
   final String? editPage;
   final String? nextPage;
   final String? nextGridPage;
-  final Widget? leading;
+  final Widget? drawer;
   final bool showCartIcon;
   final bool showManageIcon;
+  final bool manageMode;
 
   const MyModelPage(
       {Key? key,
-      required this.myList,
+      this.myList,
       this.title,
       this.editPage,
       this.nextPage,
       this.nextGridPage,
-      this.leading,
+      this.drawer,
       this.showCartIcon = true,
-      this.showManageIcon = true})
+      this.showManageIcon = true,
+      this.manageMode = false})
       : super(key: key);
 }
 
 abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
-  late bool _manageMode = false;
+  late bool _manageMode = widget.manageMode;
 
-  late List<MyModel> myList;
+  List<MyModel>? myList;
 
   @override
   void initState() {
     super.initState();
-    myList = widget.myList;
+    if (widget.myList != null) {
+      myList = widget.myList!;
+    }else{
+
+    }
   }
+
 
   void onCreatePressed();
 
@@ -49,7 +56,6 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.title}'),
-        leading: widget.leading,
         elevation: 0,
         actions: <Widget>[
           (widget.showCartIcon && !_manageMode)
@@ -79,8 +85,9 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
               : Container(),
         ],
       ),
+      drawer: widget.drawer,
       backgroundColor: Colors.grey[200],
-      body: myList.isNotEmpty
+      body: myList!.isNotEmpty
           ? _manageMode
               ? displayList()
               : displayGrid()
@@ -106,9 +113,9 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
           physics: const ClampingScrollPhysics(),
           scrollDirection: Axis.vertical,
           padding: const EdgeInsets.all(8),
-          itemCount: myList.length,
+          itemCount: myList!.length,
           itemBuilder: (BuildContext context, int index) {
-            final model = myList.elementAt(index);
+            final model = myList!.elementAt(index);
             return Container(
               color: Colors.amberAccent[index * 10],
               child: ListTile(
@@ -175,7 +182,7 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
                                   DeleteDialog(model: model));
                           if (result == 0) {
                             setState(() {
-                              myList.remove(model);
+                              myList!.remove(model);
                             });
                           }
                         },
@@ -195,7 +202,7 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
     return Container(
         padding: const EdgeInsets.all(4.0),
         child: GridView.builder(
-            itemCount: myList.length,
+            itemCount: myList!.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount:
                   MediaQuery.of(context).orientation == Orientation.portrait
@@ -205,7 +212,7 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
               mainAxisSpacing: 4.0,
             ),
             itemBuilder: (BuildContext context, int index) {
-              final model = myList.elementAt(index);
+              final model = myList!.elementAt(index);
               return Card(
                 color: Colors.amber,
                 child: Column(

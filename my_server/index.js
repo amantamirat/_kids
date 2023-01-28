@@ -20,6 +20,8 @@ mongoose.connect(process.env.MONGO_URL, {
 });
 
 
+const userRouter = require("./routes/users");
+app.use("/users", userRouter);
 const categoryRouter = require("./routes/categories");
 app.use("/categories", categoryRouter);
 const typeRouter = require("./routes/types");

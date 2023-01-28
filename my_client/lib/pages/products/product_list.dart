@@ -15,6 +15,7 @@ class ProductList extends MyModelPage {
             key: key,
             myList: _getProducts(selectedModel),
             title: "${selectedModel.toString()} Products",
+            showManageIcon: selectedModel is Brand,
             editPage: PageName.editProduct,
             nextPage: PageName.kinds);
 

@@ -4,6 +4,7 @@ import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -11,6 +12,7 @@ import 'dart:convert';
 import '../util/constants.dart';
 
 class MyService {
+  
   static var client = http.Client();
 
   static late List<Category>? _data;
@@ -23,7 +25,7 @@ class MyService {
     );
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      _data = Category.categoriesFromJson(data["categories"]);
+      _data = Category.categoriesFromJson(data[PageName.categories]);
       return _data;
     } else {
       return null;
@@ -66,6 +68,7 @@ class MyService {
     return response.statusCode == 204;
   }
 
+  @Deprecated("Bad Implementation")
   static Kind? findKindById(String id) {
     for (Category category in _data!) {
       for (ClothingType type in category.clothingTypes) {
@@ -81,5 +84,20 @@ class MyService {
       }
     }
     return null;
+  }
+
+  static Future<List<User>?> getUsers() async {
+    String url = "${Constants.apiURL()}/${PageName.users}";
+    var response = await client.get(
+      Uri.parse(url),
+      headers: Constants.requestHeaders,
+    );
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body);
+      return User.usersFromJson(data[PageName.users]);
+      ;
+    } else {
+      return null;
+    }
   }
 }
