@@ -28,6 +28,7 @@ exports.createUser = async (req, res, next) => {
             process.env.TOKEN_KEY, {
             expiresIn: "2h",
         });
+        delete user.password;
         return res.status(201).json({
             status: 'Success',
             data: user
