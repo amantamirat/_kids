@@ -9,6 +9,8 @@ router.post('/register', userController.registerUser);
 
 router.post('/login', userController.loginUser);
 
+router.post('/changePassword/:id', auth,userController.changePassword);
+
 router.patch("/update/:id", auth, userController.editUser);
 
 router.delete("/delete/:id", auth, userController.deleteUser);

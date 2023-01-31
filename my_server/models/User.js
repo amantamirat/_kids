@@ -45,6 +45,10 @@ const UserSchema = new mongoose.Schema(
             default: 'Customer',
             enum: ['Customer', 'Administrator']
         },
+        verification_code: {
+            type: String,
+            default: null
+        }
     }
 );
 
