@@ -186,8 +186,8 @@ exports.deleteUser = async (req, res, next) => {
 const sendEmail = async (email, subject, code) => {
     try {
         const transporter = nodemailer.createTransport({
-            host: "gmail",
-            port: 2525,
+            host: "smtp.ethereal.email",
+            port: 587,
             auth: {
                 user: process.env.USER,
                 pass: process.env.PASS,
