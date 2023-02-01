@@ -234,8 +234,7 @@ const sendEmail = async (email) => {
         const code = Math.floor(100000 + Math.random() * 900000);
         const subject = "Email Verification\n";
         const transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
+            service: "gmail",
             auth: {
                 user: process.env.USER,
                 pass: process.env.PASS,
