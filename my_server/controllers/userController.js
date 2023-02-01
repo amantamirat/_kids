@@ -241,7 +241,7 @@ const sendEmail = async (email) => {
             }
         });
         const myOptions = {
-            from: '"Abdu Kids", amweezy@gmail.com',
+            from: '"Abdu Kids", noreply@gmail.com',
             to: email,
             subject: subject,
             text: 'Hello,\n Welcome. Please Enter The Verfication Code to Activate Your Account.\n',
