@@ -234,17 +234,17 @@ const sendEmail = async (email) => {
         const code = Math.floor(100000 + Math.random() * 900000);
         const subject = "Email Verification\n";
         const transporter = nodemailer.createTransport({
-            service: "gmail",
+            service: "Gmail",
             auth: {
                 user: process.env.USER,
                 pass: process.env.PASS,
             }
         });
         const myOptions = {
-            from: 'noreply@gmail.com',
+            from: '"Abdu Kids", amweezy@gmail.com',
             to: email,
             subject: subject,
-            text: 'Hello,\n Welcome. Please Enter This Verfication Code to Activate Your Account.\n',
+            text: 'Hello,\n Welcome. Please Enter The Verfication Code to Activate Your Account.\n',
             html: '<h2>' + code + '</h2>'
         }
 
