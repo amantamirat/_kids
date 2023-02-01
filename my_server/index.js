@@ -36,6 +36,15 @@ app.use("/kinds", kindRouter);
 const imageRouter = require("./routes/images");
 app.use("/upload", imageRouter);
 
+
+const comp = async()=>{
+  const bcrypt = require('bcryptjs');
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash("1234", salt);
+  console.log(hashed);
+} 
+
 app.listen(process.env.PORT, () => {
   console.log(`Abdu Kids Server is up and running on PORT ${process.env.PORT}...`);
 });
+
