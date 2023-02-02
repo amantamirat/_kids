@@ -43,6 +43,7 @@ exports.registerUser = async (req, res, next) => {
         user = await User.create({
             email: req.body.email,
             password: hashed,
+            phone_number: req.body.phone_number,
             verification_code: hashedcode,
         });
         await user.save();
