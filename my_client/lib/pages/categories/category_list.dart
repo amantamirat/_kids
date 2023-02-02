@@ -10,15 +10,14 @@ import 'package:go_router/go_router.dart';
 
 class CategoryList extends MyModelPage {
   final List<Category> categories;
-
   const CategoryList({Key? key, required this.categories})
       : super(
             key: key,
             myList: categories,
-            title: "ABDU KIDS",            
-            drawer: const MyNavigationDrawer(),
-            editPage: PageName.editCategory,
-            nextPage: PageName.types);
+            title: "ABDU KIDS", 
+            enableDrawer: true,           
+            editPage: PageNames.editCategory,
+            nextPage: PageNames.types);
   @override
   State<CategoryList> createState() => _CategoryListState();
 }
@@ -89,7 +88,7 @@ class _CategoryListState extends MyModelPageState<CategoryList> {
                                 InkWell(
                                   onTap: () {
                                     GoRouter.of(context).pushNamed(
-                                        PageName.types,
+                                        PageNames.types,
                                         extra: category);
                                   },
                                   child: CachedNetworkImage(
@@ -148,7 +147,7 @@ class _CategoryListState extends MyModelPageState<CategoryList> {
               children: [
                 InkWell(
                   onTap: () {
-                    context.pushNamed(PageName.products, extra: type);
+                    context.pushNamed(PageNames.products, extra: type);
                   },
                   child: CachedNetworkImage(
                     imageUrl: Constants.getImageURL(type.id),

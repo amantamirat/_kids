@@ -1,32 +1,35 @@
 import 'package:abdu_kids/model/my_model.dart';
+import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/pages/util/delete_dialog.dart';
+import 'package:abdu_kids/pages/util/my_navigation_drawer.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_session_manager/flutter_session_manager.dart';
 
 enum Menu { itemManage, itemSettings }
 
 abstract class MyModelPage extends StatefulWidget {
-  final List<MyModel>? myList;
+  final List<MyModel> myList;
   final String? title;
   final String? editPage;
   final String? nextPage;
   final String? nextGridPage;
-  final Widget? drawer;
+  final bool enableDrawer;
   final bool showCartIcon;
   final bool showManageIcon;
   final bool manageMode;
 
   const MyModelPage(
       {Key? key,
-      this.myList,
+      required this.myList,
       this.title,
       this.editPage,
       this.nextPage,
       this.nextGridPage,
-      this.drawer,
+      this.enableDrawer = false,
       this.showCartIcon = true,
       this.showManageIcon = true,
       this.manageMode = false})
@@ -35,19 +38,16 @@ abstract class MyModelPage extends StatefulWidget {
 
 abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
   late bool _manageMode = widget.manageMode;
-
-  List<MyModel>? myList;
+  late List<MyModel> myList;
+  User? loggedInUser;
+  Future<dynamic>? myUser;
 
   @override
   void initState() {
     super.initState();
-    if (widget.myList != null) {
-      myList = widget.myList!;
-    }else{
-
-    }
+    myList = widget.myList;
+    myUser = SessionManager().get(Constants.loggedInUser);
   }
-
 
   void onCreatePressed();
 
@@ -61,38 +61,62 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
           (widget.showCartIcon && !_manageMode)
               ? IconButton(
                   onPressed: () {
-                    GoRouter.of(context).pushNamed(PageName.myShoppingCart);
+                    GoRouter.of(context).pushNamed(PageNames.myShoppingCart);
                   },
                   icon: const Icon(Icons.shopping_cart),
                 )
               : Container(),
           widget.showManageIcon
-              ? PopupMenuButton<Menu>(
-                  onSelected: (Menu item) async {
-                    if (item == Menu.itemManage) {
-                      setState(
-                        () => {_manageMode = !_manageMode},
-                      );
+              ? FutureBuilder(
+                  future: myUser,
+                  builder:
+                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      default:
+                        if (snapshot.hasError) {
+                          return Container();
+                        } else {
+                          if (!snapshot.hasData) {
+                            return Container();
+                          }
+                          loggedInUser = User().fromJson(snapshot.data);
+                          return loggedInUser!.role == Role.administrator
+                              ? PopupMenuButton<Menu>(
+                                  onSelected: (Menu item) async {
+                                    if (item == Menu.itemManage) {
+                                      setState(
+                                        () => {_manageMode = !_manageMode},
+                                      );
+                                    }
+                                  },
+                                  itemBuilder: (BuildContext context) =>
+                                      <PopupMenuEntry<Menu>>[
+                                        PopupMenuItem<Menu>(
+                                          value: Menu.itemManage,
+                                          child: Text(_manageMode
+                                              ? 'View Mode'
+                                              : 'Manage Mode'),
+                                        ),
+                                      ])
+                              : Container();
+                        }
                     }
-                  },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<Menu>>[
-                        PopupMenuItem<Menu>(
-                          value: Menu.itemManage,
-                          child:
-                              Text(_manageMode ? 'View Mode' : 'Manage Mode'),
-                        ),
-                      ])
+                  })
               : Container(),
         ],
       ),
-      drawer: widget.drawer,
+      drawer: widget.enableDrawer ? const MyNavigationDrawer() : null,
       backgroundColor: Colors.grey[200],
-      body: myList!.isNotEmpty
+      body: myList.isNotEmpty
           ? _manageMode
               ? displayList()
               : displayGrid()
           : const Center(child: Text('No Data Found!')),
-      floatingActionButton: _manageMode
+      floatingActionButton: _manageMode && widget.showManageIcon
           ? FloatingActionButton(
               onPressed: () {
                 onCreatePressed();
@@ -113,9 +137,9 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
           physics: const ClampingScrollPhysics(),
           scrollDirection: Axis.vertical,
           padding: const EdgeInsets.all(8),
-          itemCount: myList!.length,
+          itemCount: myList.length,
           itemBuilder: (BuildContext context, int index) {
-            final model = myList!.elementAt(index);
+            final model = myList.elementAt(index);
             return Container(
               color: Colors.amberAccent[index * 10],
               child: ListTile(
@@ -182,7 +206,7 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
                                   DeleteDialog(model: model));
                           if (result == 0) {
                             setState(() {
-                              myList!.remove(model);
+                              myList.remove(model);
                             });
                           }
                         },
@@ -202,7 +226,7 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
     return Container(
         padding: const EdgeInsets.all(4.0),
         child: GridView.builder(
-            itemCount: myList!.length,
+            itemCount: myList.length,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount:
                   MediaQuery.of(context).orientation == Orientation.portrait
@@ -212,7 +236,7 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
               mainAxisSpacing: 4.0,
             ),
             itemBuilder: (BuildContext context, int index) {
-              final model = myList!.elementAt(index);
+              final model = myList.elementAt(index);
               return Card(
                 color: Colors.amber,
                 child: Column(

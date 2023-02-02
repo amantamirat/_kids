@@ -8,7 +8,6 @@ import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:go_router/go_router.dart';
 
 class ShoppingCart extends StatefulWidget {
-  
   const ShoppingCart({
     super.key,
   });
@@ -18,8 +17,6 @@ class ShoppingCart extends StatefulWidget {
 
 class _ShoppingCart extends State<ShoppingCart> {
   late Future<List<CartItem>?> _myFuture;
-  late List<CartItem> _myList;
-
   @override
   void initState() {
     super.initState();
@@ -61,11 +58,10 @@ class _ShoppingCart extends State<ShoppingCart> {
                 ),
               );
             } else {
-              _myList = snapshot.data!;
               return Container(
                   padding: const EdgeInsets.all(8.0),
-                  child: _myList.isNotEmpty
-                      ? _displayList()
+                  child: snapshot.hasData
+                      ? _displayList(snapshot.data!)
                       : const Center(child: Text('Empty Cart!')));
             }
         }
@@ -73,16 +69,21 @@ class _ShoppingCart extends State<ShoppingCart> {
     );
   }
 
-  Widget _displayList() {
+
+
+  Widget _displayList(List<CartItem> myList) {
     return ListView.separated(
       shrinkWrap: true,
-      itemCount: _myList.length,
+      itemCount: myList.length,
       itemBuilder: (BuildContext context, int index) {
-        final item = _myList.elementAt(index);
+        final item = myList.elementAt(index);
         if (item.selectedKind == null) {
           CartDataBase.deleteItem(item.id);
           return Container();
         }
+        double moq = item.selectedKind!.product!.moq.toDouble();
+        double max = item.selectedKind!.quantity!.toDouble();
+        max = max - (max % moq);
         return ListTile(
           title: Center(
               child: Text(
@@ -114,15 +115,15 @@ class _ShoppingCart extends State<ShoppingCart> {
             ),
           ),
           onTap: () {
-            context.pushNamed(PageName.kinds, extra: item.selectedKind);
+            context.pushNamed(PageNames.kinds, extra: item.selectedKind);
           },
           trailing: SizedBox(
             width: 120,
             height: 40,
             child: SpinBox(
               min: 0,
-              step: item.selectedKind!.product!.moq.toDouble(),
-              max: item.selectedKind!.quantity!.toDouble(),
+              step: moq,
+              max: max,
               value: item.quantity.toDouble(),
               textStyle: const TextStyle(fontSize: 12),
               iconSize: 12,
@@ -132,7 +133,7 @@ class _ShoppingCart extends State<ShoppingCart> {
                   int result = await CartDataBase.deleteItem(item.id);
                   if (result == 1) {
                     setState(() {
-                      _myList.remove(item);
+                      myList.remove(item);
                     });
                   }
                   return;

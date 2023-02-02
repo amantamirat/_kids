@@ -16,8 +16,8 @@ class ProductList extends MyModelPage {
             myList: _getProducts(selectedModel),
             title: "${selectedModel.toString()} Products",
             showManageIcon: selectedModel is Brand,
-            editPage: PageName.editProduct,
-            nextPage: PageName.kinds);
+            editPage: PageNames.editProduct,
+            nextPage: PageNames.kinds);
 
   static List<Product> _getProducts(MyModel model) {
     if (model is Brand) {
@@ -41,7 +41,7 @@ class _ProductListState extends MyModelPageState<ProductList> {
   @override
   void onCreatePressed() {
     if (widget.selectedModel is Brand) {
-      context.pushNamed(PageName.addProduct,
+      context.pushNamed(PageNames.addProduct,
           extra: Product(brand: widget.selectedModel as Brand));
     }
   }

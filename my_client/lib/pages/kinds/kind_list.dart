@@ -22,7 +22,7 @@ class KindList extends MyModelPage {
             key: key,
             myList: selectedProduct.kinds,
             title: "${selectedProduct.brand} Product Colors",
-            editPage: PageName.editKind,
+            editPage: PageNames.editKind,
             showCartIcon: selectedKind == null,
             showManageIcon: selectedKind == null);
 
@@ -52,7 +52,7 @@ class _KindList extends MyModelPageState<KindList> {
 
   @override
   void onCreatePressed() {
-    context.pushNamed(PageName.addKind,
+    context.pushNamed(PageNames.addKind,
         extra: Kind(product: widget.selectedProduct));
   }
 
@@ -69,7 +69,9 @@ class _KindList extends MyModelPageState<KindList> {
               options: CarouselOptions(
                 enlargeCenterPage: true,
                 viewportFraction: 1.0,
-                height: MediaQuery.of(context).size.height / 2.5,
+                height: widget.selectedKind != null
+                    ? MediaQuery.of(context).size.height / 1.5
+                    : MediaQuery.of(context).size.height / 2.5,
                 onPageChanged: (index, reason) => setState(() {
                   _activeIndex = index;
                   _computeMinMax();

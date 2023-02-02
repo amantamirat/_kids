@@ -46,7 +46,7 @@ class Brand extends MyModel {
 
   @override
   String basePath() {
-    return "/${PageName.brands}";
+    return "/${PageNames.brands}";
   }
 
   @override

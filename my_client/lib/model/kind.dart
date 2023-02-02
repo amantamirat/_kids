@@ -53,7 +53,7 @@ class Kind extends MyModel {
 
   @override
   String basePath() {
-    return "/${PageName.kinds}";
+    return "/${PageNames.kinds}";
   }
 
   @override

@@ -4,6 +4,7 @@ import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/pages/brands/brand_list.dart';
 import 'package:abdu_kids/pages/brands/brand_merge.dart';
 import 'package:abdu_kids/pages/categories/category_list.dart';
@@ -14,12 +15,17 @@ import 'package:abdu_kids/pages/products/product_list.dart';
 import 'package:abdu_kids/pages/products/product_merge.dart';
 import 'package:abdu_kids/pages/types/type_list.dart';
 import 'package:abdu_kids/pages/types/type_merge.dart';
+import 'package:abdu_kids/pages/user/change_password.dart';
+import 'package:abdu_kids/pages/user/confirm_account.dart';
+import 'package:abdu_kids/pages/user/edit_profile.dart';
 import 'package:abdu_kids/pages/user/log_in.dart';
+import 'package:abdu_kids/pages/user/register_user.dart';
 import 'package:abdu_kids/pages/user/user_list.dart';
 import 'package:abdu_kids/pages/util/image_uloader.dart';
 import 'package:abdu_kids/pages/util/shoping_cart.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/services/database_util.dart';
+import 'package:abdu_kids/services/user_service.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:abdu_kids/services/preference_util.dart';
 import 'package:flutter/material.dart';
@@ -45,27 +51,26 @@ final GoRouter _router = GoRouter(
       routes: <RouteBase>[
         GoRoute(
             path: 'categories/types',
-            name: PageName.types,
+            name: PageNames.types,
             builder: (context, state) {
-              //final extra = state.extra as MyExtraWrapper;
               return TypeList(selectedCategory: state.extra as Category);
             },
             routes: <RouteBase>[
               GoRoute(
-                  path: PageName.brands,
-                  name: PageName.brands,
+                  path: PageNames.brands,
+                  name: PageNames.brands,
                   builder: (context, state) =>
                       BrandList(selectedType: state.extra as ClothingType),
                   routes: <RouteBase>[
                     GoRoute(
-                        path: PageName.products,
-                        name: PageName.products,
+                        path: PageNames.products,
+                        name: PageNames.products,
                         builder: (context, state) =>
                             ProductList(selectedModel: state.extra as MyModel),
                         routes: <RouteBase>[
                           GoRoute(
-                              path: PageName.kinds,
-                              name: PageName.kinds,
+                              path: PageNames.kinds,
+                              name: PageNames.kinds,
                               builder: (context, state) {
                                 if (state.extra is Kind) {
                                   final kind = state.extra as Kind;
@@ -79,64 +84,64 @@ final GoRouter _router = GoRouter(
                               },
                               routes: <RouteBase>[
                                 GoRoute(
-                                  path: PageName.addKind,
-                                  name: PageName.addKind,
+                                  path: PageNames.addKind,
+                                  name: PageNames.addKind,
                                   builder: (context, state) => KindMerge(
                                       editMode: false,
                                       selectedKind: state.extra as Kind),
                                 ),
                                 GoRoute(
-                                  path: PageName.editKind,
-                                  name: PageName.editKind,
+                                  path: PageNames.editKind,
+                                  name: PageNames.editKind,
                                   builder: (context, state) => KindMerge(
                                       editMode: true,
                                       selectedKind: state.extra as Kind),
                                 ),
                               ]),
                           GoRoute(
-                            path: PageName.addProduct,
-                            name: PageName.addProduct,
+                            path: PageNames.addProduct,
+                            name: PageNames.addProduct,
                             builder: (context, state) => ProductMerge(
                                 editMode: false,
                                 selectedProduct: state.extra as Product),
                           ),
                           GoRoute(
-                            path: PageName.editProduct,
-                            name: PageName.editProduct,
+                            path: PageNames.editProduct,
+                            name: PageNames.editProduct,
                             builder: (context, state) => ProductMerge(
                                 editMode: true,
                                 selectedProduct: state.extra as Product),
                           )
                         ]),
                     GoRoute(
-                      path: PageName.addBrand,
-                      name: PageName.addBrand,
+                      path: PageNames.addBrand,
+                      name: PageNames.addBrand,
                       builder: (context, state) => BrandMerge(
                           editMode: false, selectedBrand: state.extra as Brand),
                     ),
                     GoRoute(
-                      path: PageName.editBrand,
-                      name: PageName.editBrand,
+                      path: PageNames.editBrand,
+                      name: PageNames.editBrand,
                       builder: (context, state) => BrandMerge(
                           editMode: true, selectedBrand: state.extra as Brand),
                     ),
                   ]),
               GoRoute(
-                path: PageName.addType,
-                name: PageName.addType,
+                path: PageNames.addType,
+                name: PageNames.addType,
                 builder: (context, state) => TypeMerge(
                     editMode: false, selectedType: state.extra as ClothingType),
               ),
               GoRoute(
-                path: PageName.editType,
-                name: PageName.editType,
+                path: PageNames.editType,
+                name: PageNames.editType,
                 builder: (context, state) => TypeMerge(
                     editMode: true, selectedType: state.extra as ClothingType),
               ),
             ]),
         GoRoute(
           path: 'categories/merge_category',
-          name: PageName.editCategory,
+          name: PageNames.editCategory,
           pageBuilder: (context, state) {
             return MaterialPage<int>(
               key: state.pageKey,
@@ -148,24 +153,71 @@ final GoRouter _router = GoRouter(
       ],
     ),
     GoRoute(
-      path: '/${PageName.categories}',
-      name: PageName.categories,
+      path: '/${PageNames.login}',
+      name: PageNames.login,
+      builder: (context, state) => const LoginPage(),
+    ),
+    GoRoute(
+      path: '/${PageNames.register}',
+      name: PageNames.register,
+      builder: (context, state) => const SignupPage(),
+    ),
+    GoRoute(
+      path: '/${PageNames.verify}',
+      name: PageNames.verify,
       builder: (context, state) =>
-          CategoryList(categories: state.extra as List<Category>),
+          ConfirmAccount(selectedUser: state.extra as User),
     ),
     GoRoute(
-      path: '/${PageName.users}',
-      name: PageName.users,
-      builder: (context, state) => const UserList(),
+      path: '/${PageNames.editProfile}',
+      name: PageNames.editProfile,
+      builder: (context, state) =>
+          EditProfile(selectedUser: state.extra as User),
     ),
     GoRoute(
-      path: '/${PageName.login}',
-      name: PageName.login,
-      builder: (context, state) => const Login(),
+      path: '/${PageNames.changePassword}',
+      name: PageNames.changePassword,
+      builder: (context, state) =>
+          ChangePassword(selectedUser: state.extra as User),
     ),
     GoRoute(
-      path: '/${PageName.myShoppingCart}',
-      name: PageName.myShoppingCart,
+      path: '/${PageNames.users}',
+      name: PageNames.users,
+      builder: (context, state) {
+        return FutureBuilder(
+          future: UserService.getUsers(),
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<List<User>?> snapshot,
+          ) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              default:
+                if (snapshot.hasError) {
+                  return Scaffold(
+                    body: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Error: ${snapshot.error}'),
+                        ],
+                      ),
+                    ),
+                  );
+                } else {
+                  return UserList(users: snapshot.data!);
+                }
+            }
+          },
+        );
+      },
+    ),
+    GoRoute(
+      path: '/${PageNames.myShoppingCart}',
+      name: PageNames.myShoppingCart,
       builder: (context, state) => const ShoppingCart(),
     ),
     GoRoute(
@@ -175,7 +227,7 @@ final GoRouter _router = GoRouter(
     ),
     GoRoute(
       path: '/settings',
-      name: PageName.settings,
+      name: PageNames.settings,
       builder: (context, state) => const MySharedPreferences(),
     ),
   ],
@@ -225,6 +277,14 @@ class _Home extends State<Home> {
           default:
             if (snapshot.hasError) {
               return Scaffold(
+                appBar: AppBar(actions: <Widget>[
+                  IconButton(
+                    onPressed: () {
+                      GoRouter.of(context).pushNamed(PageNames.settings);
+                    },
+                    icon: const Icon(Icons.settings),
+                  )
+                ]),
                 body: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -246,24 +306,6 @@ class _Home extends State<Home> {
                           onPressed: () {
                             setState(() {
                               _myFuture = MyService.getCategories();
-                            });
-                          }),
-                      ElevatedButton(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(
-                                Icons.settings,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text('Configure'),
-                            ],
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              GoRouter.of(context).pushNamed(PageName.settings);
                             });
                           }),
                     ],

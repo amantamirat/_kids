@@ -14,8 +14,8 @@ class BrandList extends MyModelPage {
             key: key,
             title: "${selectedType.type} Brands",
             myList: selectedType.brands,
-            editPage: PageName.editBrand,
-            nextPage: PageName.products);
+            editPage: PageNames.editBrand,
+            nextPage: PageNames.products);
 
   @override
   State<BrandList> createState() => _BrandList();
@@ -24,7 +24,7 @@ class BrandList extends MyModelPage {
 class _BrandList extends MyModelPageState<BrandList> {
   @override
   void onCreatePressed() {
-    context.pushNamed(PageName.addBrand,
+    context.pushNamed(PageNames.addBrand,
         extra: Brand(type: widget.selectedType));
   }
 }

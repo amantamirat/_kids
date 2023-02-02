@@ -59,7 +59,7 @@ class Product extends MyModel {
 
   @override
   String basePath() {
-    return "/${PageName.products}";
+    return "/${PageNames.products}";
   }
 
   @override

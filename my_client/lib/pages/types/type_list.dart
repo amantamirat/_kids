@@ -12,9 +12,9 @@ class TypeList extends MyModelPage {
             key: key,
             title: "${selectedCategory.title} Types",
             myList: selectedCategory.clothingTypes,
-            editPage: PageName.editType,
-            nextPage: PageName.brands,
-            nextGridPage: PageName.products);
+            editPage: PageNames.editType,
+            nextPage: PageNames.brands,
+            nextGridPage: PageNames.products);
 
   @override
   State<TypeList> createState() => _TypeList();
@@ -23,7 +23,7 @@ class TypeList extends MyModelPage {
 class _TypeList extends MyModelPageState<TypeList> {
   @override
   void onCreatePressed() {
-    context.pushNamed(PageName.addType,
+    context.pushNamed(PageNames.addType,
         extra: ClothingType(category: widget.selectedCategory));
   }
 }

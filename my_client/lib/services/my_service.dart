@@ -4,7 +4,6 @@ import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
-import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -12,20 +11,19 @@ import 'dart:convert';
 import '../util/constants.dart';
 
 class MyService {
-  
   static var client = http.Client();
 
   static late List<Category>? _data;
 
   static Future<List<Category>?> getCategories() async {
-    String url = "${Constants.apiURL()}/${PageName.categories}";
+    String url = "${Constants.apiURL()}/${PageNames.categories}";
     var response = await client.get(
       Uri.parse(url),
       headers: Constants.requestHeaders,
     );
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      _data = Category.categoriesFromJson(data[PageName.categories]);
+      _data = Category.categoriesFromJson(data[PageNames.categories]);
       return _data;
     } else {
       return null;
@@ -42,18 +40,20 @@ class MyService {
         headers: Constants.requestHeaders,
         body: jsonEncode(myModel.toJson()),
       );
-      return response.statusCode == 201;
+    } else {
+      url = "$url${Constants.newPath}${myModel.paramsPath()}";
+      response = await http.post(
+        Uri.parse(url),
+        headers: Constants.requestHeaders,
+        body: jsonEncode(myModel.toJson(includeId: false)),
+      );
     }
-    url = "$url${Constants.newPath}${myModel.paramsPath()}";
-    response = await http.post(
-      Uri.parse(url),
-      headers: Constants.requestHeaders,
-      body: jsonEncode(myModel.toJson(includeId: false)),
-    );
+
+    var data = jsonDecode(response.body);
     if (response.statusCode != 201) {
+      myModel.message = data["message"];
       return false;
     }
-    var data = jsonDecode(response.body);
     myModel.id = data["data"]["_id"];
     return true;
   }
@@ -86,18 +86,5 @@ class MyService {
     return null;
   }
 
-  static Future<List<User>?> getUsers() async {
-    String url = "${Constants.apiURL()}/${PageName.users}";
-    var response = await client.get(
-      Uri.parse(url),
-      headers: Constants.requestHeaders,
-    );
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
-      return User.usersFromJson(data[PageName.users]);
-      ;
-    } else {
-      return null;
-    }
-  }
+  
 }

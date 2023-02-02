@@ -47,7 +47,7 @@ class ClothingType extends MyModel {
 
   @override
   String basePath() {
-    return "/${PageName.types}";
+    return "/${PageNames.types}";
   }
 
   @override

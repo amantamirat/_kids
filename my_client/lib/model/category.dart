@@ -46,7 +46,7 @@ class Category extends MyModel {
 
   @override
   String basePath() {
-    return "/${PageName.categories}";
+    return "/${PageNames.categories}";
   }
 
   @override
