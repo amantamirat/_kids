@@ -8,11 +8,11 @@ router.get("/", auth, verifyAdmin, userController.findAll);
 
 router.post('/register', userController.registerUser);
 
-router.post('/login', userController.loginUser);
+router.post('/verify', userController.verify);
 
 router.post('/sendCode', userController.sendCode);
 
-router.post('/verify', userController.verify);
+router.post('/login', userController.loginUser);
 
 router.post('/changePassword/:id', auth, userController.changePassword);
 

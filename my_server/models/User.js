@@ -5,9 +5,6 @@ const UserSchema = new mongoose.Schema(
         first_name: {
             type: String,
         },
-        middle_name: {
-            type: String,
-        },
         last_name: {
             type: String,
         },
@@ -22,10 +19,6 @@ const UserSchema = new mongoose.Schema(
         },
         address: {
             type: String,
-        },
-        user_name: {
-            type: String,
-            unique: true
         },
         password: {
             type: String,
