@@ -119,8 +119,14 @@ class _LoginPageState extends State<LoginPage> {
                 }
                 if (context.mounted) {
                   if (loggedInUser.status == Status.verified) {
-                    SessionManager().set(Constants.loggedInUser, loggedInUser);
-                    GoRouter.of(context).pop();
+                    await SessionManager()
+                        .set(Constants.loggedInUser, loggedInUser);
+                    if (context.mounted) {
+                      GoRouter.of(context).goNamed(PageNames.categories);
+                      //GoRouter.of(context).pushReplacementNamed(PageNames.home);
+                    }
+
+                    //GoRouter.of(context).pushReplacementNamed(PageNames.categories);
                   } else if (loggedInUser.status == Status.pending) {
                     GoRouter.of(context).pop();
                     context.pushNamed(PageNames.verify, extra: loggedInUser);

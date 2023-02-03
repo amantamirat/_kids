@@ -49,7 +49,7 @@ class UserService {
       user.message = data["message"].toString();
       return false;
     }
-    user = User().fromJson(data["data"]);
+    user.id = data["data"]["_id"];
     return true;
   }
 
@@ -81,7 +81,14 @@ class UserService {
       user.message = data["message"];
       return false;
     }
-    user = User().fromJson(data["data"]);
+    user.id = data["data"]["_id"];
+    var userstatus = data["data"][User.attributeUserStatus];
+    for (Status s in Status.values) {
+      if (userstatus == s.title) {
+        user.status = s;
+        break;
+      }
+    }
     return true;
   }
 

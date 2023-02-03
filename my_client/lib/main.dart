@@ -16,7 +16,7 @@ import 'package:abdu_kids/pages/products/product_merge.dart';
 import 'package:abdu_kids/pages/types/type_list.dart';
 import 'package:abdu_kids/pages/types/type_merge.dart';
 import 'package:abdu_kids/pages/user/change_password.dart';
-import 'package:abdu_kids/pages/user/confirm_account.dart';
+import 'package:abdu_kids/pages/user/verify_account.dart';
 import 'package:abdu_kids/pages/user/edit_profile.dart';
 import 'package:abdu_kids/pages/user/log_in.dart';
 import 'package:abdu_kids/pages/user/register_user.dart';
@@ -44,7 +44,7 @@ final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     GoRoute(
       path: '/',
-      name: 'home',
+      name: PageNames.home,
       builder: (BuildContext context, GoRouterState state) {
         return const Home();
       },
@@ -166,7 +166,7 @@ final GoRouter _router = GoRouter(
       path: '/${PageNames.verify}',
       name: PageNames.verify,
       builder: (context, state) =>
-          ConfirmAccount(selectedUser: state.extra as User),
+          VerifyAccount(selectedUser: state.extra as User),
     ),
     GoRoute(
       path: '/${PageNames.editProfile}',
@@ -179,6 +179,12 @@ final GoRouter _router = GoRouter(
       name: PageNames.changePassword,
       builder: (context, state) =>
           ChangePassword(selectedUser: state.extra as User),
+    ),
+    GoRoute(
+      path: '/${PageNames.categories}',
+      name: PageNames.categories,
+      builder: (context, state) =>
+          CategoryList(categories: MyService.myRootData!),
     ),
     GoRoute(
       path: '/${PageNames.users}',
@@ -218,7 +224,12 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/${PageNames.myShoppingCart}',
       name: PageNames.myShoppingCart,
-      builder: (context, state) => const ShoppingCart(),
+      builder: (context, state) {
+        if (state.extra == null) {
+          return const ShoppingCart(loggedInUser: null);
+        }
+        return ShoppingCart(loggedInUser: state.extra as User);
+      },
     ),
     GoRoute(
       path: '/upload',

@@ -13,7 +13,7 @@ import '../util/constants.dart';
 class MyService {
   static var client = http.Client();
 
-  static late List<Category>? _data;
+  static late List<Category>? myRootData;
 
   static Future<List<Category>?> getCategories() async {
     String url = "${Constants.apiURL()}/${PageNames.categories}";
@@ -23,8 +23,8 @@ class MyService {
     );
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      _data = Category.categoriesFromJson(data[PageNames.categories]);
-      return _data;
+      myRootData = Category.categoriesFromJson(data[PageNames.categories]);
+      return myRootData;
     } else {
       return null;
     }
@@ -70,7 +70,7 @@ class MyService {
 
   @Deprecated("Bad Implementation")
   static Kind? findKindById(String id) {
-    for (Category category in _data!) {
+    for (Category category in myRootData!) {
       for (ClothingType type in category.clothingTypes) {
         for (Brand brand in type.brands) {
           for (Product product in brand.products) {

@@ -1,3 +1,5 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/util/page_names.dart';
@@ -7,7 +9,8 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 
 class MyNavigationDrawer extends StatefulWidget {
-  const MyNavigationDrawer({super.key});
+  User? loggedInUser;
+  MyNavigationDrawer({super.key, this.loggedInUser});
   @override
   State<MyNavigationDrawer> createState() => _MyNavigationDrawer();
 }
@@ -18,12 +21,22 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
   @override
   void initState() {
     super.initState();
-    _loggedInUser = SessionManager().get(Constants.loggedInUser);
+    user = widget.loggedInUser;
+    //_loggedInUser = SessionManager().get(Constants.loggedInUser);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(child: _prepareMyMenu());
+    return Drawer(
+        child: SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          _buildHeader(),
+          _buildMenuItems(),
+        ],
+      ),
+    ));
   }
 
   Widget _prepareMyMenu() {
@@ -191,7 +204,7 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
                       onTap: () async {
                         await SessionManager().remove(Constants.loggedInUser);
                         if (context.mounted) {
-                          GoRouter.of(context).pop();
+                          GoRouter.of(context).goNamed(PageNames.categories);
                         }
                       },
                     )

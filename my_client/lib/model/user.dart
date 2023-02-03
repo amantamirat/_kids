@@ -58,9 +58,9 @@ class User extends MyModel {
       }
     }
     var userstatus = json[attributeUserStatus];
-    for (Status u in Status.values) {
-      if (userstatus == u.title) {
-        status = u;
+    for (Status s in Status.values) {
+      if (userstatus == s.title) {
+        status = s;
         break;
       }
     }
@@ -91,7 +91,7 @@ class User extends MyModel {
 
   @override
   String header() {
-    return firstName == null ? "" : firstName!;
+    return email;
   }
 
   @override

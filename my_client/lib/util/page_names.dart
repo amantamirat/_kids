@@ -1,4 +1,5 @@
 class PageNames {
+  static const String home = "home";
   static const String categories = "categories";
   static const String editCategory = "edit_category";
   static const String types = "types";

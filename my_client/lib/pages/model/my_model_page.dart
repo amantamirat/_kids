@@ -39,8 +39,9 @@ abstract class MyModelPage extends StatefulWidget {
 abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
   late bool _manageMode = widget.manageMode;
   late List<MyModel> myList;
-  User? loggedInUser;
   Future<dynamic>? myUser;
+  User? loggedInUser;
+  late bool isUserloggedin;
 
   @override
   void initState() {
@@ -50,9 +51,86 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
   }
 
   void onCreatePressed();
-
   @override
   Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: myUser,
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return const Scaffold(
+                  body: Center(
+                child: CircularProgressIndicator(),
+              ));
+            default:
+              if (snapshot.hasError) {
+                return Container();
+              } else {
+                if (snapshot.hasData) {
+                  loggedInUser = User().fromJson(snapshot.data);
+                }
+                isUserloggedin = loggedInUser != null;
+
+                return Scaffold(
+                  appBar: AppBar(
+                    title: Text("${widget.title}"),
+                    elevation: 0,
+                    actions: widget.showManageIcon &&
+                            isUserloggedin &&
+                            loggedInUser!.role == Role.administrator
+                        ? <Widget>[
+                            IconButton(
+                              onPressed: () {
+                                onCreatePressed();
+                              },
+                              icon: const Icon(Icons.add),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                setState(
+                                  () => {_manageMode = !_manageMode},
+                                );
+                              },
+                              icon: _manageMode
+                                  ? const Icon(Icons.edit)
+                                  : const Icon(Icons.view_agenda),
+                            )
+                          ]
+                        : <Widget>[
+                            widget.showCartIcon
+                                ? IconButton(
+                                    onPressed: () {
+                                      GoRouter.of(context).pushNamed(
+                                          PageNames.myShoppingCart,
+                                          extra: loggedInUser);
+                                    },
+                                    icon: const Icon(Icons.shopping_cart),
+                                  )
+                                : Container(),
+                            IconButton(
+                              icon: const Icon(Icons.search),
+                              onPressed: () {},
+                            ),
+                          ],
+                  ),
+                  drawer: widget.enableDrawer
+                      ? isUserloggedin
+                          ? MyNavigationDrawer(loggedInUser: loggedInUser!)
+                          : MyNavigationDrawer()
+                      : null,
+                  body: myList.isNotEmpty
+                      ? _manageMode
+                          ? displayList()
+                          : displayGrid()
+                      : const Center(child: Text('No Data Found!')),
+                );
+              }
+          }
+        });
+  }
+
+  @override
+  Widget old_build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('${widget.title}'),
@@ -109,7 +187,7 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
               : Container(),
         ],
       ),
-      drawer: widget.enableDrawer ? const MyNavigationDrawer() : null,
+      drawer: widget.enableDrawer ? MyNavigationDrawer() : null,
       backgroundColor: Colors.grey[200],
       body: myList.isNotEmpty
           ? _manageMode

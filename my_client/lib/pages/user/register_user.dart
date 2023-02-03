@@ -92,7 +92,7 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 40),
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
                   child: Container(
                     padding: const EdgeInsets.only(top: 3, left: 3),
                     decoration: BoxDecoration(
@@ -144,7 +144,7 @@ class _SignupPageState extends State<SignupPage> {
                           });
                           return;
                         }
-                        if (context.mounted) {
+                        if (context.mounted) {                          
                           GoRouter.of(context).pop();
                           context.pushNamed(PageNames.verify, extra: user);
                         }

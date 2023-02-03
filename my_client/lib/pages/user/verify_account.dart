@@ -5,16 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:go_router/go_router.dart';
 
-class ConfirmAccount extends StatefulWidget {
+class VerifyAccount extends StatefulWidget {
   final User selectedUser;
-
-  const ConfirmAccount({Key? key, required this.selectedUser})
-      : super(key: key);
+  const VerifyAccount({Key? key, required this.selectedUser}) : super(key: key);
   @override
-  State<ConfirmAccount> createState() => _ConfirmAccount();
+  State<VerifyAccount> createState() => _VerifyAccount();
 }
 
-class _ConfirmAccount extends State<ConfirmAccount> {
+class _VerifyAccount extends State<VerifyAccount> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
   final _codeController = TextEditingController();
   String? _errorMessage;
@@ -27,7 +25,7 @@ class _ConfirmAccount extends State<ConfirmAccount> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-      appBar: AppBar(title: const Text("Confirm Code")),
+      appBar: AppBar(title: const Text("Verify Account")),
       body: Form(key: globalFormKey, child: _myForm()),
     ));
   }
@@ -41,6 +39,15 @@ class _ConfirmAccount extends State<ConfirmAccount> {
             padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
             child: Column(
               children: <Widget>[
+                 Padding(
+                  padding: const EdgeInsets.only(
+                    bottom: 10,
+                    top: 10,
+                  ),
+                  child: Center(
+                      child: Text(
+                          "Enter the 6-digit code sent to ${widget.selectedUser.email}.")),
+                ),
                 Padding(
                   padding: const EdgeInsets.only(
                     bottom: 10,
@@ -48,11 +55,14 @@ class _ConfirmAccount extends State<ConfirmAccount> {
                   ),
                   child: TextFormField(
                     controller: _codeController,
-                    decoration:
-                        const InputDecoration(hintText: "Enter Your Code!"),
+                    decoration: const InputDecoration(
+                        hintText: "Enter The 6-digit Code!"),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Code, can not be empty, what are you thinking?';
+                        return 'Code, can not be empty,!';
+                      }
+                      if (value.length != 6) {
+                        return "not 6 digit code!";
                       }
                       return null;
                     },
@@ -71,11 +81,12 @@ class _ConfirmAccount extends State<ConfirmAccount> {
                   height: 10,
                 ),
                 ElevatedButton(
-                    child: const Text("Confirm"),
+                    child: const Text("Verify"),
                     onPressed: () async {
                       if (globalFormKey.currentState!.validate()) {
                         final user = widget.selectedUser;
-                        user.verificationCode = _codeController.text;
+                        final code = _codeController.text;
+                        user.verificationCode = code;
                         bool verified = await UserService.verifyAccount(user);
                         if (verified) {
                           await SessionManager()
@@ -96,9 +107,9 @@ class _ConfirmAccount extends State<ConfirmAccount> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text('Not Recieved?'),
+                    const Text("Don't see the email?"),
                     TextButton(
-                      child: const Text('Send Again.',
+                      child: const Text('Send a new code.',
                           style: TextStyle(color: Colors.purple)),
                       onPressed: () async {
                         final user = widget.selectedUser;
