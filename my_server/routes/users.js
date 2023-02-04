@@ -21,6 +21,6 @@ router.patch("/update/:id", auth, userController.editUser);
 
 router.delete("/delete/:id", auth, userController.deleteUser);
 
-router.post("/orderItems/:id", auth, orderController.placeOrders);
+router.post("/placeOrders/:id", auth, orderController.placeOrders);
 
 module.exports = router;
