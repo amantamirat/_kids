@@ -41,7 +41,43 @@ const UserSchema = new mongoose.Schema(
         verification_code: {
             type: String,
             default: null
-        }
+        },
+        orders: [{            
+            total_quantity: {
+                type: Number
+            },
+            total_price: {
+                type: Number
+            },
+            date: {
+                type: Date,
+                default: Date.now
+            },
+            items: [{
+                kind_id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                },
+                brand: {
+                    type: String
+                },
+                product_detail: {
+                    type: String
+                },
+                product_size: {
+                    type: Number
+                },
+                product_color: {
+                    type: Number
+                },
+                price: {
+                    type: Number
+                },
+                quantity: {
+                    type: Number
+                }
+            }],
+
+        }]
     }
 );
 

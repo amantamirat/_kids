@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const userController = require("../controllers/userController");
+const orderController = require("../controllers/orderController");
 const auth = require("../middlewares/auth");
 const verifyAdmin = require("../middlewares/verifyAdmin");
 
@@ -19,5 +20,7 @@ router.post('/changePassword/:id', auth, userController.changePassword);
 router.patch("/update/:id", auth, userController.editUser);
 
 router.delete("/delete/:id", auth, userController.deleteUser);
+
+router.post("/orderItems/:id", auth, orderController.orderItems);
 
 module.exports = router;

@@ -1,6 +1,24 @@
 const Category = require("../models/Category");
 const imageController = require("./imageController");
 
+
+exports.findItems = async (req, res, next) => {
+    try {
+        const categories = await Category.find({
+            "clothing_types.brands.products.product_kinds.quantity": { $gt: 0 }
+        });       
+        res.status(200).json({
+            status: "Success",
+            categories: categories
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: "Failed to retrieve categories",
+            message: err,
+        });
+    }
+}
+
 exports.findAll = async (req, res, next) => {
     try {
         const categories = await Category.find({});

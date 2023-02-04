@@ -91,7 +91,6 @@ exports.verify = async (req, res, next) => {
             data: user,
         });
     } catch (err) {
-        //console.log(err);
         res.status(500).json({
             status: 'Failed to Verify',
             message: err
@@ -167,7 +166,7 @@ exports.sendCode = async (req, res, next) => {
         });
     } catch (err) {
         return res.status(500).json({
-            status: "Failed to Update User",
+            status: "Failed to Send the code",
             message: err,
         });
     }
@@ -276,7 +275,7 @@ const sendEmail = async (email, code) => {
             if (error) {
                 //if email is not found delete the user
                 console.log(error);
-                throw error;
+                //throw error;
             } else {
                 console.log("Email Sent:" + info.response);
             }

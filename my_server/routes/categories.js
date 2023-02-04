@@ -6,6 +6,8 @@ const verifyAdmin = require("../middlewares/verifyAdmin");
 
 router.get("/", categoryController.findAll);
 
+router.get("/items", categoryController.findItems);
+
 router.post('/new', auth, verifyAdmin, categoryController.createCategory);
 
 router.patch("/update/:id", auth, verifyAdmin, categoryController.editCategory);
