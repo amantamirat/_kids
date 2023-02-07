@@ -42,19 +42,31 @@ const UserSchema = new mongoose.Schema(
             type: String,
             default: null
         },
-        orders: [{            
+        orders: [{
             total_quantity: {
                 type: Number
             },
             total_price: {
                 type: Number
             },
-            date: {
+            order_date: {
                 type: Date,
                 default: Date.now
             },
             items: [{
                 kind_id: {
+                    type: mongoose.Schema.Types.ObjectId,                    
+                },
+                product_id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                },
+                brand_id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                },
+                type_id: {
+                    type: mongoose.Schema.Types.ObjectId,
+                },
+                category_id: {
                     type: mongoose.Schema.Types.ObjectId,
                 },
                 brand: {
@@ -67,7 +79,7 @@ const UserSchema = new mongoose.Schema(
                     type: Number
                 },
                 product_color: {
-                    type: Number
+                    type: String
                 },
                 price: {
                     type: Number
