@@ -12,6 +12,7 @@ import 'package:flutter_session_manager/flutter_session_manager.dart';
 enum Menu { itemManage, itemSettings }
 
 abstract class MyModelPage extends StatefulWidget {
+  
   final List<MyModel> myList;
   final String? title;
   final String? editPage;
@@ -97,20 +98,27 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
                             )
                           ]
                         : <Widget>[
-                            widget.showCartIcon
-                                ? IconButton(
-                                    onPressed: () {
-                                      GoRouter.of(context).pushNamed(
-                                          PageNames.myShoppingCart,
-                                          extra: loggedInUser);
-                                    },
-                                    icon: const Icon(Icons.shopping_cart),
-                                  )
-                                : Container(),
                             IconButton(
                               icon: const Icon(Icons.search),
                               onPressed: () {},
                             ),
+                            widget.showCartIcon
+                                ? IconButton(
+                                    onPressed: () {
+                                      if (isUserloggedin) {
+                                        GoRouter.of(context).pushNamed(
+                                            PageNames.myShoppingCart,
+                                            extra: loggedInUser);
+                                        return;
+                                      }
+
+                                      GoRouter.of(context).pushNamed(
+                                          PageNames.myShoppingCart,
+                                          extra: null);
+                                    },
+                                    icon: const Icon(Icons.shopping_cart),
+                                  )
+                                : Container(),
                           ],
                   ),
                   drawer: widget.enableDrawer
@@ -127,84 +135,6 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
               }
           }
         });
-  }
-
-  @override
-  Widget old_build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('${widget.title}'),
-        elevation: 0,
-        actions: <Widget>[
-          (widget.showCartIcon && !_manageMode)
-              ? IconButton(
-                  onPressed: () {
-                    GoRouter.of(context).pushNamed(PageNames.myShoppingCart);
-                  },
-                  icon: const Icon(Icons.shopping_cart),
-                )
-              : Container(),
-          widget.showManageIcon
-              ? FutureBuilder(
-                  future: myUser,
-                  builder:
-                      (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.waiting:
-                        return const Center(
-                          child: CircularProgressIndicator(),
-                        );
-                      default:
-                        if (snapshot.hasError) {
-                          return Container();
-                        } else {
-                          if (!snapshot.hasData) {
-                            return Container();
-                          }
-                          loggedInUser = User().fromJson(snapshot.data);
-                          return loggedInUser!.role == Role.administrator
-                              ? PopupMenuButton<Menu>(
-                                  onSelected: (Menu item) async {
-                                    if (item == Menu.itemManage) {
-                                      setState(
-                                        () => {_manageMode = !_manageMode},
-                                      );
-                                    }
-                                  },
-                                  itemBuilder: (BuildContext context) =>
-                                      <PopupMenuEntry<Menu>>[
-                                        PopupMenuItem<Menu>(
-                                          value: Menu.itemManage,
-                                          child: Text(_manageMode
-                                              ? 'View Mode'
-                                              : 'Manage Mode'),
-                                        ),
-                                      ])
-                              : Container();
-                        }
-                    }
-                  })
-              : Container(),
-        ],
-      ),
-      drawer: widget.enableDrawer ? MyNavigationDrawer() : null,
-      backgroundColor: Colors.grey[200],
-      body: myList.isNotEmpty
-          ? _manageMode
-              ? displayList()
-              : displayGrid()
-          : const Center(child: Text('No Data Found!')),
-      floatingActionButton: _manageMode && widget.showManageIcon
-          ? FloatingActionButton(
-              onPressed: () {
-                onCreatePressed();
-              },
-              backgroundColor: Colors.green,
-              tooltip: 'Add New',
-              child: const Icon(Icons.add),
-            )
-          : Container(),
-    );
   }
 
   Widget displayList() {

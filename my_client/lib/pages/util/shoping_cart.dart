@@ -1,11 +1,11 @@
 import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/model/util/cart_item.dart';
+import 'package:abdu_kids/services/user_service.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/services/database_util.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:flutter_spinbox/flutter_spinbox.dart';
 import 'package:go_router/go_router.dart';
 
@@ -19,11 +19,12 @@ class ShoppingCart extends StatefulWidget {
 class _ShoppingCart extends State<ShoppingCart> {
   late Future<List<CartItem>?> _myFuture;
   late List<CartItem>? myList;
-  late num _totalPrice = 0;
+  late num _totalPrice;
   late bool _isUserLoggedIn;
   @override
   void initState() {
     super.initState();
+    _totalPrice = 0;
     _isUserLoggedIn = widget.loggedInUser != null;
     _myFuture = CartDataBase.cartItems();
   }
@@ -59,11 +60,13 @@ class _ShoppingCart extends State<ShoppingCart> {
               );
             } else {
               myList = snapshot.data;
+              _updateTotalPrice();
               return Scaffold(
                   appBar: AppBar(
-                    title: const Text('My Cart'),
+                    title:
+                        Text("My Cart ${_isUserLoggedIn ? '- ON' : '- OFF'}"),
                   ),
-                  body: snapshot.hasData
+                  body: (myList != null || myList!.isNotEmpty)
                       ? _displayList()
                       : Container(
                           padding: const EdgeInsets.all(8.0),
@@ -76,16 +79,23 @@ class _ShoppingCart extends State<ShoppingCart> {
     );
   }
 
+  void _updateTotalPrice() {
+    _totalPrice = 0;
+    for (int i = 0; i < myList!.length; i++) {
+      final item = myList!.elementAt(i);
+      if (item.selectedKind != null) {
+        _totalPrice =
+            _totalPrice + item.quantity * item.selectedKind!.product!.price;
+      }
+    }
+  }
+
   Widget _displayList() {
     return ListView.builder(
         shrinkWrap: true,
         itemCount: myList!.length,
         itemBuilder: (BuildContext context, int index) {
           final item = myList!.elementAt(index);
-          if (item.selectedKind == null) {
-            CartDataBase.deleteItem(item.id);
-            return Container();
-          }
           double moq = item.selectedKind!.product!.moq.toDouble();
           double max = item.selectedKind!.quantity!.toDouble();
           max = max - (max % moq);
@@ -106,7 +116,7 @@ class _ShoppingCart extends State<ShoppingCart> {
                 child: Text("Price: $price Birr"),
               ),
               leading: CachedNetworkImage(
-                imageUrl: Constants.getImageURL(item.id),
+                imageUrl: Constants.getImageURL(item.kindId),
                 imageBuilder: (context, imageProvider) => Container(
                   width: 80.0,
                   height: 80.0,
@@ -140,7 +150,7 @@ class _ShoppingCart extends State<ShoppingCart> {
                   readOnly: true,
                   onChanged: (value) async {
                     if (value == 0) {
-                      int result = await CartDataBase.deleteItem(item.id);
+                      int result = await CartDataBase.deleteItem(item);
                       if (result == 1) {
                         setState(() {
                           _totalPrice = _totalPrice - price;
@@ -149,11 +159,11 @@ class _ShoppingCart extends State<ShoppingCart> {
                       }
                       return;
                     }
+                    item.quantity = value.toInt();
+                    await CartDataBase.updateCartItem(item);
                     setState(() {
                       _totalPrice = _totalPrice - price + value.toInt();
-                      item.quantity = value.toInt();
                     });
-                    CartDataBase.updateCartItem(item);
                   },
                 ),
               ),
@@ -162,16 +172,7 @@ class _ShoppingCart extends State<ShoppingCart> {
         });
   }
 
-  void _updateTotalPrice() {
-    _totalPrice = 0;
-    for (CartItem item in myList!) {
-      _totalPrice =
-          _totalPrice + item.quantity * item.selectedKind!.product!.price;
-    }
-  }
-
   Widget _summry() {
-    _updateTotalPrice();
     return Container(
       color: Colors.yellow.shade600,
       alignment: Alignment.center,
@@ -195,12 +196,19 @@ class _ShoppingCart extends State<ShoppingCart> {
               ),
             ),
             onPressed: () async {
-              if (!_isUserLoggedIn) {
-                context.pushNamed(PageNames.login);
+              if (myList!.isEmpty) {
+                return;
               }
-
-              
-              
+              if (!_isUserLoggedIn) {
+                GoRouter.of(context).pushNamed(PageNames.login);
+                return;
+              }
+              bool ordered =
+                  await UserService.placeOrders(widget.loggedInUser!, myList!);
+              if (!ordered) {
+                //show error message and
+              }
+              //add to local ordered database,
             },
           )
         ],

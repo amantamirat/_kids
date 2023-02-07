@@ -22,4 +22,5 @@ class PageNames {
   static const String changePassword = "change_password";
   static const String settings = "settings";
   static const String myShoppingCart = "my_shopping_cart";
+  static const String myOrderList = "my_order_list";
 }

@@ -1,4 +1,5 @@
 import 'package:abdu_kids/model/user.dart';
+import 'package:abdu_kids/model/util/cart_item.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -104,6 +105,36 @@ class UserService {
       user.message = data["message"];
       return false;
     }
+    return true;
+  }
+
+  static Future<bool> placeOrders(User user, List<CartItem> items) async {
+    String url =
+        "${Constants.apiURL()}/${PageNames.users}/placeOrders/${user.id}";
+    num totalPrice = 0;
+    num totalquantity = 0;
+    for (int i = 0; i < items.length; i++) {
+      final item = items.elementAt(i);
+      totalquantity = totalquantity + item.quantity;
+      totalPrice = 
+          totalPrice + item.quantity * item.selectedKind!.product!.price;
+    }
+    var orderItems = CartItem.jsonFromItemList(items);
+    var response = await client.post(
+      Uri.parse(url),
+      headers: Constants.prepareHeaders(user.token!),
+      body: jsonEncode({
+        'total_quantity': totalquantity,
+        'total_price': totalPrice,
+        'items': orderItems
+      }),
+    );
+    //var data = jsonDecode(response.body);
+    if (response.statusCode != 201) {
+      //user.message = data["message"];
+      return false;
+    }
+
     return true;
   }
 }

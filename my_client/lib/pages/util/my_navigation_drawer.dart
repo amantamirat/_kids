@@ -39,49 +39,6 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
     ));
   }
 
-  Widget _prepareMyMenu() {
-    return FutureBuilder(
-      future: _loggedInUser,
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<dynamic> snapshot,
-      ) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            if (snapshot.hasError) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Error: ${snapshot.error}'),
-                  ],
-                ),
-              );
-            } else {
-              if (snapshot.hasData) {
-                user = User().fromJson(snapshot.data);
-              } else {
-                user = null;
-              }
-              return SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _buildHeader(),
-                    _buildMenuItems(),
-                  ],
-                ),
-              );
-            }
-        }
-      },
-    );
-  }
-
   Widget _buildHeader() {
     return Container(
       color: Colors.amber.shade100,
@@ -175,9 +132,11 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
                   runSpacing: 12,
                   children: [
                     ListTile(
-                      leading: const Icon(Icons.notifications),
-                      title: const Text("Notifications"),
-                      onTap: () {},
+                      leading: const Icon(Icons.work_history),
+                      title: const Text("My Orders"),
+                      onTap: () {
+                        context.pushNamed(PageNames.myOrderList, extra: user);
+                      },
                     ),
                     ListTile(
                       leading: const Icon(Icons.badge),
@@ -204,7 +163,10 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
                       onTap: () async {
                         await SessionManager().remove(Constants.loggedInUser);
                         if (context.mounted) {
-                          GoRouter.of(context).goNamed(PageNames.categories);
+                          //GoRouter.of(context).goNamed(PageNames.categories);
+                          GoRouter.of(context).pop();
+                          GoRouter.of(context)
+                              .pushReplacementNamed(PageNames.categories);
                         }
                       },
                     )

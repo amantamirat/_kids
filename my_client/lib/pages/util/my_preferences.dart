@@ -9,7 +9,7 @@ class MySharedPreferences extends StatefulWidget {
   MySharedPreferencesState createState() => MySharedPreferencesState();
 }
 
-class MySharedPreferencesState extends State<MySharedPreferences> {
+class MySharedPreferencesState extends State<MySharedPreferences> {  
   final _hostAddressController = TextEditingController();
   late String _hostAddress;
 
@@ -44,44 +44,30 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
 
   Widget _myForm() {
     return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-            child: Column(
-              children: <Widget>[
-                const Text(
-                  "URL",
-                  style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w400,
-                      color: Colors.black87),
-                ),
-                const SizedBox(
-                  height: 5,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 10,
-                    top: 10,
-                  ),
-                  child: TextFormField(
-                    controller: _hostAddressController,
-                    decoration:
-                        const InputDecoration(hintText: "Server Host Address"),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please provide a vlaue for Host Address';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 15),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[            
+            Padding(
+              padding: const EdgeInsets.only(
+                bottom: 10,
+                top: 10,
+              ),
+              child: TextFormField(
+                controller: _hostAddressController,
+                decoration:
+                    const InputDecoration(hintText: "Server Host Address"),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please provide a vlaue for Host Address';
+                  }
+                  return null;
+                },
+              ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }

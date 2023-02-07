@@ -291,8 +291,14 @@ class _KindList extends MyModelPageState<KindList> {
                   onPressed: () async {
                     if (_quantity > 0) {
                       final kind = _kindList.elementAt(_activeIndex);
-                      final item =
-                          CartItem(id: kind.id!, quantity: _quantity.toInt());
+                      final item = CartItem(
+                          kindId: kind.id!,
+                          quantity: _quantity.toInt(),
+                          price: kind.product!.price,
+                          categoryId: kind.product!.brand!.type!.category!.id!,
+                          typeId: kind.product!.brand!.type!.id!,
+                          brandId: kind.product!.brand!.id!,
+                          productId: kind.product!.id!);
                       if (widget.selectedKind == null) {
                         int result = await CartDataBase.insertItem(item);
                         if (result != 0) {

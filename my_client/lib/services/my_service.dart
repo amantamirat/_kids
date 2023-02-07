@@ -4,6 +4,7 @@ import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/model/util/cart_item.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -86,5 +87,28 @@ class MyService {
     return null;
   }
 
-  
+  static Kind? findKind(CartItem item) {
+    for (Category category in myRootData!) {
+      if (category.id == item.categoryId) {
+        for (ClothingType type in category.clothingTypes) {
+          if (type.id == item.typeId) {
+            for (Brand brand in type.brands) {
+              if (brand.id == item.brandId) {
+                for (Product product in brand.products) {
+                  if (product.id == item.productId) {
+                    for (Kind kind in product.kinds) {
+                      if (kind.id == item.kindId) {
+                        return kind;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
 }

@@ -18,6 +18,13 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _pwdController = TextEditingController();
   String? _errorMessage;
+  late int attempts;
+  @override
+  void initState() {
+    super.initState();
+    attempts = 0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -95,17 +102,19 @@ class _LoginPageState extends State<LoginPage> {
                 color: Colors.blue, borderRadius: BorderRadius.circular(20)),
             child: ElevatedButton(
               onPressed: () async {
+                attempts = attempts + 1;
                 String email = _emailController.text;
                 String password = _pwdController.text;
                 if (email.isEmpty || password.isEmpty) {
                   setState(() {
-                    _errorMessage = "Please Provide the Values";
+                    _errorMessage =
+                        "Please Provide the Values, $attempts attempts";
                   });
                   return;
                 }
                 if (!EmailValidator.validate(email)) {
                   setState(() {
-                    _errorMessage = "Not a Valid Email";
+                    _errorMessage = "Not a Valid Email, $attempts attempts";
                   });
                   return;
                 }
@@ -113,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
                     await UserService.logInUser(email, password);
                 if (loggedInUser == null) {
                   setState(() {
-                    _errorMessage = "Invalid Credentials";
+                    _errorMessage = "Invalid Credentials , $attempts attempts";
                   });
                   return;
                 }

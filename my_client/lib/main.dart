@@ -16,6 +16,7 @@ import 'package:abdu_kids/pages/products/product_merge.dart';
 import 'package:abdu_kids/pages/types/type_list.dart';
 import 'package:abdu_kids/pages/types/type_merge.dart';
 import 'package:abdu_kids/pages/user/change_password.dart';
+import 'package:abdu_kids/pages/user/order_list.dart';
 import 'package:abdu_kids/pages/user/verify_account.dart';
 import 'package:abdu_kids/pages/user/edit_profile.dart';
 import 'package:abdu_kids/pages/user/log_in.dart';
@@ -229,6 +230,13 @@ final GoRouter _router = GoRouter(
           return const ShoppingCart(loggedInUser: null);
         }
         return ShoppingCart(loggedInUser: state.extra as User);
+      },
+    ),
+    GoRoute(
+      path: '/${PageNames.myOrderList}',
+      name: PageNames.myOrderList,
+      builder: (context, state) {
+        return OrderList(selectedUser: state.extra as User);
       },
     ),
     GoRoute(

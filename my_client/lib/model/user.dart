@@ -1,4 +1,5 @@
 import 'package:abdu_kids/model/my_model.dart';
+import 'package:abdu_kids/model/util/order.dart';
 import 'package:abdu_kids/util/page_names.dart';
 
 enum Role {
@@ -29,6 +30,7 @@ class User extends MyModel {
   static const String attributeRole = 'role';
   static const String attributeToken = 'token';
   static const String attributeCode = 'verification_code';
+  static const String attributeOrders = 'orders';
 
   late String? firstName = "Unkown";
   late String? lastName = "";
@@ -40,6 +42,7 @@ class User extends MyModel {
   late Status status = Status.pending;
   late String? token = "";
   late String? verificationCode = "";
+  late List<Order>? orders;
 
   @override
   User fromJson(Map<String, dynamic> json) {
@@ -66,7 +69,7 @@ class User extends MyModel {
     }
     token = json[attributeToken];
     verificationCode = json[attributeCode];
-    //products = Product.productsFromJson(json[attributeProducts], this);
+    orders = Order.ordersFromJson(json[attributeOrders]);
     return this;
   }
 
