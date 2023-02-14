@@ -149,3 +149,18 @@ exports.updateInventory = async (req, res, next) => {
         })
     }
 }
+
+exports.findOrders = async (req, res, next) => {
+    try {
+        const users = await User.findById(req.params.id)
+        res.status(201).json({
+            status: "Success",
+            data: users.orders
+        });
+    } catch (err) {
+        return res.status(500).json({
+            status: "Failed to retrieve user orders",
+            message: err,
+        });
+    }
+}

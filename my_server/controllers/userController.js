@@ -4,12 +4,14 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const nodemailer = require('nodemailer');
 
+
+
 exports.findAll = async (req, res, next) => {
     try {
         const users = await User.find({});
         res.status(200).json({
             status: "Success",
-            users: users
+            data: users
         });
     } catch (err) {
         return res.status(500).json({
@@ -18,6 +20,7 @@ exports.findAll = async (req, res, next) => {
         });
     }
 }
+
 
 exports.registerUser = async (req, res, next) => {
     try {
@@ -100,7 +103,7 @@ exports.verify = async (req, res, next) => {
 
 exports.loginUser = async (req, res, next) => {
     try {
-        let user = await User.findOne({ email: req.body.email });
+        const user = await User.findOne({ email: req.body.email });
         if (!user) {
             return res.status(400).json({
                 status: 'Error',
@@ -114,8 +117,8 @@ exports.loginUser = async (req, res, next) => {
                 message: 'Incorrect email or password.',
             });
         }
+        user.password = "null";
         if (user.user_status == "Pending") {
-            delete user.password;
             return res.status(201).json({
                 status: 'Success',
                 data: user
@@ -126,7 +129,7 @@ exports.loginUser = async (req, res, next) => {
                 process.env.TOKEN_KEY, {
                 expiresIn: "2h",
             });
-            delete user.password;
+            // console.log(user);
             return res.status(201).json({
                 status: 'Success',
                 data: user
@@ -137,6 +140,7 @@ exports.loginUser = async (req, res, next) => {
             message: 'Account is not verified!',
         });
     } catch (err) {
+        console.log(err);
         return res.status(500).json({
             status: "Failed to Update User",
             message: err,

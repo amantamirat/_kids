@@ -5,7 +5,9 @@ const orderController = require("../controllers/orderController");
 const auth = require("../middlewares/auth");
 const verifyAdmin = require("../middlewares/verifyAdmin");
 
-router.get("/", auth, verifyAdmin, userController.findAll);
+//router.get("/", auth, verifyAdmin, userController.findAll);
+
+router.get("/",  userController.findAll);
 
 router.post('/register', userController.registerUser);
 
@@ -22,5 +24,7 @@ router.patch("/update/:id", auth, userController.editUser);
 router.delete("/delete/:id", auth, userController.deleteUser);
 
 router.post("/placeOrders/:id", auth, orderController.checkOrder, orderController.placeOrders, orderController.updateInventory);
+
+router.get("/findOrders/:id", auth, orderController.findOrders);
 
 module.exports = router;
