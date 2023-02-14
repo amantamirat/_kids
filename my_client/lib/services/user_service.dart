@@ -1,5 +1,6 @@
 import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/model/util/cart_item.dart';
+import 'package:abdu_kids/model/util/order.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -16,8 +17,7 @@ class UserService {
     );
     if (response.statusCode == 200) {
       var data = jsonDecode(response.body);
-      return User.usersFromJson(data[PageNames.users]);
-      ;
+      return User.usersFromJson(data["data"]);
     } else {
       return null;
     }
@@ -116,7 +116,7 @@ class UserService {
     for (int i = 0; i < items.length; i++) {
       final item = items.elementAt(i);
       totalquantity = totalquantity + item.quantity;
-      totalPrice = 
+      totalPrice =
           totalPrice + item.quantity * item.selectedKind!.product!.price;
     }
     var orderItems = CartItem.jsonFromItemList(items);
@@ -136,5 +136,21 @@ class UserService {
     }
 
     return true;
+  }
+
+  static Future<List<Order>?> findOrders(User selectedUser) async {
+    String url =
+        "${Constants.apiURL()}/${PageNames.users}/findOrders/${selectedUser.id}";
+    var response = await client.get(
+      Uri.parse(url),
+      headers: Constants.prepareHeaders(selectedUser.token!),
+    );
+    if (response.statusCode == 201) {
+      var data = jsonDecode(response.body);
+      //print(data["data"].toString());
+      return Order.ordersFromJson(data["data"]);
+    } else {
+      return null;
+    }
   }
 }

@@ -69,24 +69,6 @@ class MyService {
     return response.statusCode == 204;
   }
 
-  @Deprecated("Bad Implementation")
-  static Kind? findKindById(String id) {
-    for (Category category in myRootData!) {
-      for (ClothingType type in category.clothingTypes) {
-        for (Brand brand in type.brands) {
-          for (Product product in brand.products) {
-            for (Kind kind in product.kinds) {
-              if (kind.id == id) {
-                return kind;
-              }
-            }
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   static Kind? findKind(CartItem item) {
     for (Category category in myRootData!) {
       if (category.id == item.categoryId) {

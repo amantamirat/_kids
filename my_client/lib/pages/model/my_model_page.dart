@@ -1,7 +1,6 @@
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/pages/util/delete_dialog.dart';
-import 'package:abdu_kids/pages/util/my_navigation_drawer.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -12,7 +11,6 @@ import 'package:flutter_session_manager/flutter_session_manager.dart';
 enum Menu { itemManage, itemSettings }
 
 abstract class MyModelPage extends StatefulWidget {
-  
   final List<MyModel> myList;
   final String? title;
   final String? editPage;
@@ -71,7 +69,6 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
                   loggedInUser = User().fromJson(snapshot.data);
                 }
                 isUserloggedin = loggedInUser != null;
-
                 return Scaffold(
                   appBar: AppBar(
                     title: Text("${widget.title}"),
@@ -92,9 +89,9 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
                                   () => {_manageMode = !_manageMode},
                                 );
                               },
-                              icon: _manageMode
+                              icon: !_manageMode
                                   ? const Icon(Icons.edit)
-                                  : const Icon(Icons.view_agenda),
+                                  : const Icon(Icons.view_cozy),
                             )
                           ]
                         : <Widget>[
@@ -121,11 +118,6 @@ abstract class MyModelPageState<T extends MyModelPage> extends State<T> {
                                 : Container(),
                           ],
                   ),
-                  drawer: widget.enableDrawer
-                      ? isUserloggedin
-                          ? MyNavigationDrawer(loggedInUser: loggedInUser!)
-                          : MyNavigationDrawer()
-                      : null,
                   body: myList.isNotEmpty
                       ? _manageMode
                           ? displayList()

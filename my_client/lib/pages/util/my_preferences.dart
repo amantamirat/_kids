@@ -1,4 +1,5 @@
 import 'package:abdu_kids/services/preference_util.dart';
+import 'package:abdu_kids/util/page_names.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:go_router/go_router.dart';
@@ -39,7 +40,8 @@ class MySharedPreferencesState extends State<MySharedPreferences> {
     final SharedPreferences prefs = SharedPrefs.instance;
     final String hostAddress = _hostAddressController.text;
     prefs.setString(SharedPrefs.keyHostAddress, hostAddress);
-    GoRouter.of(context).pop();
+    //GoRouter.of(context).pop();
+    GoRouter.of(context).goNamed(PageNames.home);
   }
 
   Widget _myForm() {

@@ -6,15 +6,14 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 
 class EditProfile extends StatefulWidget {
-  final User selectedUser;
-  const EditProfile({Key? key, required this.selectedUser}) : super(key: key);
+  final User loggedInUser;
+  const EditProfile({Key? key, required this.loggedInUser}) : super(key: key);
   @override
   State<EditProfile> createState() => _EditProfile();
 }
 
 class _EditProfile extends State<EditProfile> {
   static final GlobalKey<FormState> globalFormKey = GlobalKey<FormState>();
-
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
   final _phoneNumberController = TextEditingController();
@@ -24,10 +23,10 @@ class _EditProfile extends State<EditProfile> {
   @override
   void initState() {
     super.initState();
-    _firstNameController.text = widget.selectedUser.firstName ?? '';
-    _lastNameController.text = widget.selectedUser.lastName ?? '';
-    _phoneNumberController.text = widget.selectedUser.phoneNumber ?? '';
-    _addressController.text = widget.selectedUser.address ?? '';
+    _firstNameController.text = widget.loggedInUser.firstName ?? '';
+    _lastNameController.text = widget.loggedInUser.lastName ?? '';
+    _phoneNumberController.text = widget.loggedInUser.phoneNumber ?? '';
+    _addressController.text = widget.loggedInUser.address ?? '';
   }
 
   @override
@@ -38,7 +37,7 @@ class _EditProfile extends State<EditProfile> {
       actions: <Widget>[
         IconButton(
                   onPressed: () {
-                    GoRouter.of(context).pushNamed(PageNames.changePassword, extra: widget.selectedUser);
+                    GoRouter.of(context).pushNamed(PageNames.changePassword, extra: widget.loggedInUser);
                   },
                   icon: const Icon(Icons.password),
                 )
@@ -68,7 +67,7 @@ class _EditProfile extends State<EditProfile> {
                     child: const Text("Save"),
                     onPressed: () async {
                       if (globalFormKey.currentState!.validate()) {
-                        final user = widget.selectedUser;
+                        final user = widget.loggedInUser;
                         user.firstName = _firstNameController.text;
                         user.lastName = _lastNameController.text;
                         user.phoneNumber = _phoneNumberController.text;

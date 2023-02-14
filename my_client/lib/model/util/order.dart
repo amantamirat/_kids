@@ -29,26 +29,26 @@ class Order extends MyModel {
   @override
   Order fromJson(Map<String, dynamic> json) {
     id = json[MyModel.attributeId];
-    date = json[attributeDate];
+    date = "${json[attributeDate]}";
     totalQuantity = json[attributeTotalQuantity];
     totalPrice = json[attributeTotalPrice];
-    orderedItems = json[attributeItems];
+    orderedItems = OrderedItem.orderItemsFromJson(json[attributeItems]);
     return this;
   }
 
   @override
   String basePath() {
-    throw UnimplementedError();
+    return "";
   }
 
   @override
   String paramsPath() {
-    throw UnimplementedError();
+    return "";
   }
 
   @override
   String header() {
-    throw UnimplementedError();
+    return "";
   }
 
   static List<Order> ordersFromJson(dynamic str) =>

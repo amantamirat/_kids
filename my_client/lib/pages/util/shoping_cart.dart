@@ -18,7 +18,7 @@ class ShoppingCart extends StatefulWidget {
 
 class _ShoppingCart extends State<ShoppingCart> {
   late Future<List<CartItem>?> _myFuture;
-  late List<CartItem>? myList;
+  //late List<CartItem>? myList;
   late num _totalPrice;
   late bool _isUserLoggedIn;
   @override
@@ -59,30 +59,32 @@ class _ShoppingCart extends State<ShoppingCart> {
                 ),
               );
             } else {
-              myList = snapshot.data;
-              _updateTotalPrice();
+              if (snapshot.hasData) {
+                _updateTotalPrice(snapshot.data!);
+              }
+
               return Scaffold(
                   appBar: AppBar(
                     title:
                         Text("My Cart ${_isUserLoggedIn ? '- ON' : '- OFF'}"),
                   ),
-                  body: (myList != null || myList!.isNotEmpty)
-                      ? _displayList()
+                  body: snapshot.hasData
+                      ? _displayList(snapshot.data!)
                       : Container(
                           padding: const EdgeInsets.all(8.0),
                           child: const Center(child: Text('Empty Cart!'))),
                   bottomNavigationBar:
-                      snapshot.hasData ? _summry() : Container());
+                      snapshot.hasData ? _summry(snapshot.data!) : Container());
             }
         }
       },
     );
   }
 
-  void _updateTotalPrice() {
+  void _updateTotalPrice(List<CartItem> myList) {
     _totalPrice = 0;
-    for (int i = 0; i < myList!.length; i++) {
-      final item = myList!.elementAt(i);
+    for (int i = 0; i < myList.length; i++) {
+      final item = myList.elementAt(i);
       if (item.selectedKind != null) {
         _totalPrice =
             _totalPrice + item.quantity * item.selectedKind!.product!.price;
@@ -90,12 +92,12 @@ class _ShoppingCart extends State<ShoppingCart> {
     }
   }
 
-  Widget _displayList() {
+  Widget _displayList(List<CartItem> myList) {
     return ListView.builder(
         shrinkWrap: true,
-        itemCount: myList!.length,
+        itemCount: myList.length,
         itemBuilder: (BuildContext context, int index) {
-          final item = myList!.elementAt(index);
+          final item = myList.elementAt(index);
           double moq = item.selectedKind!.product!.moq.toDouble();
           double max = item.selectedKind!.quantity!.toDouble();
           max = max - (max % moq);
@@ -154,7 +156,7 @@ class _ShoppingCart extends State<ShoppingCart> {
                       if (result == 1) {
                         setState(() {
                           _totalPrice = _totalPrice - price;
-                          myList!.remove(item);
+                          myList.remove(item);
                         });
                       }
                       return;
@@ -172,7 +174,7 @@ class _ShoppingCart extends State<ShoppingCart> {
         });
   }
 
-  Widget _summry() {
+  Widget _summry(List<CartItem> myList) {
     return Container(
       color: Colors.yellow.shade600,
       alignment: Alignment.center,
@@ -196,7 +198,7 @@ class _ShoppingCart extends State<ShoppingCart> {
               ),
             ),
             onPressed: () async {
-              if (myList!.isEmpty) {
+              if (myList.isEmpty) {
                 return;
               }
               if (!_isUserLoggedIn) {
@@ -204,7 +206,7 @@ class _ShoppingCart extends State<ShoppingCart> {
                 return;
               }
               bool ordered =
-                  await UserService.placeOrders(widget.loggedInUser!, myList!);
+                  await UserService.placeOrders(widget.loggedInUser!, myList);
               if (!ordered) {
                 //show error message and
               }

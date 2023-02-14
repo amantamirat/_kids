@@ -18,13 +18,15 @@ class _SignupPageState extends State<SignupPage> {
   final _pwdController = TextEditingController();
   final _confPwdController = TextEditingController();
   String? _errorMessage;
+  Future<bool?>? _isRegistred;
+  User user = User();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
-        title: const Text("Sign up Page"),
+        title: const Text("Register User"),
       ),
       body: SafeArea(
         child: Form(key: _globalFormKey, child: _registerForm()),
@@ -50,7 +52,7 @@ class _SignupPageState extends State<SignupPage> {
                       height: 20,
                     ),
                     Text(
-                      "Create an Account, Its free!",
+                      "Create Your Account. Its free!",
                       style: TextStyle(
                         fontSize: 15,
                         color: Colors.grey[700],
@@ -79,12 +81,37 @@ class _SignupPageState extends State<SignupPage> {
                       const SizedBox(
                         height: 10,
                       ),
-                      Container(
-                        child: _errorMessage == null
-                            ? Container()
-                            : Text(_errorMessage!,
-                                style: const TextStyle(color: Colors.red)),
-                      ),
+                      _isRegistred != null
+                          ? FutureBuilder(
+                              future: _isRegistred,
+                              builder: (
+                                BuildContext context,
+                                AsyncSnapshot<bool?> snapshot,
+                              ) {
+                                switch (snapshot.connectionState) {
+                                  case ConnectionState.waiting:
+                                    return const CircularProgressIndicator();
+                                  default:
+                                    if (snapshot.hasError) {
+                                      return Center(
+                                        child: Text('Error: ${snapshot.error}'),
+                                      );
+                                    } else {
+                                      if (snapshot.hasData && snapshot.data!) {
+                                        context.pushNamed(PageNames.verify,
+                                            extra: user);
+                                      }
+                                      return Text(user.message!,
+                                          style: const TextStyle(
+                                              color: Colors.red));
+                                    }
+                                }
+                              },
+                            )
+                          : _errorMessage != null
+                              ? Text(_errorMessage!,
+                                  style: const TextStyle(color: Colors.red))
+                              : Container(),
                       const SizedBox(
                         height: 10,
                       ),
@@ -131,23 +158,14 @@ class _SignupPageState extends State<SignupPage> {
                           });
                           return;
                         }
-                        User user = User();
                         user.email = email;
                         user.password = password;
                         user.role = Role.customer;
                         user.status = Status.pending;
                         user.phoneNumber = phoneNumber;
-                        bool registered = await UserService.registerUser(user);
-                        if (!registered) {
-                          setState(() {
-                            _errorMessage = user.message;
-                          });
-                          return;
-                        }
-                        if (context.mounted) {                          
-                          GoRouter.of(context).pop();
-                          context.pushNamed(PageNames.verify, extra: user);
-                        }
+                        setState(() {
+                          _isRegistred = UserService.registerUser(user);
+                        });
                       },
                       color: Colors.redAccent,
                       shape: RoundedRectangleBorder(

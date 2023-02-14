@@ -19,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
   final _pwdController = TextEditingController();
   String? _errorMessage;
   late int attempts;
+  Future<User?>? _user;
   @override
   void initState() {
     super.initState();
@@ -30,7 +31,7 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("Login Page"),
+        title: const Text("Login"),
       ),
       body: Form(key: _globalFormKey, child: _logInForm()),
     );
@@ -80,12 +81,39 @@ class _LoginPageState extends State<LoginPage> {
           const SizedBox(
             height: 10,
           ),
-          Container(
-            child: _errorMessage == null
-                ? Container()
-                : Text(_errorMessage!,
-                    style: const TextStyle(color: Colors.red)),
-          ),
+          _user != null
+              ? FutureBuilder(
+                  future: _user,
+                  builder: (
+                    BuildContext context,
+                    AsyncSnapshot<User?> snapshot,
+                  ) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                        return const CircularProgressIndicator();
+                      default:
+                        if (snapshot.hasError) {
+                          return Center(
+                            child: Text('Error: ${snapshot.error}'),
+                          );
+                        } else {
+                          if (snapshot.hasData) {
+                            _login(snapshot.data!);
+                            return const Text(
+                              "Sucess",
+                            );
+                          }
+                          return Text(
+                              "Invalid Credentials , $attempts attempts",
+                              style: const TextStyle(color: Colors.red));
+                        }
+                    }
+                  },
+                )
+              : _errorMessage != null
+                  ? Text(_errorMessage!,
+                      style: const TextStyle(color: Colors.red))
+                  : Container(),
           const SizedBox(
             height: 20,
           ),
@@ -101,8 +129,15 @@ class _LoginPageState extends State<LoginPage> {
             decoration: BoxDecoration(
                 color: Colors.blue, borderRadius: BorderRadius.circular(20)),
             child: ElevatedButton(
+              child: const Text(
+                'Login',
+                style: TextStyle(color: Colors.purple),
+              ),
               onPressed: () async {
                 attempts = attempts + 1;
+                if (attempts > 9) {
+                  GoRouter.of(context).goNamed(PageNames.home);
+                }
                 String email = _emailController.text;
                 String password = _pwdController.text;
                 if (email.isEmpty || password.isEmpty) {
@@ -118,34 +153,10 @@ class _LoginPageState extends State<LoginPage> {
                   });
                   return;
                 }
-                User? loggedInUser =
-                    await UserService.logInUser(email, password);
-                if (loggedInUser == null) {
-                  setState(() {
-                    _errorMessage = "Invalid Credentials , $attempts attempts";
-                  });
-                  return;
-                }
-                if (context.mounted) {
-                  if (loggedInUser.status == Status.verified) {
-                    await SessionManager()
-                        .set(Constants.loggedInUser, loggedInUser);
-                    if (context.mounted) {
-                      GoRouter.of(context).goNamed(PageNames.categories);
-                      //GoRouter.of(context).pushReplacementNamed(PageNames.home);
-                    }
-
-                    //GoRouter.of(context).pushReplacementNamed(PageNames.categories);
-                  } else if (loggedInUser.status == Status.pending) {
-                    GoRouter.of(context).pop();
-                    context.pushNamed(PageNames.verify, extra: loggedInUser);
-                  }
-                }
+                setState(() {
+                  _user = UserService.logInUser(email, password);
+                });
               },
-              child: const Text(
-                'Login',
-                style: TextStyle(color: Colors.purple),
-              ),
             ),
           ),
           const SizedBox(
@@ -168,5 +179,17 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
     );
+  }
+
+  void _login(User user) async {
+    if (user.status == Status.verified) {
+      await SessionManager().set(Constants.loggedInUser, user);
+      if (context.mounted) {
+        GoRouter.of(context).pushReplacementNamed(PageNames.home);
+      }
+    } else if (user.status == Status.pending) {
+      GoRouter.of(context).pop();
+      GoRouter.of(context).pushNamed(PageNames.verify, extra: user);
+    }
   }
 }

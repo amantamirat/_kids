@@ -1,7 +1,6 @@
 import 'package:abdu_kids/model/category.dart';
 import 'package:abdu_kids/pages/categories/category_merge.dart';
 import 'package:abdu_kids/pages/model/my_model_page.dart';
-import 'package:abdu_kids/pages/util/my_navigation_drawer.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,8 +13,7 @@ class CategoryList extends MyModelPage {
       : super(
             key: key,
             myList: categories,
-            title: "ABDU KIDS", 
-            enableDrawer: true,           
+            title: "ABDU KIDS",            
             editPage: PageNames.editCategory,
             nextPage: PageNames.types);
   @override
@@ -24,7 +22,6 @@ class CategoryList extends MyModelPage {
 
 class _CategoryListState extends MyModelPageState<CategoryList> {
   late List<Category> _categories;
-
   @override
   void initState() {
     super.initState();

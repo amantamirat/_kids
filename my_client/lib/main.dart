@@ -9,6 +9,7 @@ import 'package:abdu_kids/pages/brands/brand_list.dart';
 import 'package:abdu_kids/pages/brands/brand_merge.dart';
 import 'package:abdu_kids/pages/categories/category_list.dart';
 import 'package:abdu_kids/pages/categories/category_merge.dart';
+import 'package:abdu_kids/pages/categories/dashboard.dart';
 import 'package:abdu_kids/pages/kinds/kind_list.dart';
 import 'package:abdu_kids/pages/kinds/kind_merge.dart';
 import 'package:abdu_kids/pages/products/product_list.dart';
@@ -27,10 +28,12 @@ import 'package:abdu_kids/pages/util/shoping_cart.dart';
 import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/services/database_util.dart';
 import 'package:abdu_kids/services/user_service.dart';
+import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:abdu_kids/services/preference_util.dart';
 import 'package:flutter/material.dart';
 import 'package:abdu_kids/pages/util/my_preferences.dart';
+import 'package:flutter_session_manager/flutter_session_manager.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 
@@ -173,7 +176,7 @@ final GoRouter _router = GoRouter(
       path: '/${PageNames.editProfile}',
       name: PageNames.editProfile,
       builder: (context, state) =>
-          EditProfile(selectedUser: state.extra as User),
+          EditProfile(loggedInUser: state.extra as User),
     ),
     GoRoute(
       path: '/${PageNames.changePassword}',
@@ -191,35 +194,7 @@ final GoRouter _router = GoRouter(
       path: '/${PageNames.users}',
       name: PageNames.users,
       builder: (context, state) {
-        return FutureBuilder(
-          future: UserService.getUsers(),
-          builder: (
-            BuildContext context,
-            AsyncSnapshot<List<User>?> snapshot,
-          ) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.waiting:
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              default:
-                if (snapshot.hasError) {
-                  return Scaffold(
-                    body: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text('Error: ${snapshot.error}'),
-                        ],
-                      ),
-                    ),
-                  );
-                } else {
-                  return UserList(users: snapshot.data!);
-                }
-            }
-          },
-        );
+        return const UserList();
       },
     ),
     GoRoute(
@@ -236,7 +211,7 @@ final GoRouter _router = GoRouter(
       path: '/${PageNames.myOrderList}',
       name: PageNames.myOrderList,
       builder: (context, state) {
-        return OrderList(selectedUser: state.extra as User);
+        return MyOrderList(loggedInUser: state.extra as User);
       },
     ),
     GoRoute(
@@ -273,69 +248,48 @@ class Home extends StatefulWidget {
 }
 
 class _Home extends State<Home> {
-  late Future<List<Category>?> _myFuture;
+  late Future<dynamic>? _myUser;
   @override
   void initState() {
-    _myFuture = MyService.getCategories();
     super.initState();
+    _myUser = SessionManager().get(Constants.loggedInUser);
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: _myFuture,
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<List<Category>?> snapshot,
-      ) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          default:
-            if (snapshot.hasError) {
-              return Scaffold(
-                appBar: AppBar(actions: <Widget>[
-                  IconButton(
-                    onPressed: () {
-                      GoRouter.of(context).pushNamed(PageNames.settings);
-                    },
-                    icon: const Icon(Icons.settings),
-                  )
-                ]),
-                body: Center(
+    return Scaffold(
+      body: FutureBuilder(
+        future: _myUser,
+        builder: (
+          BuildContext context,
+          AsyncSnapshot<dynamic> snapshot,
+        ) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            default:
+              if (snapshot.hasError) {                
+                return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text('Error: ${snapshot.error}'),
-                      ElevatedButton(
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Icon(
-                                Icons.refresh,
-                              ),
-                              SizedBox(
-                                width: 5,
-                              ),
-                              Text('Refresh'),
-                            ],
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _myFuture = MyService.getCategories();
-                            });
-                          }),
                     ],
                   ),
-                ),
-              );
-            } else {
-              return CategoryList(categories: snapshot.data!);
-            }
-        }
-      },
+                );
+              } else {
+                //return CategoryList(categories: snapshot.data!);
+                //check the user data
+                return Dashboard(
+                    loggedInUser: snapshot.hasData
+                        ? User().fromJson(snapshot.data)
+                        : null);
+              }
+          }
+        },
+      ),
     );
   }
 }

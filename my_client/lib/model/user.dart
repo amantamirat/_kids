@@ -69,7 +69,10 @@ class User extends MyModel {
     }
     token = json[attributeToken];
     verificationCode = json[attributeCode];
-    orders = Order.ordersFromJson(json[attributeOrders]);
+    if (json[attributeOrders] != null) {
+      orders = Order.ordersFromJson(json[attributeOrders]);
+    }
+
     return this;
   }
 

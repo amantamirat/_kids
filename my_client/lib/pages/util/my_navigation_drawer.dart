@@ -9,20 +9,18 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_session_manager/flutter_session_manager.dart';
 
 class MyNavigationDrawer extends StatefulWidget {
-  User? loggedInUser;
-  MyNavigationDrawer({super.key, this.loggedInUser});
+  final User? loggedInUser;
+  const MyNavigationDrawer({super.key, this.loggedInUser});
   @override
   State<MyNavigationDrawer> createState() => _MyNavigationDrawer();
 }
 
 class _MyNavigationDrawer extends State<MyNavigationDrawer> {
-  late Future<dynamic> _loggedInUser;
   late User? user;
   @override
   void initState() {
     super.initState();
     user = widget.loggedInUser;
-    //_loggedInUser = SessionManager().get(Constants.loggedInUser);
   }
 
   @override
@@ -81,7 +79,7 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
           ),
           Text(
             user == null
-                ? "Guest"
+                ? "Welcome!"
                 : (user!.firstName == null
                     ? user!.role.title
                     : user!.firstName!),
@@ -107,6 +105,7 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
             title: const Text("Home"),
             onTap: () {
               context.pop();
+              GoRouter.of(context).pushReplacementNamed(PageNames.home);
             },
           ),
           user == null
@@ -131,31 +130,36 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
               : Wrap(
                   runSpacing: 12,
                   children: [
-                    ListTile(
-                      leading: const Icon(Icons.work_history),
-                      title: const Text("My Orders"),
-                      onTap: () {
-                        context.pushNamed(PageNames.myOrderList, extra: user);
-                      },
-                    ),
-                    ListTile(
-                      leading: const Icon(Icons.badge),
-                      title: const Text("Edit Profile"),
-                      onTap: () {
-                        context.pop();
-                        context.pushNamed(PageNames.editProfile, extra: user);
-                      },
-                    ),
                     user!.role == Role.administrator
-                        ? ListTile(
-                            leading: const Icon(Icons.account_circle_sharp),
-                            title: const Text("User Accounts"),
-                            onTap: () {
-                              context.pop();
-                              context.pushNamed(PageNames.users);
-                            },
-                          )
-                        : Container(),
+                        ? Wrap(runSpacing: 12, children: [
+                            ListTile(
+                              leading: const Icon(Icons.account_circle_sharp),
+                              title: const Text("User Accounts"),
+                              onTap: () {
+                                context.pop();
+                                context.pushNamed(PageNames.users);
+                              },
+                            )
+                          ])
+                        : Wrap(runSpacing: 12, children: [
+                            ListTile(
+                              leading: const Icon(Icons.work_history),
+                              title: const Text("My Orders"),
+                              onTap: () {
+                                context.pushNamed(PageNames.myOrderList,
+                                    extra: user);
+                              },
+                            ),
+                            ListTile(
+                              leading: const Icon(Icons.badge),
+                              title: const Text("Edit Profile"),
+                              onTap: () {
+                                context.pop();
+                                context.pushNamed(PageNames.editProfile,
+                                    extra: user);
+                              },
+                            ),
+                          ]),
                     const Divider(),
                     ListTile(
                       leading: const Icon(Icons.logout),
@@ -163,15 +167,22 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
                       onTap: () async {
                         await SessionManager().remove(Constants.loggedInUser);
                         if (context.mounted) {
-                          //GoRouter.of(context).goNamed(PageNames.categories);
-                          GoRouter.of(context).pop();
+                          context.pop();
                           GoRouter.of(context)
-                              .pushReplacementNamed(PageNames.categories);
+                              .pushReplacementNamed(PageNames.home);
                         }
                       },
                     )
                   ],
                 ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text("Settings"),
+            onTap: () {
+              GoRouter.of(context).pushNamed(PageNames.settings);
+            },
+          )
         ],
       ),
     );

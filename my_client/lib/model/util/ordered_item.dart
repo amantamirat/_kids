@@ -2,6 +2,7 @@ import 'package:abdu_kids/model/my_model.dart';
 
 class OrderedItem extends MyModel {
   //static const String tableName = "ordered_items";
+  static const String attributeKindId = "kind_id";
   static const String attributeBrand = "brand";
   static const String attributeProduct = "product_detail";
   static const String attributeProductSize = "product_size";
@@ -9,9 +10,10 @@ class OrderedItem extends MyModel {
   static const String attributeProductPrice = "price";
   static const String attributeQuantity = "quantity";
 
+  String? kindId;
   String? brand;
   String? productDetail;
-  String? productSize;
+  num? productSize;
   String? productColor;
   num? productPrice;
   int? quantity;
@@ -22,7 +24,8 @@ class OrderedItem extends MyModel {
       this.productSize,
       this.productColor,
       this.productPrice,
-      this.quantity});
+      this.quantity,
+      this.kindId});
 
   @override
   Map<String, dynamic> toJson({bool includeId = true}) {
@@ -45,6 +48,7 @@ class OrderedItem extends MyModel {
     productColor = json[attributeProductColor];
     productPrice = json[attributeProductPrice];
     quantity = json[attributeQuantity];
+    kindId = json[attributeKindId];
     return this;
   }
 
@@ -57,6 +61,7 @@ class OrderedItem extends MyModel {
   String paramsPath() {
     throw UnimplementedError();
   }
+
   @override
   String header() {
     throw UnimplementedError();
@@ -67,6 +72,6 @@ class OrderedItem extends MyModel {
     return 'Ordered Item{brand: $brand, product: $productDetail, quantity: $quantity}';
   }
 
-  static List<OrderedItem> categoriesFromJson(dynamic str) =>
+  static List<OrderedItem> orderItemsFromJson(dynamic str) =>
       List<OrderedItem>.from((str).map((x) => OrderedItem().fromJson(x)));
 }
