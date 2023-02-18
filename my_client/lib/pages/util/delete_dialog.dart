@@ -1,12 +1,12 @@
-import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/services/my_service.dart';
+import 'package:abdu_kids/util/extra_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:go_router/go_router.dart';
 
 class DeleteDialog extends StatefulWidget {
-  final MyModel model;
-  const DeleteDialog({Key? key, required this.model}) : super(key: key);
+  final ExtraWrapper wrapper;
+  const DeleteDialog({Key? key, required this.wrapper}) : super(key: key);
   @override
   State<DeleteDialog> createState() => _DeleteDialog();
 }
@@ -22,7 +22,7 @@ class _DeleteDialog extends State<DeleteDialog> {
     return AlertDialog(
       title: const Text('Delete Data'),
       content: Text(
-          'Are you sure, delete ${widget.model.toString()} and its Contenet?'),
+          'Are you sure, delete ${widget.wrapper.model.toString()} and its Contenet?'),
       actions: <Widget>[
         TextButton(
           onPressed: () {
@@ -32,7 +32,8 @@ class _DeleteDialog extends State<DeleteDialog> {
         ),
         TextButton(
           onPressed: () async {
-            if (await MyService.deleteModel(widget.model)) {
+            if (await MyService.deleteModel(
+                widget.wrapper.model!, widget.wrapper.user!)) {
               Fluttertoast.showToast(
                   msg: 'Removed!',
                   toastLength: Toast.LENGTH_SHORT,
@@ -40,9 +41,13 @@ class _DeleteDialog extends State<DeleteDialog> {
                   timeInSecForIosWeb: 1,
                   backgroundColor: Colors.amber,
                   textColor: Colors.black);
-              GoRouter.of(context).pop(0);
+              if (context.mounted) {
+                GoRouter.of(context).pop(0);
+              }
             } else {
-              GoRouter.of(context).pop(1);
+              if (context.mounted) {
+                GoRouter.of(context).pop(1);
+              }
             }
           },
           child: const Text('Yes'),

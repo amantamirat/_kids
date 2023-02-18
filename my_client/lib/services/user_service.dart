@@ -108,9 +108,7 @@ class UserService {
     return true;
   }
 
-  static Future<bool> placeOrders(User user, List<CartItem> items) async {
-    String url =
-        "${Constants.apiURL()}/${PageNames.users}/placeOrders/${user.id}";
+  static Future<String> placeOrders(User user, List<CartItem> items) async {
     num totalPrice = 0;
     num totalquantity = 0;
     for (int i = 0; i < items.length; i++) {
@@ -120,6 +118,10 @@ class UserService {
           totalPrice + item.quantity * item.selectedKind!.product!.price;
     }
     var orderItems = CartItem.jsonFromItemList(items);
+    String url =
+        "${Constants.apiURL()}/${PageNames.users}/placeOrders/${user.id}";
+
+    
     var response = await client.post(
       Uri.parse(url),
       headers: Constants.prepareHeaders(user.token!),
@@ -129,13 +131,10 @@ class UserService {
         'items': orderItems
       }),
     );
-    //var data = jsonDecode(response.body);
-    if (response.statusCode != 201) {
-      //user.message = data["message"];
-      return false;
-    }
-
-    return true;
+    
+    var data = jsonDecode(response.body);
+    //user.message = data["message"];
+    return "${data['message']}";
   }
 
   static Future<List<Order>?> findOrders(User selectedUser) async {

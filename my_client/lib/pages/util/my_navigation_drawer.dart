@@ -2,6 +2,7 @@
 
 import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/util/constants.dart';
+import 'package:abdu_kids/util/extra_wrapper.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -135,9 +136,8 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
                             ListTile(
                               leading: const Icon(Icons.account_circle_sharp),
                               title: const Text("User Accounts"),
-                              onTap: () {
-                                context.pop();
-                                context.pushNamed(PageNames.users);
+                              onTap: () {                                
+                                context.pushNamed(PageNames.users, extra: user);
                               },
                             )
                           ])
@@ -153,10 +153,10 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
                             ListTile(
                               leading: const Icon(Icons.badge),
                               title: const Text("Edit Profile"),
-                              onTap: () {
-                                context.pop();
+                              onTap: () {                               
                                 context.pushNamed(PageNames.editProfile,
-                                    extra: user);
+                                    extra: ExtraWrapper(user, user,
+                                        editMode: true));
                               },
                             ),
                           ]),
@@ -167,7 +167,7 @@ class _MyNavigationDrawer extends State<MyNavigationDrawer> {
                       onTap: () async {
                         await SessionManager().remove(Constants.loggedInUser);
                         if (context.mounted) {
-                          context.pop();
+                          //context.pop();
                           GoRouter.of(context)
                               .pushReplacementNamed(PageNames.home);
                         }

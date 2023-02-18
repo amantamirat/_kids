@@ -19,12 +19,6 @@ class Kind extends MyModel {
     id = json[MyModel.attributeId];
     color = json[attributeColor];
     quantity = json[attributeQuantity];
-    /*
-    if (includeLocal) {
-      product = Product().fromJson(json[attributeProduct]);
-    }
-    */
-
     return this;
   }
 
@@ -37,18 +31,12 @@ class Kind extends MyModel {
     }
     data[attributeColor] = color;
     data[attributeQuantity] = quantity;
-    /*
-    if (includeLocal) {
-      data[attributeProduct] =
-          jsonEncode(product!.toJson(includeLocal: includeLocal));
-    }
-    */
     return data;
   }
 
   @override
   String header() {
-    return "${product!.brand!.name} - ${product!.detail} - ${product!.size}";
+    return "${product!.detail}/${product!.size}/$color";
   }
 
   @override

@@ -46,12 +46,7 @@ class Product extends MyModel {
     data[attributeSize] = size;
     data[attributePrice] = price;
     data[attributeMOQ] = moq;
-    /*
-    if (includeLocal) {
-      data[attributeBrand] =
-          jsonEncode(brand!.toJson(includeLocal: includeLocal));
-    }
-    */
+    data[attributeKinds] = kindsFromList(kinds);
     return data;
   }
 
@@ -71,10 +66,23 @@ class Product extends MyModel {
   }
 
   @override
+  String? defaultNextPage() {
+    return PageNames.kinds;
+  }
+
+  @override
+  List<MyModel>? subList() {
+    return kinds;
+  }
+
+  @override
   String toString() {
     return detail!;
   }
 
   static List<Product> productsFromJson(dynamic str, Brand brand) =>
       List<Product>.from((str).map((x) => Product(brand: brand).fromJson(x)));
+
+  static List<dynamic> kindsFromList(List<Kind> items) =>
+      List<dynamic>.from((items).map((x) => x.toJson()));
 }

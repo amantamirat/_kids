@@ -55,6 +55,16 @@ class Brand extends MyModel {
   }
 
   @override
+  String? defaultNextPage() {
+    return PageNames.products;
+  }
+
+  @override
+  List<MyModel>? subList() {
+    return products;
+  }
+
+  @override
   String toString() {
     return name!;
   }

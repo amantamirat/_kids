@@ -60,6 +60,7 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: TextField(
               controller: _emailController,
+              keyboardType: TextInputType.emailAddress,
               decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Email',
@@ -100,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                           if (snapshot.hasData) {
                             _login(snapshot.data!);
                             return const Text(
-                              "Sucess",
+                              "Welcome!",
                             );
                           }
                           return Text(

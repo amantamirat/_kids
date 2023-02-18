@@ -2,6 +2,7 @@ import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/pages/user/order_list.dart';
 import 'package:abdu_kids/pages/util/delete_dialog.dart';
 import 'package:abdu_kids/services/user_service.dart';
+import 'package:abdu_kids/util/extra_wrapper.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,7 +10,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:abdu_kids/util/constants.dart';
 
 class UserList extends StatefulWidget {
-  const UserList({Key? key}) : super(key: key);
+  final User? loggedInUser;
+  const UserList({Key? key, this.loggedInUser}) : super(key: key);
   @override
   State<UserList> createState() => _UserList();
 }
@@ -125,7 +127,8 @@ class _UserList extends State<UserList> {
                       GestureDetector(
                         child: const Icon(Icons.edit),
                         onTap: () {
-                          context.pushNamed(PageNames.editProfile, extra: user);
+                          context.pushNamed(PageNames.editProfile,
+                              extra: ExtraWrapper(widget.loggedInUser, user));
                         },
                       ),
                       GestureDetector(
@@ -136,8 +139,10 @@ class _UserList extends State<UserList> {
                         onTap: () async {
                           int? result = await showDialog<int>(
                               context: context,
-                              builder: (BuildContext context) =>
-                                  DeleteDialog(model: user));
+                              builder: (BuildContext context) => DeleteDialog(
+                                    wrapper:
+                                        ExtraWrapper(widget.loggedInUser, user),
+                                  ));
                           if (result == 0) {
                             setState(() {
                               userList.remove(user);

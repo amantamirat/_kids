@@ -43,6 +43,7 @@ class User extends MyModel {
   late String? token = "";
   late String? verificationCode = "";
   late List<Order>? orders;
+  late bool isAdmin;
 
   @override
   User fromJson(Map<String, dynamic> json) {
@@ -72,6 +73,8 @@ class User extends MyModel {
     if (json[attributeOrders] != null) {
       orders = Order.ordersFromJson(json[attributeOrders]);
     }
+
+    isAdmin = role == Role.administrator;
 
     return this;
   }

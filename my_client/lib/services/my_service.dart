@@ -4,6 +4,7 @@ import 'package:abdu_kids/model/kind.dart';
 import 'package:abdu_kids/model/my_model.dart';
 import 'package:abdu_kids/model/product.dart';
 import 'package:abdu_kids/model/type.dart';
+import 'package:abdu_kids/model/user.dart';
 import 'package:abdu_kids/model/util/cart_item.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:http/http.dart' as http;
@@ -31,21 +32,23 @@ class MyService {
     }
   }
 
-  static Future<bool> saveItem(MyModel myModel, bool isEditMode) async {
+  static Future<bool> save(
+      MyModel myModel, User loggedinUser, bool isEditMode) async {
     String url = "${Constants.apiURL()}${myModel.basePath()}";
+    dynamic headers = Constants.prepareHeaders(loggedinUser.token!);
     var response = http.Response("{}", 404);
     if (isEditMode) {
       url = "$url${Constants.updatePath}${myModel.paramsPath()}/${myModel.id}";
       response = await http.patch(
         Uri.parse(url),
-        headers: Constants.requestHeaders,
+        headers: headers,
         body: jsonEncode(myModel.toJson()),
       );
     } else {
       url = "$url${Constants.newPath}${myModel.paramsPath()}";
       response = await http.post(
         Uri.parse(url),
-        headers: Constants.requestHeaders,
+        headers: headers,
         body: jsonEncode(myModel.toJson(includeId: false)),
       );
     }
@@ -59,12 +62,12 @@ class MyService {
     return true;
   }
 
-  static Future<bool> deleteModel(MyModel myModel) async {
+  static Future<bool> deleteModel(MyModel myModel, User loggedinUser) async {
     String url =
         "${Constants.apiURL()}${myModel.basePath()}${Constants.deletePath}${myModel.paramsPath()}/${myModel.id}";
     var response = await client.delete(
       Uri.parse(url),
-      headers: Constants.requestHeaders,
+      headers: Constants.prepareHeaders(loggedinUser.token!),
     );
     return response.statusCode == 204;
   }

@@ -1,21 +1,12 @@
-import 'package:abdu_kids/model/brand.dart';
-import 'package:abdu_kids/model/category.dart';
-import 'package:abdu_kids/model/kind.dart';
-import 'package:abdu_kids/model/my_model.dart';
-import 'package:abdu_kids/model/product.dart';
-import 'package:abdu_kids/model/type.dart';
 import 'package:abdu_kids/model/user.dart';
-import 'package:abdu_kids/pages/brands/brand_list.dart';
-import 'package:abdu_kids/pages/brands/brand_merge.dart';
-import 'package:abdu_kids/pages/categories/category_list.dart';
-import 'package:abdu_kids/pages/categories/category_merge.dart';
-import 'package:abdu_kids/pages/categories/dashboard.dart';
-import 'package:abdu_kids/pages/kinds/kind_list.dart';
-import 'package:abdu_kids/pages/kinds/kind_merge.dart';
-import 'package:abdu_kids/pages/products/product_list.dart';
-import 'package:abdu_kids/pages/products/product_merge.dart';
-import 'package:abdu_kids/pages/types/type_list.dart';
-import 'package:abdu_kids/pages/types/type_merge.dart';
+import 'package:abdu_kids/pages/brands/merge_brand.dart';
+import 'package:abdu_kids/pages/categories/merge_category.dart';
+import 'package:abdu_kids/pages/kinds/merge_kind.dart';
+import 'package:abdu_kids/pages/kinds/view_kinds.dart';
+import 'package:abdu_kids/pages/my_dashboard.dart';
+import 'package:abdu_kids/pages/my_grid_page.dart';
+import 'package:abdu_kids/pages/products/merge_product.dart';
+import 'package:abdu_kids/pages/types/merge_type.dart';
 import 'package:abdu_kids/pages/user/change_password.dart';
 import 'package:abdu_kids/pages/user/order_list.dart';
 import 'package:abdu_kids/pages/user/verify_account.dart';
@@ -25,10 +16,9 @@ import 'package:abdu_kids/pages/user/register_user.dart';
 import 'package:abdu_kids/pages/user/user_list.dart';
 import 'package:abdu_kids/pages/util/image_uloader.dart';
 import 'package:abdu_kids/pages/util/shoping_cart.dart';
-import 'package:abdu_kids/services/my_service.dart';
 import 'package:abdu_kids/services/database_util.dart';
-import 'package:abdu_kids/services/user_service.dart';
 import 'package:abdu_kids/util/constants.dart';
+import 'package:abdu_kids/util/extra_wrapper.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:abdu_kids/services/preference_util.dart';
 import 'package:flutter/material.dart';
@@ -47,114 +37,55 @@ void main() async {
 final GoRouter _router = GoRouter(
   routes: <RouteBase>[
     GoRoute(
-      path: '/',
-      name: PageNames.home,
-      builder: (BuildContext context, GoRouterState state) {
-        return const Home();
-      },
-      routes: <RouteBase>[
-        GoRoute(
-            path: 'categories/types',
-            name: PageNames.types,
+        path: '/',
+        name: PageNames.home,
+        builder: (BuildContext context, GoRouterState state) {
+          return const Home();
+        },
+        routes: <RouteBase>[
+          GoRoute(
+            path: PageNames.mergeCategory,
+            name: PageNames.mergeCategory,
             builder: (context, state) {
-              return TypeList(selectedCategory: state.extra as Category);
+              return MergeCategory(wrapper: state.extra as ExtraWrapper);
             },
-            routes: <RouteBase>[
-              GoRoute(
-                  path: PageNames.brands,
-                  name: PageNames.brands,
-                  builder: (context, state) =>
-                      BrandList(selectedType: state.extra as ClothingType),
-                  routes: <RouteBase>[
-                    GoRoute(
-                        path: PageNames.products,
-                        name: PageNames.products,
-                        builder: (context, state) =>
-                            ProductList(selectedModel: state.extra as MyModel),
-                        routes: <RouteBase>[
-                          GoRoute(
-                              path: PageNames.kinds,
-                              name: PageNames.kinds,
-                              builder: (context, state) {
-                                if (state.extra is Kind) {
-                                  final kind = state.extra as Kind;
-                                  return KindList(
-                                    selectedProduct: kind.product!,
-                                    selectedKind: kind,
-                                  );
-                                }
-                                return KindList(
-                                    selectedProduct: state.extra as Product);
-                              },
-                              routes: <RouteBase>[
-                                GoRoute(
-                                  path: PageNames.addKind,
-                                  name: PageNames.addKind,
-                                  builder: (context, state) => KindMerge(
-                                      editMode: false,
-                                      selectedKind: state.extra as Kind),
-                                ),
-                                GoRoute(
-                                  path: PageNames.editKind,
-                                  name: PageNames.editKind,
-                                  builder: (context, state) => KindMerge(
-                                      editMode: true,
-                                      selectedKind: state.extra as Kind),
-                                ),
-                              ]),
-                          GoRoute(
-                            path: PageNames.addProduct,
-                            name: PageNames.addProduct,
-                            builder: (context, state) => ProductMerge(
-                                editMode: false,
-                                selectedProduct: state.extra as Product),
-                          ),
-                          GoRoute(
-                            path: PageNames.editProduct,
-                            name: PageNames.editProduct,
-                            builder: (context, state) => ProductMerge(
-                                editMode: true,
-                                selectedProduct: state.extra as Product),
-                          )
-                        ]),
-                    GoRoute(
-                      path: PageNames.addBrand,
-                      name: PageNames.addBrand,
-                      builder: (context, state) => BrandMerge(
-                          editMode: false, selectedBrand: state.extra as Brand),
-                    ),
-                    GoRoute(
-                      path: PageNames.editBrand,
-                      name: PageNames.editBrand,
-                      builder: (context, state) => BrandMerge(
-                          editMode: true, selectedBrand: state.extra as Brand),
-                    ),
-                  ]),
-              GoRoute(
-                path: PageNames.addType,
-                name: PageNames.addType,
-                builder: (context, state) => TypeMerge(
-                    editMode: false, selectedType: state.extra as ClothingType),
-              ),
-              GoRoute(
-                path: PageNames.editType,
-                name: PageNames.editType,
-                builder: (context, state) => TypeMerge(
-                    editMode: true, selectedType: state.extra as ClothingType),
-              ),
-            ]),
-        GoRoute(
-          path: 'categories/merge_category',
-          name: PageNames.editCategory,
-          pageBuilder: (context, state) {
-            return MaterialPage<int>(
-              key: state.pageKey,
-              child: CategoryMerge(
-                  editMode: true, selectedCategory: state.extra as Category),
-            );
-          },
-        ),
-      ],
+          ),
+          GoRoute(
+            path: PageNames.mergeType,
+            name: PageNames.mergeType,
+            builder: (context, state) =>
+                MergeType(wrapper: state.extra as ExtraWrapper),
+          ),
+          GoRoute(
+            path: PageNames.mergeBrand,
+            name: PageNames.mergeBrand,
+            builder: (context, state) =>
+                MergeBrand(wrapper: state.extra as ExtraWrapper),
+          ),
+          GoRoute(
+            path: PageNames.mergeProduct,
+            name: PageNames.mergeProduct,
+            builder: (context, state) =>
+                MergeProduct(wrapper: state.extra as ExtraWrapper),
+          ),
+          GoRoute(
+            path: PageNames.mergeKind,
+            name: PageNames.mergeKind,
+            builder: (context, state) =>
+                MergeKind(wrapper: state.extra as ExtraWrapper),
+          ),
+        ]),
+    GoRoute(
+      path: '/${PageNames.viewKinds}',
+      name: PageNames.viewKinds,
+      builder: (context, state) =>
+          ViewKinds(wrapper: state.extra as ExtraWrapper),
+    ),
+    GoRoute(
+      path: '/${PageNames.myGridPage}',
+      name: PageNames.myGridPage,
+      builder: (context, state) =>
+          MyGridPage(wrapper: state.extra as ExtraWrapper),
     ),
     GoRoute(
       path: '/${PageNames.login}',
@@ -176,7 +107,7 @@ final GoRouter _router = GoRouter(
       path: '/${PageNames.editProfile}',
       name: PageNames.editProfile,
       builder: (context, state) =>
-          EditProfile(loggedInUser: state.extra as User),
+          EditProfile(wrapper: state.extra as ExtraWrapper),
     ),
     GoRoute(
       path: '/${PageNames.changePassword}',
@@ -185,16 +116,12 @@ final GoRouter _router = GoRouter(
           ChangePassword(selectedUser: state.extra as User),
     ),
     GoRoute(
-      path: '/${PageNames.categories}',
-      name: PageNames.categories,
-      builder: (context, state) =>
-          CategoryList(categories: MyService.myRootData!),
-    ),
-    GoRoute(
       path: '/${PageNames.users}',
       name: PageNames.users,
       builder: (context, state) {
-        return const UserList();
+        return UserList(
+          loggedInUser: state.extra as User,
+        );
       },
     ),
     GoRoute(
@@ -270,7 +197,7 @@ class _Home extends State<Home> {
                 child: CircularProgressIndicator(),
               );
             default:
-              if (snapshot.hasError) {                
+              if (snapshot.hasError) {
                 return Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -280,9 +207,7 @@ class _Home extends State<Home> {
                   ),
                 );
               } else {
-                //return CategoryList(categories: snapshot.data!);
-                //check the user data
-                return Dashboard(
+                return MyDashboard(
                     loggedInUser: snapshot.hasData
                         ? User().fromJson(snapshot.data)
                         : null);

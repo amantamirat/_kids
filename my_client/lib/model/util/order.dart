@@ -51,6 +51,11 @@ class Order extends MyModel {
     return "";
   }
 
+  @override
+  String? defaultNextPage() {
+    return null;
+  }
+
   static List<Order> ordersFromJson(dynamic str) =>
       List<Order>.from((str).map((x) => Order().fromJson(x)));
 }

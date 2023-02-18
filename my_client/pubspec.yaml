@@ -50,6 +50,7 @@ dependencies:
   path: ^1.8.2
   flutter_session_manager: ^1.0.3
   email_validator: ^2.1.17
+  chapasdk: ^0.0.5
 
 dev_dependencies:
   flutter_test:

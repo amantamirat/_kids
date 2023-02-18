@@ -3,26 +3,20 @@ import 'package:abdu_kids/model/type.dart';
 import 'package:abdu_kids/util/page_names.dart';
 
 class Category extends MyModel {
-  //static const String path = "/categories";
   static const String attributeTitle = 'title';
   static const String attributeDescription = 'description';
   static const String attributeClothingTypes = 'clothing_types';
   late String? title;
   late String? description;
-
   List<ClothingType> clothingTypes = List.empty(growable: true);
-
   Category({this.title, this.description});
-
   @override
   Category fromJson(Map<String, dynamic> json) {
     id = json[MyModel.attributeId];
     title = json[attributeTitle];
     description = json[attributeDescription];
-    //if (json.containsKey(attributeClothingTypes)) {
     clothingTypes =
         ClothingType.clothingTypesFromJson(json[attributeClothingTypes], this);
-    //}
     return this;
   }
 
@@ -52,6 +46,16 @@ class Category extends MyModel {
   @override
   String paramsPath() {
     return "";
+  }
+
+  @override
+  String? defaultNextPage() {
+    return PageNames.types;
+  }
+
+  @override
+  List<MyModel>? subList() {
+    return clothingTypes;
   }
 
   @override

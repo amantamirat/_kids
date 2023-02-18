@@ -3,6 +3,7 @@ import 'package:abdu_kids/model/util/cart_item.dart';
 import 'package:abdu_kids/services/user_service.dart';
 import 'package:abdu_kids/util/constants.dart';
 import 'package:abdu_kids/services/database_util.dart';
+import 'package:abdu_kids/util/extra_wrapper.dart';
 import 'package:abdu_kids/util/page_names.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +19,9 @@ class ShoppingCart extends StatefulWidget {
 
 class _ShoppingCart extends State<ShoppingCart> {
   late Future<List<CartItem>?> _myFuture;
-  //late List<CartItem>? myList;
   late num _totalPrice;
   late bool _isUserLoggedIn;
+  Future<String>? _placeOrderMessage;
   @override
   void initState() {
     super.initState();
@@ -59,7 +60,7 @@ class _ShoppingCart extends State<ShoppingCart> {
                 ),
               );
             } else {
-              if (snapshot.hasData) {
+              if (snapshot.hasData) {                
                 _updateTotalPrice(snapshot.data!);
               }
 
@@ -137,7 +138,9 @@ class _ShoppingCart extends State<ShoppingCart> {
                 ),
               ),
               onTap: () {
-                context.pushNamed(PageNames.kinds, extra: item.selectedKind);
+                context.pushNamed(PageNames.viewKinds,
+                    extra:
+                        ExtraWrapper(widget.loggedInUser, item.selectedKind));
               },
               trailing: SizedBox(
                 width: 120,
@@ -179,40 +182,67 @@ class _ShoppingCart extends State<ShoppingCart> {
       color: Colors.yellow.shade600,
       alignment: Alignment.center,
       height: 60.0,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          Text(
-            "Total Price: $_totalPrice",
-            style: const TextStyle(
-              fontSize: 16.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          ElevatedButton(
-            child: const Text(
-              'Proceed to Pay',
-              style: TextStyle(
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            onPressed: () async {
-              if (myList.isEmpty) {
-                return;
+      child: Column(
+        children: [
+          FutureBuilder(
+            future: _placeOrderMessage,
+            builder: (
+              BuildContext context,
+              AsyncSnapshot<String?> snapshot,
+            ) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                  return const CircularProgressIndicator();
+                default:
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Error: ${snapshot.error}'),
+                    );
+                  } else {
+                    if (snapshot.hasData) {
+                      return Text(snapshot.data!,
+                          style: const TextStyle(color: Colors.red));
+                    }
+                    return Container();
+                  }
               }
-              if (!_isUserLoggedIn) {
-                GoRouter.of(context).pushNamed(PageNames.login);
-                return;
-              }
-              bool ordered =
-                  await UserService.placeOrders(widget.loggedInUser!, myList);
-              if (!ordered) {
-                //show error message and
-              }
-              //add to local ordered database,
             },
-          )
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: <Widget>[
+              Text(
+                "Total Price: $_totalPrice",
+                style: const TextStyle(
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              ElevatedButton(
+                child: const Text(
+                  'Proceed to Pay',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                onPressed: () async {
+                  if (myList.isEmpty) {
+                    return;
+                  }
+                  if (!_isUserLoggedIn) {
+                    GoRouter.of(context).pushNamed(PageNames.login);
+                    return;
+                  }
+                  setState(() {
+                    _placeOrderMessage =
+                        UserService.placeOrders(widget.loggedInUser!, myList);
+                  });
+                  //add to local ordered database,
+                },
+              )
+            ],
+          ),
         ],
       ),
     );

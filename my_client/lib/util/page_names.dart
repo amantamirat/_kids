@@ -1,19 +1,15 @@
 class PageNames {
   static const String home = "home";
   static const String categories = "categories";
-  static const String editCategory = "edit_category";
+  static const String mergeCategory = "merge_category";  
   static const String types = "types";
-  static const String addType = "add_type";
-  static const String editType = "edit_type";
+  static const String mergeType = "merge_type";
   static const String brands = "brands";
-  static const String addBrand = "add_brand";
-  static const String editBrand = "edit_brand";
+  static const String mergeBrand = "merge_brand";
   static const String products = "products";
-  static const String addProduct = "add_product";
-  static const String editProduct = "edit_product";
+  static const String mergeProduct = "merge_product";
   static const String kinds = "kinds";
-  static const String addKind = "add_kind";
-  static const String editKind = "edit_kind";
+  static const String mergeKind = "merge_kind";
   static const String users = "users";
   static const String register = "register";
   static const String login = "login";
@@ -23,4 +19,6 @@ class PageNames {
   static const String settings = "settings";
   static const String myShoppingCart = "my_shopping_cart";
   static const String myOrderList = "my_order_list";
+  static const String myGridPage = "grid_page";
+  static const String viewKinds = "view_kinds";
 }

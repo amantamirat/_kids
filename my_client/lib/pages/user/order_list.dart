@@ -24,7 +24,7 @@ class _MyOrderList extends State<MyOrderList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Orders of ${widget.loggedInUser.email}")),
+      appBar: AppBar(title: Text("${widget.loggedInUser.email} Orders")),
       body: FutureBuilder(
         future: _myFuture,
         builder: (
